@@ -34,6 +34,8 @@ Again, under the GITFLOW tab, first press `Feature - Rebase` to ensure you are o
 
 ![Rebase the repo](docs/img/rebase.png)
 
+> WARNING: always rebase from dev, main might be outdated!
+
 Once rebased, you can finish your version and merge it to dev by clicking on `Feature - Finish`.
 
 ![Finish a feature](docs/img/finish.png)
