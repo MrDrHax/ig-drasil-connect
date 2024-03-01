@@ -18,4 +18,4 @@ source connectEnv/bin/activate
 pip install --upgrade pip
 
 # Install the dependencies
-#pip install -r requirements.txt
+pip install -r requirements.txt
