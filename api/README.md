@@ -25,9 +25,9 @@ Each app has the following files:
 ## Setup
 
 1. Clone the repository.
-2. Run the setup.sh script to set up the Python virtual environment and install dependencies.
+2. Run the `setup.sh` script to set up the Python virtual environment and install dependencies.
 3. For developing, clone the .example.env file and name it as .dev.env
-4. Run the application with `uvcorn main.py`.
+4. Run the application with `./rundev.sh`.
 
 ## Usage
 
