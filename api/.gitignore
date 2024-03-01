@@ -1,0 +1,8 @@
+connectEnv/
+
+*__pycache__/
+*.pyc
+
+.dev.env
+.env
+
