@@ -8,3 +8,8 @@ class Extra(BaseModel):
 
 # If there are no models for the 'extras' app, this file can be left blank.
 # This is intentionally left blank.
+    
+class Token(BaseModel):
+    token: str
+    refresh: str
+    deviceID: str
