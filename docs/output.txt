@@ -1,0 +1,1172 @@
+(get) Read Root
+'/'
+Responses:
+200: Successful Response
+Response models:
+(application/json)
+{}
+
+
+(get) Check Agent Availability
+'/actions/agent-availability'
+Description: Verifies the availability of agents in Amazon Connect.
+
+@return 
+    List containing the availability status of agents.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "items": {
+        "type": "object"
+    },
+    "title": "Response Check Agent Availability Actions Agent Availability Get",
+    "type": "array"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Call Details
+'/actions/calls-details/{call_id}'
+Description: Get details of a call in Amazon Connect.
+
+@param call_id: ID of the call to get details for.
+
+@return: Details of the specified call.
+Responses:
+200: Success
+Response models:
+(application/json)
+{}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(post) Create Contact
+'/actions/create-contact'
+Description: Create a contact in Amazon Connect.
+
+@param contact_name: Name of the contact.
+@param phone_number: Phone number of the contact.
+
+@return: Details of the created contact.
+Responses:
+200: Success
+Response models:
+(application/json)
+{}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(post) End Call
+'/actions/end-call'
+Description: end of a phone call in Amazon Connect.
+
+@param call_id: ID of the call that has ended.
+
+@return: Confirmation message of the call ending.
+Responses:
+200: Success
+Response models:
+(application/json)
+{}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(post) Start Call
+'/actions/start-call'
+Description: start of a phone call in Amazon Connect.
+
+@param phone_number: Phone number to call.
+
+@return: Confirmation message of the call starting.
+Responses:
+200: Success
+Response models:
+(application/json)
+{}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Angry Calls
+'/dashboard/data/angry'
+Description: Returns the number of ongoing calls that have been flagged as having an angry client.
+
+To get the full list, go to /lists/angry
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Angry Calls Dashboard Data Angry Get",
+    "type": "integer"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Ongoing Call Data
+'/dashboard/data/calls'
+Description: Returns data about agents connected, and in breaks, to see how many agents are available for calls.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "agents": {
+            "default": 0,
+            "examples": [
+                5,
+                10,
+                15
+            ],
+            "title": "Agents",
+            "type": "integer"
+        },
+        "agents_in_break": {
+            "default": 0,
+            "examples": [
+                2,
+                4,
+                6
+            ],
+            "title": "Agents In Break",
+            "type": "integer"
+        },
+        "costumers": {
+            "default": 0,
+            "examples": [
+                10,
+                20,
+                30
+            ],
+            "title": "Costumers",
+            "type": "integer"
+        },
+        "rating": {
+            "default": 0,
+            "examples": [
+                4.5,
+                3.5,
+                5.0
+            ],
+            "title": "Rating",
+            "type": "number"
+        }
+    },
+    "title": "OngoingCallData",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Lex Users
+'/dashboard/data/lex_users'
+Description: Returns the number of users using the Lex service.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Lex Users Dashboard Data Lex Users Get",
+    "type": "integer"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Reconnected Calls
+'/dashboard/data/reconnected'
+Description: Returns the number of ongoing calls that were reconnected.
+
+To get the full list, go to /lists/reconnected
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Reconnected Calls Dashboard Data Reconnected Get",
+    "type": "integer"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Connection Status Graph
+'/dashboard/graph/connection_status'
+Description: Returns a pie graph of the connection status of the queues.
+
+Sum will always be 100.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "examples": [
+                [
+                    20,
+                    30,
+                    50
+                ],
+                [
+                    100,
+                    120,
+                    20
+                ]
+            ],
+            "items": {
+                "type": "number"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "labels": {
+            "default": [],
+            "examples": [
+                [
+                    "Starting call",
+                    "Queue",
+                    "Agent"
+                ],
+                [
+                    "Finance",
+                    "Support",
+                    "Sales"
+                ]
+            ],
+            "items": {
+                "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+        }
+    },
+    "title": "UsageGraph",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Usage Graph
+'/dashboard/graph/usage'
+Description: Returns a graph of what queues is being used and capacity of each queue.
+
+100 means the queue is full, 0 means the queue is empty.
+Anything over a 100 is considered an overflow. (waiting users)
+
+Will not consider the number of agents in break or disconnected.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "examples": [
+                [
+                    20,
+                    30,
+                    50
+                ],
+                [
+                    100,
+                    120,
+                    20
+                ]
+            ],
+            "items": {
+                "type": "number"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "labels": {
+            "default": [],
+            "examples": [
+                [
+                    "Starting call",
+                    "Queue",
+                    "Agent"
+                ],
+                [
+                    "Finance",
+                    "Support",
+                    "Sales"
+                ]
+            ],
+            "items": {
+                "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+        }
+    },
+    "title": "UsageGraph",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Agentid
+'/extras/agentID'
+Description: Returns the agentID of the user.
+Works only for logged in users.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Agentid Extras Agentid Get",
+    "type": "string"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Ai Sentiment
+'/extras/AI/sentiment/{callID}'
+Description: Returns the sentiment of the call, generated by AI.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Ai Sentiment Extras Ai Sentiment  Callid  Get",
+    "type": "string"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Ai Summary
+'/extras/AI/summary/{callID}'
+Description: Returns a summary of the call, generated by AI.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Ai Summary Extras Ai Summary  Callid  Get",
+    "type": "string"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Ai Transcript
+'/extras/AI/transcript/{callID}'
+Description: Returns a transcript of the call, generated by AI.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Ai Transcript Extras Ai Transcript  Callid  Get",
+    "type": "string"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Iam
+'/extras/IAM'
+Description: Returns the IAM link.
+Starts the IAM oauth process.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Get Iam Extras Iam Get",
+    "type": "string"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Iam Callback
+'/extras/IAM/callback'
+Description: Returns the IAM token.
+Finishes the IAM oauth process.
+
+Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "deviceID": {
+            "title": "Deviceid",
+            "type": "string"
+        },
+        "refresh": {
+            "title": "Refresh",
+            "type": "string"
+        },
+        "token": {
+            "title": "Token",
+            "type": "string"
+        }
+    },
+    "required": [
+        "token",
+        "refresh",
+        "deviceID"
+    ],
+    "title": "Token",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Iam Refresh
+'/extras/IAM/refresh'
+Description: Returns the refreshed IAM token.
+
+Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "deviceID": {
+            "title": "Deviceid",
+            "type": "string"
+        },
+        "refresh": {
+            "title": "Refresh",
+            "type": "string"
+        },
+        "token": {
+            "title": "Token",
+            "type": "string"
+        }
+    },
+    "required": [
+        "token",
+        "refresh",
+        "deviceID"
+    ],
+    "title": "Token",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Lex
+'/extras/lex/QA'
+Description: Returns questions to ask when the user is using the Lex QA service.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "items": {
+        "type": "string"
+    },
+    "title": "Response Get Lex Extras Lex Qa Get",
+    "type": "array"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(post) Post Lex
+'/extras/lex/QA'
+Description: Processes the QA answers from the user.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Post Lex Extras Lex Qa Post",
+    "type": "string"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(post) Route Call
+'/extras/route/{callID}/{agentID}'
+Description: Routes a call to a specific agent.
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "title": "Response Route Call Extras Route  Callid   Agentid  Post",
+    "type": "string"
+}
+202: Accepted, request is being processed. Continue on the connect app.
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Agents
+'/lists/agents'
+Description: Returns a list of all available agents (even on break).
+
+To see details, go to summary/agents/{agentID}
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "description": "The contents of the list.",
+            "example": [
+                {
+                    "agentID": "a",
+                    "calls": 5,
+                    "name": "Ron",
+                    "rating": 4.5,
+                    "status": "Available"
+                }
+            ],
+            "items": {
+                "$ref": "#/components/schemas/AgentsDataListItem"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "pagination": {
+            "default": "-",
+            "description": "The pagination of the list. Format: min-max/total",
+            "example": "0-100/200",
+            "title": "Pagination",
+            "type": "string"
+        }
+    },
+    "title": "AgentsDataList",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Angry Calls
+'/lists/angry'
+Description: Returns a list of all calls that have clients angry, shouting or treating the operator badly.
+
+To see details, go to summary/calls/{callID}
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "description": "The data to be displayed in the list.",
+            "example": [
+                {
+                    "agent": "Ron (support)",
+                    "callID": 1,
+                    "ended": "2021-07-26T14:30:00",
+                    "name": "John",
+                    "rating": 4.5,
+                    "started": "2021-07-26T14:00:00"
+                }
+            ],
+            "items": {
+                "$ref": "#/components/schemas/ListItem"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "description": {
+            "default": "No description",
+            "description": "The description of the list.",
+            "example": "Calls that were reconnected within the last hour.",
+            "title": "Description",
+            "type": "string"
+        },
+        "name": {
+            "default": "No name",
+            "description": "The name of the list.",
+            "example": "Reconnected calls",
+            "title": "Name",
+            "type": "string"
+        },
+        "pagination": {
+            "default": "-",
+            "description": "The pagination of the list. Format: min-max/total",
+            "example": "0-100/200",
+            "title": "Pagination",
+            "type": "string"
+        }
+    },
+    "title": "ListData",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Calls
+'/lists/calls'
+Description: Returns a list of all ongoing calls.
+
+To see details, go to summary/calls/{callID}
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "description": "The data to be displayed in the list.",
+            "example": [
+                {
+                    "agent": "Ron (support)",
+                    "callID": 1,
+                    "ended": "2021-07-26T14:30:00",
+                    "name": "John",
+                    "rating": 4.5,
+                    "started": "2021-07-26T14:00:00"
+                }
+            ],
+            "items": {
+                "$ref": "#/components/schemas/ListItem"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "description": {
+            "default": "No description",
+            "description": "The description of the list.",
+            "example": "Calls that were reconnected within the last hour.",
+            "title": "Description",
+            "type": "string"
+        },
+        "name": {
+            "default": "No name",
+            "description": "The name of the list.",
+            "example": "Reconnected calls",
+            "title": "Name",
+            "type": "string"
+        },
+        "pagination": {
+            "default": "-",
+            "description": "The pagination of the list. Format: min-max/total",
+            "example": "0-100/200",
+            "title": "Pagination",
+            "type": "string"
+        }
+    },
+    "title": "ListData",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Queues
+'/lists/queues'
+Description: Returns a list of all available queues.
+
+To see details, go to summary/queues/{queueID}
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "description": "The contents of the list.",
+            "example": [
+                {
+                    "enabled": true,
+                    "maxContacts": 10,
+                    "name": "Support",
+                    "queueID": "a",
+                    "usage": 5
+                }
+            ],
+            "items": {
+                "$ref": "#/components/schemas/QueueDataListItem"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "pagination": {
+            "default": "-",
+            "description": "The pagination of the list. Format: min-max/total",
+            "example": "0-100/200",
+            "title": "Pagination",
+            "type": "string"
+        }
+    },
+    "title": "QueueDataList",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Get Reconnected Calls
+'/lists/reconnected'
+Description: Returns a list of all calls that were reconnected within the last hour.
+
+To see details, go to summary/calls/{callID}
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "data": {
+            "default": [],
+            "description": "The data to be displayed in the list.",
+            "example": [
+                {
+                    "agent": "Ron (support)",
+                    "callID": 1,
+                    "ended": "2021-07-26T14:30:00",
+                    "name": "John",
+                    "rating": 4.5,
+                    "started": "2021-07-26T14:00:00"
+                }
+            ],
+            "items": {
+                "$ref": "#/components/schemas/ListItem"
+            },
+            "title": "Data",
+            "type": "array"
+        },
+        "description": {
+            "default": "No description",
+            "description": "The description of the list.",
+            "example": "Calls that were reconnected within the last hour.",
+            "title": "Description",
+            "type": "string"
+        },
+        "name": {
+            "default": "No name",
+            "description": "The name of the list.",
+            "example": "Reconnected calls",
+            "title": "Name",
+            "type": "string"
+        },
+        "pagination": {
+            "default": "-",
+            "description": "The pagination of the list. Format: min-max/total",
+            "example": "0-100/200",
+            "title": "Pagination",
+            "type": "string"
+        }
+    },
+    "title": "ListData",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
+(get) Read Summary
+'/summaries/'
+Responses:
+200: Success
+Response models:
+(application/json)
+{
+    "properties": {
+        "content": {
+            "title": "Content",
+            "type": "string"
+        },
+        "id": {
+            "title": "Id",
+            "type": "integer"
+        },
+        "title": {
+            "title": "Title",
+            "type": "string"
+        }
+    },
+    "required": [
+        "id",
+        "title",
+        "content"
+    ],
+    "title": "Summary",
+    "type": "object"
+}
+400: Bad request, parameters are missing or invalid
+401: Unauthorized. The request was not authorized.
+404: Not found
+422: Validation Error
+Response models:
+(application/json)
+{
+    "properties": {
+        "detail": {
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+        }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+}
+500: Internal server error, unknown error occurred.
+503: Service unavailable. Amazon Connect did not respond.
+
+
