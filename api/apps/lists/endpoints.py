@@ -92,3 +92,17 @@ async def get_agents(qpams: Annotated[QueryParams, Depends()]) -> models.AgentsD
             models.AgentsDataListItem(agentID="b", name="Jane", status="Available", calls=5, rating=4.5), 
             models.AgentsDataListItem(agentID="c", name="John", status="Available", calls=5, rating=4.5), 
             models.AgentsDataListItem(agentID="d", name="Ron", status="Available", calls=5, rating=4.5)])
+
+@router.get("/rerouted", tags=["calls"])
+async def get_rerouted_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:
+    '''
+    Returns a list of all calls that have been rerouted more than 3 times.
+
+    To see details, go to summary/calls/{callID}
+    '''
+
+    return models.ListData(name="Rerouted calls", description="Calls that have been rerouted more than 3 times.", 
+                           data=[models.ListItem(callID=1, name="John", agent="Ron (support)", started="2021-07-26T14:00:00", ended="2021-07-26T14:30:00", rating=4.5), 
+                                 models.ListItem(callID=2, name="Jane", agent="Ron (support)", started="2021-07-26T14:00:00", ended=None, rating=4.5), 
+                                 models.ListItem(callID=3, name="John", agent="Ron (support)", started="2021-07-26T14:00:00", ended="2021-07-26T14:30:00", rating=4.5)],
+                           pagination="1-3/3")

@@ -1,0 +1,646 @@
+Schema: AgentsDataList
+{
+ "properties": {
+  "data": {
+   "default": [],
+   "description": "The contents of the list.",
+   "example": [
+    {
+     "agentID": "a",
+     "calls": 5,
+     "name": "Ron",
+     "rating": 4.5,
+     "status": "Available"
+    }
+   ],
+   "items": [
+    {
+     "properties": {
+      "agentID": {
+       "default": "0",
+       "description": "The id of the item. Use this to get the summary",
+       "examples": [
+        "a",
+        "b",
+        "c"
+       ],
+       "title": "Agentid",
+       "type": "string"
+      },
+      "calls": {
+       "default": 0,
+       "description": "The amount of calls the agent has taken today.",
+       "example": 5,
+       "title": "Calls",
+       "type": "integer"
+      },
+      "name": {
+       "default": "No name",
+       "description": "The name of the agent.",
+       "example": "Ron",
+       "title": "Name",
+       "type": "string"
+      },
+      "rating": {
+       "default": 0,
+       "description": "The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going",
+       "example": 4.5,
+       "title": "Rating",
+       "type": "number"
+      },
+      "status": {
+       "default": "No status",
+       "description": "The current status of the agent.",
+       "example": "Available",
+       "title": "Status",
+       "type": "string"
+      }
+     },
+     "title": "AgentsDataListItem",
+     "type": "object"
+    }
+   ],
+   "title": "Data",
+   "type": "array"
+  },
+  "pagination": {
+   "default": "-",
+   "description": "The pagination of the list. Format: min-max/total",
+   "example": "0-100/200",
+   "title": "Pagination",
+   "type": "string"
+  }
+ },
+ "title": "AgentsDataList",
+ "type": "object"
+}
+Schema: AgentsDataListItem
+{
+ "properties": {
+  "agentID": {
+   "default": "0",
+   "description": "The id of the item. Use this to get the summary",
+   "examples": [
+    "a",
+    "b",
+    "c"
+   ],
+   "title": "Agentid",
+   "type": "string"
+  },
+  "calls": {
+   "default": 0,
+   "description": "The amount of calls the agent has taken today.",
+   "example": 5,
+   "title": "Calls",
+   "type": "integer"
+  },
+  "name": {
+   "default": "No name",
+   "description": "The name of the agent.",
+   "example": "Ron",
+   "title": "Name",
+   "type": "string"
+  },
+  "rating": {
+   "default": 0,
+   "description": "The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going",
+   "example": 4.5,
+   "title": "Rating",
+   "type": "number"
+  },
+  "status": {
+   "default": "No status",
+   "description": "The current status of the agent.",
+   "example": "Available",
+   "title": "Status",
+   "type": "string"
+  }
+ },
+ "title": "AgentsDataListItem",
+ "type": "object"
+}
+Schema: Body_post_lex_extras_lex_QA_post
+{
+ "properties": {
+  "answers": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Answers",
+   "type": "array"
+  },
+  "questions": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Questions",
+   "type": "array"
+  }
+ },
+ "required": [
+  "answers",
+  "questions"
+ ],
+ "title": "Body_post_lex_extras_lex_QA_post",
+ "type": "object"
+}
+Schema: HTTPValidationError
+{
+ "properties": {
+  "detail": {
+   "items": {
+    {
+     "properties": {
+      "loc": {
+       "items": {
+        "anyOf": [
+         {
+          "type": "string"
+         },
+         {
+          "type": "integer"
+         }
+        ]
+       },
+       "title": "Location",
+       "type": "array"
+      },
+      "msg": {
+       "title": "Message",
+       "type": "string"
+      },
+      "type": {
+       "title": "Error Type",
+       "type": "string"
+      }
+     },
+     "required": [
+      "loc",
+      "msg",
+      "type"
+     ],
+     "title": "ValidationError",
+     "type": "object"
+    }
+   },
+   "title": "Detail",
+   "type": "array"
+  }
+ },
+ "title": "HTTPValidationError",
+ "type": "object"
+}
+Schema: ListData
+{
+ "properties": {
+  "data": {
+   "default": [],
+   "description": "The data to be displayed in the list.",
+   "example": [
+    {
+     "agent": "Ron (support)",
+     "callID": 1,
+     "ended": "2021-07-26T14:30:00",
+     "name": "John",
+     "rating": 4.5,
+     "started": "2021-07-26T14:00:00"
+    }
+   ],
+   "items": [
+    {
+     "properties": {
+      "agent": {
+       "default": "No agent",
+       "description": "Agent that is taking the call.",
+       "example": "Ron (support)",
+       "title": "Agent",
+       "type": "string"
+      },
+      "callID": {
+       "default": 0,
+       "description": "The id of the item. Use this to get the summary",
+       "examples": [
+        1,
+        2,
+        3
+       ],
+       "title": "Callid",
+       "type": "integer"
+      },
+      "ended": {
+       "allow_none": true,
+       "description": "If not none, the call has finished",
+       "example": "2021-07-26T14:30:00",
+       "format": "date-time",
+       "title": "Ended",
+       "type": "string"
+      },
+      "name": {
+       "default": "No name",
+       "description": "The name of the connected person. Only applies if authenticated",
+       "example": "John",
+       "title": "Name",
+       "type": "string"
+      },
+      "rating": {
+       "default": 0,
+       "description": "The rating of the call. Higher is better. Uses KPIs to try to approach how well it's going",
+       "example": 4.5,
+       "title": "Rating",
+       "type": "number"
+      },
+      "started": {
+       "default": "2024-03-06T15:35:24.664951",
+       "description": "When the call was started. Use this to get ongoing time",
+       "example": "2021-07-26T14:00:00",
+       "format": "date-time",
+       "title": "Started",
+       "type": "string"
+      }
+     },
+     "title": "ListItem",
+     "type": "object"
+    }
+   ],
+   "title": "Data",
+   "type": "array"
+  },
+  "description": {
+   "default": "No description",
+   "description": "The description of the list.",
+   "example": "Calls that were reconnected within the last hour.",
+   "title": "Description",
+   "type": "string"
+  },
+  "name": {
+   "default": "No name",
+   "description": "The name of the list.",
+   "example": "Reconnected calls",
+   "title": "Name",
+   "type": "string"
+  },
+  "pagination": {
+   "default": "-",
+   "description": "The pagination of the list. Format: min-max/total",
+   "example": "0-100/200",
+   "title": "Pagination",
+   "type": "string"
+  }
+ },
+ "title": "ListData",
+ "type": "object"
+}
+Schema: ListItem
+{
+ "properties": {
+  "agent": {
+   "default": "No agent",
+   "description": "Agent that is taking the call.",
+   "example": "Ron (support)",
+   "title": "Agent",
+   "type": "string"
+  },
+  "callID": {
+   "default": 0,
+   "description": "The id of the item. Use this to get the summary",
+   "examples": [
+    1,
+    2,
+    3
+   ],
+   "title": "Callid",
+   "type": "integer"
+  },
+  "ended": {
+   "allow_none": true,
+   "description": "If not none, the call has finished",
+   "example": "2021-07-26T14:30:00",
+   "format": "date-time",
+   "title": "Ended",
+   "type": "string"
+  },
+  "name": {
+   "default": "No name",
+   "description": "The name of the connected person. Only applies if authenticated",
+   "example": "John",
+   "title": "Name",
+   "type": "string"
+  },
+  "rating": {
+   "default": 0,
+   "description": "The rating of the call. Higher is better. Uses KPIs to try to approach how well it's going",
+   "example": 4.5,
+   "title": "Rating",
+   "type": "number"
+  },
+  "started": {
+   "default": "2024-03-06T15:35:24.664951",
+   "description": "When the call was started. Use this to get ongoing time",
+   "example": "2021-07-26T14:00:00",
+   "format": "date-time",
+   "title": "Started",
+   "type": "string"
+  }
+ },
+ "title": "ListItem",
+ "type": "object"
+}
+Schema: OngoingCallData
+{
+ "properties": {
+  "agents": {
+   "default": 0,
+   "examples": [
+    5,
+    10,
+    15
+   ],
+   "title": "Agents",
+   "type": "integer"
+  },
+  "agents_in_break": {
+   "default": 0,
+   "examples": [
+    2,
+    4,
+    6
+   ],
+   "title": "Agents In Break",
+   "type": "integer"
+  },
+  "costumers": {
+   "default": 0,
+   "examples": [
+    10,
+    20,
+    30
+   ],
+   "title": "Costumers",
+   "type": "integer"
+  },
+  "rating": {
+   "default": 0,
+   "examples": [
+    4.5,
+    3.5,
+    5.0
+   ],
+   "title": "Rating",
+   "type": "number"
+  }
+ },
+ "title": "OngoingCallData",
+ "type": "object"
+}
+Schema: QueueDataList
+{
+ "properties": {
+  "data": {
+   "default": [],
+   "description": "The contents of the list.",
+   "example": [
+    {
+     "enabled": true,
+     "maxContacts": 10,
+     "name": "Support",
+     "queueID": "a",
+     "usage": 5
+    }
+   ],
+   "items": {
+    {
+     "properties": {
+      "enabled": {
+       "default": true,
+       "description": "If the queue is enabled or not.",
+       "example": true,
+       "title": "Enabled",
+       "type": "boolean"
+      },
+      "maxContacts": {
+       "default": 10,
+       "description": "The max amount of contacts a queue can have before considered full.",
+       "example": 10,
+       "title": "Maxcontacts",
+       "type": "integer"
+      },
+      "name": {
+       "default": "No name",
+       "description": "The name of the queue.",
+       "example": "Support",
+       "title": "Name",
+       "type": "string"
+      },
+      "queueID": {
+       "default": "0",
+       "description": "The id of the item. Use this to get the summary",
+       "examples": [
+        "a",
+        "b",
+        "c"
+       ],
+       "title": "Queueid",
+       "type": "string"
+      },
+      "usage": {
+       "default": 0,
+       "description": "The current usage of the queue. 100 means full, 0 means empty.",
+       "example": 5,
+       "title": "Usage",
+       "type": "number"
+      }
+     },
+     "title": "QueueDataListItem",
+     "type": "object"
+    }
+   },
+   "title": "Data",
+   "type": "array"
+  },
+  "pagination": {
+   "default": "-",
+   "description": "The pagination of the list. Format: min-max/total",
+   "example": "0-100/200",
+   "title": "Pagination",
+   "type": "string"
+  }
+ },
+ "title": "QueueDataList",
+ "type": "object"
+}
+Schema: QueueDataListItem
+{
+ "properties": {
+  "enabled": {
+   "default": true,
+   "description": "If the queue is enabled or not.",
+   "example": true,
+   "title": "Enabled",
+   "type": "boolean"
+  },
+  "maxContacts": {
+   "default": 10,
+   "description": "The max amount of contacts a queue can have before considered full.",
+   "example": 10,
+   "title": "Maxcontacts",
+   "type": "integer"
+  },
+  "name": {
+   "default": "No name",
+   "description": "The name of the queue.",
+   "example": "Support",
+   "title": "Name",
+   "type": "string"
+  },
+  "queueID": {
+   "default": "0",
+   "description": "The id of the item. Use this to get the summary",
+   "examples": [
+    "a",
+    "b",
+    "c"
+   ],
+   "title": "Queueid",
+   "type": "string"
+  },
+  "usage": {
+   "default": 0,
+   "description": "The current usage of the queue. 100 means full, 0 means empty.",
+   "example": 5,
+   "title": "Usage",
+   "type": "number"
+  }
+ },
+ "title": "QueueDataListItem",
+ "type": "object"
+}
+Schema: Summary
+{
+ "properties": {
+  "content": {
+   "title": "Content",
+   "type": "string"
+  },
+  "id": {
+   "title": "Id",
+   "type": "integer"
+  },
+  "title": {
+   "title": "Title",
+   "type": "string"
+  }
+ },
+ "required": [
+  "id",
+  "title",
+  "content"
+ ],
+ "title": "Summary",
+ "type": "object"
+}
+Schema: Token
+{
+ "properties": {
+  "deviceID": {
+   "title": "Deviceid",
+   "type": "string"
+  },
+  "refresh": {
+   "title": "Refresh",
+   "type": "string"
+  },
+  "token": {
+   "title": "Token",
+   "type": "string"
+  }
+ },
+ "required": [
+  "token",
+  "refresh",
+  "deviceID"
+ ],
+ "title": "Token",
+ "type": "object"
+}
+Schema: UsageGraph
+{
+ "properties": {
+  "data": {
+   "default": [],
+   "examples": [
+    [
+     20,
+     30,
+     50
+    ],
+    [
+     100,
+     120,
+     20
+    ]
+   ],
+   "items": {
+    "type": "number"
+   },
+   "title": "Data",
+   "type": "array"
+  },
+  "labels": {
+   "default": [],
+   "examples": [
+    [
+     "Starting call",
+     "Queue",
+     "Agent"
+    ],
+    [
+     "Finance",
+     "Support",
+     "Sales"
+    ]
+   ],
+   "items": {
+    "type": "string"
+   },
+   "title": "Labels",
+   "type": "array"
+  }
+ },
+ "title": "UsageGraph",
+ "type": "object"
+}
+Schema: ValidationError
+{
+ "properties": {
+  "loc": {
+   "items": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "integer"
+     }
+    ]
+   },
+   "title": "Location",
+   "type": "array"
+  },
+  "msg": {
+   "title": "Message",
+   "type": "string"
+  },
+  "type": {
+   "title": "Error Type",
+   "type": "string"
+  }
+ },
+ "required": [
+  "loc",
+  "msg",
+  "type"
+ ],
+ "title": "ValidationError",
+ "type": "object"
+}
