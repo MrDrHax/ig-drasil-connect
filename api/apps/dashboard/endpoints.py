@@ -73,3 +73,12 @@ async def get_angry_calls() -> int:
     '''
 
     return 5
+
+
+@router.get("/data/rerouted", tags=["lists"])
+async def get_rerouted_calls() -> int:
+    '''
+    Returns the number of calls that have been rerouted more than 3 times.
+    '''
+
+    return 5
