@@ -1,0 +1,106 @@
+<mxfile host="Electron" modified="2024-03-08T18:23:36.598Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="V8GOiwBA8ooas4eEMWRT" version="23.1.5" type="device">
+  <diagram name="Page-1" id="lNPx74rnNkHt7TFwgwoe">
+    <mxGraphModel dx="669" dy="581" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Vo5U6N55_tptmbHkalh--9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=ERoneToMany;endFill=0;" edge="1" parent="1" source="Vo5U6N55_tptmbHkalh--5" target="Vo5U6N55_tptmbHkalh--7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--5" value="AgentsDataList" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="50" y="140" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--6" value="data: array[AgentsDataListItem]&#xa;pagination: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--5">
+          <mxGeometry x="5" y="30" width="185" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--7" value="AgentsDataListItem" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="320" y="120" width="230" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--8" value="agentID: string&#xa;calls: integer&#xa;name: string&#xa;rating: number&#xa;status: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--7">
+          <mxGeometry x="5" y="30" width="185" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--10" value="Body_post_lex_extras_lex_QA_post" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="440" y="530" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--11" value="answers: array[string]&#xa;questions: array[string]" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--10">
+          <mxGeometry x="5" y="30" width="185" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=ERoneToMany;endFill=0;" edge="1" parent="1" source="Vo5U6N55_tptmbHkalh--12" target="Vo5U6N55_tptmbHkalh--33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--12" value="HTTPValidationError" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="50" y="260" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--13" value="detail: array[ValidationError]" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--12">
+          <mxGeometry x="5" y="30" width="185" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERoneToMany;endFill=0;" edge="1" parent="1" source="Vo5U6N55_tptmbHkalh--14" target="Vo5U6N55_tptmbHkalh--16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--14" value="ListData" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="50" y="365" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--15" value="data: array[ListItem]&#xa;description: string&#xa;name: string&#xa;pagination: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--14">
+          <mxGeometry x="5" y="30" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--16" value="ListItem" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="320" y="360" width="230" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--17" value="agent: string&#xa;callID: integer&#xa;ended: string&#xa;name: string&#xa;rating: number&#xa;started: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--16">
+          <mxGeometry x="5" y="30" width="185" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--20" value="OngoingCallData" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="570" y="120" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--21" value="agents: integer&#xa;agents_in_break: integer&#xa;costumers: integer&#xa;rating: number" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--20">
+          <mxGeometry x="5" y="30" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=ERoneToMany;endFill=0;" edge="1" parent="1" source="Vo5U6N55_tptmbHkalh--22" target="Vo5U6N55_tptmbHkalh--24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--22" value="QueueDataList" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="570" y="255" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--23" value="data: array[QueueDataListItem]&#xa;pagination: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--22">
+          <mxGeometry x="5" y="30" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--24" value="QueueDataListItem" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="839" y="250" width="230" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--25" value="enabled: boolean&#xa;maxContacts: integer&#xa;name: string&#xa;queueID: string&#xa;usage: number" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--24">
+          <mxGeometry x="5" y="30" width="185" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--27" value="Summary" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="839" y="120" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--28" value="content: string&#xa;id: integer&#xa;title: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--27">
+          <mxGeometry x="5" y="30" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--29" value="Token" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="570" y="390" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--30" value="deviceID: string&#xa;refresh: string&#xa;token: string" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--29">
+          <mxGeometry x="5" y="30" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--31" value="UsageGraph" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="839" y="390" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--32" value="data: array&#xa;labels: array" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--31">
+          <mxGeometry x="5" y="30" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--33" value="ValidationError" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" vertex="1" parent="1">
+          <mxGeometry x="320" y="260" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--34" value="loc: array[string]&#xa;msg: string&#xa;type: string&#xa;" style="text;" vertex="1" parent="Vo5U6N55_tptmbHkalh--33">
+          <mxGeometry x="5" y="30" width="215" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Vo5U6N55_tptmbHkalh--36" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="560" y="510" as="sourcePoint" />
+            <mxPoint x="560" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
