@@ -31,7 +31,7 @@ Each app has the following files:
 
 ## For Windows 
 1. Clone the repository.
-2. In the `setup.sh`replace `python3 -m venv connectEnv` for `python -m venv connectEnv`
+2. In terminal, replace `python3 -m venv connectEnv` for `python -m venv connectEnv`
 3. Paste `.\connectEnv\Scripts\Activate.ps1` in powershell
 4. Follow the last two steps of `setup.sh`
 5. Run the application using `uvicorn main:app --host $HOST --port $PORT --reload` replacing the values with the dotenv keys.
