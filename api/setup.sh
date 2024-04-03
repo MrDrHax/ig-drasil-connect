@@ -9,13 +9,15 @@ then
 fi
 
 # Create a new virtual environment
-python3 -m venv connectEnv
+python3 -m venv venv
 
 # Activate the virtual environment
-source connectEnv/bin/activate
+source ./venv/bin/activate
 
 # Upgrade pip
 pip install --upgrade pip
 
 # Install the dependencies
 pip install -r requirements.txt
+
+pip list
