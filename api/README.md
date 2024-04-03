@@ -29,6 +29,13 @@ Each app has the following files:
 3. For developing, clone the .example.env file and name it as .dev.env
 4. Run the application with `./rundev.sh`.
 
+## For Windows 
+1. Clone the repository.
+2. In the `setup.sh`replace `python3 -m venv connectEnv` for `python -m venv connectEnv`
+3. Paste `.\connectEnv\Scripts\Activate.ps1` in powershell
+4. Follow the last two steps of `setup.sh`
+5. Run the application using `uvicorn main:app --host $HOST --port $PORT --reload` replacing the values with the dotenv keys.
+
 ## Usage
 
 Once the application is running, you can interact with it through its API endpoints. Each app has its own set of endpoints, defined in its endpoints.py file.
