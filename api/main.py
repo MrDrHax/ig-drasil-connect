@@ -32,4 +32,4 @@ app.include_router(extras_router)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "World  >_<"}
