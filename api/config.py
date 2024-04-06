@@ -7,6 +7,7 @@ if os.name == 'posix' and os.uname().release == 'ubuntu':
 else:
     load_dotenv('.env.dev')
 
+# if you want to add a config variable, add it here!!!
 class Config:
     PORT = os.getenv('PORT', 8080)
     HOST = os.getenv('HOST', 'localhost')
