@@ -1,34 +1,17 @@
-# Ig-drasil connect backend
+## Iniciar contenedores
 
-This is a FastAPI application with the following structure:
+1. Descargar Docker Desktop 
+2. Verificar la Version de Docker Compose (prueba los siguientes comandos)
 
-- main.py: The entry point of the application.
-- db.py: Sets up a global database pool.
-- config.py: Loads environment variables and sets up the application configuration.
-- requirements.txt: Lists the Python packages that the application depends on.
-- setup.sh: A bash script that sets up a Python virtual environment and installs dependencies.
+        docker compose version = v1
+        docker-compose version = v2
 
-The application is divided into several apps, each with its own directory:
+- Limpiar docker 
 
-- dashboard
-- lists
-- summary
-- actions
-- extras
+        docker system prune -f
+        docker builder prune 
 
-Each app has the following files:
+3. Ejecutar docker 
 
-- crud.py: Defines the CRUD operations for the app.
-- models.py: Defines the data models for the app.
-- endpoints.py: Defines the API endpoints for the app.
+        docker compose up -d
 
-## Setup
-
-1. Clone the repository.
-2. Run the `setup.sh` script to set up the Python virtual environment and install dependencies.
-3. For developing, clone the .example.env file and name it as .dev.env
-4. Run the application with `./rundev.sh`.
-
-## Usage
-
-Once the application is running, you can interact with it through its API endpoints. Each app has its own set of endpoints, defined in its endpoints.py file.

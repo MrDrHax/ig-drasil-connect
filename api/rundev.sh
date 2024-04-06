@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source .dev.env
+source .env
 uvicorn main:app --host $HOST --port $PORT --reload
