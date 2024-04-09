@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form, Card} from 'react-bootstrap';
-import '../Styles/LogIn.css';
+import '../Styles/Login.css';
 import AmazonLogo from '../img/aws.svg';
 import TicketMasterLogo from '../img/ticketmaster.svg';
 
