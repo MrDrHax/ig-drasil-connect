@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, Card} from 'react-bootstrap';
+import { Button, Card} from 'react-bootstrap';
 import '../Styles/Login.css';
 import AmazonLogo from '../img/aws.svg';
 import TicketMasterLogo from '../img/ticketmaster.svg';
@@ -21,10 +21,11 @@ function LogIn() {
          <div>
          <Card className='rightCard'>
             <Card.Body> 
-              <Card.Text className='text'>
-                Welcome Back!
+              <Card.Text className='awsText'>
+                Sign in with
               </Card.Text>
-              <Button variant="primary"><img src={AmazonLogo} alt="Amazon Logo" /></Button>
+              <Button variant="secondary"><img className='awsLogo' src={AmazonLogo} alt="Amazon Logo" /></Button>
+              <br/>
               <br/>
               <a href="http://">Forgot Password?</a>
             </Card.Body>

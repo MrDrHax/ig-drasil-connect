@@ -56,3 +56,21 @@ img {
 a{
     padding-top: 20px;
 }
+
+.awsLogo {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.awsText {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    align-content: center;
+    padding-top: 120px;
+}
+
+button {
+    padding-bottom: 10px;
+}

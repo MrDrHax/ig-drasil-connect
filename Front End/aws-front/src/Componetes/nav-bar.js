@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 
 
-export function NavBar() {
+export default function NavBar() {
     return (
         <div className="navbar">
             <div className="leftside">
