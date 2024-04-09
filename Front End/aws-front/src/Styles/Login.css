@@ -1,0 +1,55 @@
+body {
+    background-color: rgb(255, 255, 255);
+}
+
+Form {
+    width: 30%;
+    height: 85%;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 10px 5px 5px #5e5863;
+    background-color: rgb(252, 252, 252);
+}
+
+.mb-3 {
+    margin-bottom: 0.5rem;
+}
+
+.Container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgb(255, 255, 255);
+}
+
+.leftCard {
+    display: flex;
+    width: 50vw;
+    height: 100vh;
+    background-color: #3c5468;
+    justify-content: center;
+    border-radius: 0%;
+    align-items: center;
+}
+
+.rightForm{
+    width: 50vw;
+    height: 100vh;
+    border-radius: 0%;
+
+}
+
+img {
+    padding-top: 150px;
+}
+
+.text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    align-content: center;
+    padding-top: 10px;
+}
