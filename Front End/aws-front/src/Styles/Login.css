@@ -43,7 +43,7 @@ Form {
 }
 
 img {
-    padding-top: 150px;
+    padding-top: 250px;
 }
 
 .text {
@@ -58,9 +58,9 @@ a{
 }
 
 .awsLogo {
-    width: 30px;
+    width: 150px;
     height: 30px;
-    padding: 0;
+    padding: 0.2rem;
 }
 
 .awsText {
@@ -68,7 +68,7 @@ a{
     font-weight: 500;
     margin-bottom: 1rem;
     align-content: center;
-    padding-top: 120px;
+    padding-top: 240px;
 }
 
 button {
