@@ -35,7 +35,7 @@ Form {
     align-items: center;
 }
 
-.rightForm{
+.rightCard{
     width: 50vw;
     height: 100vh;
     border-radius: 0%;
@@ -52,4 +52,7 @@ img {
     margin-bottom: 1rem;
     align-content: center;
     padding-top: 10px;
+}
+a{
+    padding-top: 20px;
 }
