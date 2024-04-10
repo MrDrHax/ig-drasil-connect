@@ -35,6 +35,12 @@ Form {
     align-items: center;
 }
 
+.ticket{
+    padding-top: 5vh;
+    z-index: 1;
+    height: 88%;
+}
+
 .rightCard{
     width: 50vw;
     height: 100vh;
@@ -42,17 +48,22 @@ Form {
 
 }
 
-img {
-    padding-top: 250px;
+.t-logo {
+    padding-top: 1vh;
 }
 
 .text {
-    font-size: 1.2rem;
+    position: absolute;
+    z-index: 0;
+    top: 46%;
+    left: 17%;
+    font-size: 4.5vw;
     font-weight: 500;
     margin-bottom: 1rem;
     align-content: center;
     padding-top: 10px;
 }
+
 a{
     padding-top: 20px;
 }
