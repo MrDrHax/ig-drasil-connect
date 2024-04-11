@@ -1,3 +1,11 @@
+ticket works perfectly at width 1330px
+
+para poner rangos en el media query, hacer lo siguiente:
+
+@media (min-width: <value>) and (max-width: <value>)
+
+
+1330 px working
 body {
     background-color: rgb(255, 255, 255);
 }
@@ -59,7 +67,6 @@ button {
     z-index: 0;
     font-weight: 500;
     font-size: 4.5vw;
-    color: #FFFFFF;
     padding-top: 10px;
     position: absolute;
     margin-bottom: 1rem;
@@ -81,47 +88,8 @@ button {
     align-content: center;
 }
 
-.button{
-    border: #e48900;
-    border-radius: 12px;
-    background-color: #e48900;
-}
-
 .awsLogo {
     width: 150px;
     height: 30px;
     padding: 0.2rem;
 }
-
-@media screen and (min-width: 1300px) and (max-width: 1920px) {
-    .ticket{
-        height: 97%;
-        padding-top: 3vh;
-    }
-
-    .text {
-        top: 47%;
-        left: 22%;
-        font-size: 4vw;
-    }
-    
-    .awsText {
-        font-size: 4rem;
-        font-weight: 500;
-        margin-top: 5.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .button{
-        border-radius: 12px;
-    }
-
-    .awsLogo {
-        width: 16.5vw;
-        height: 6vh;
-    }
-
-    a{
-        font-size: 1.5vw;
-    }
-  }

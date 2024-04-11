@@ -28,7 +28,7 @@ function LogIn() {
               <Card.Text className='awsText'>
                 Sign in with
               </Card.Text>
-              <Button variant="secondary"><img className='awsLogo' src={AmazonLogo} alt="Amazon Logo" /></Button>
+              <Button className='button' variant="secondary"><img className='awsLogo' src={AmazonLogo} alt="Amazon Logo" /></Button>
               <br/>
               <br/>
               <a href="http://">Forgot Password?</a>
