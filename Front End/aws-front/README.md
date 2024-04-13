@@ -68,3 +68,23 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### `npm -v`
+
+To check what verion of Node you currently have installed on your machine. We are using version 10.5.0. If you have a different version, you can install the correct version by running the following command:
+
+### `nvm install 10.5.0`
+
+This will install the correct version of Node on your machine.
+
+-----------------------------------------------------------------
+
+### React 
+We are currently using React version 18.2.0 If you have a different version, you can install the correct version by running the following command:
+
+### `npm install react-native@18.2.0`
+Which will install the correct version of React on your machine.
+
+### Bootstrap & React-Bootstrap
+We are currently using Bootstrap version 5.3.3 and React-bootstrap version 2.10.2.
+`npm install bootstrap@5.3.3` or `npm install react-bootstrap@2.10.2`
