@@ -7,3 +7,4 @@ connectEnv/
 .env
 venv
 
+!.vscode/launch.json

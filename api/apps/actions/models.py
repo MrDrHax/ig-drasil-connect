@@ -1,8 +1,6 @@
 from pydantic import BaseModel
 from typing import List
 
-from pydantic import BaseModel
-
 class StartCallResponse(BaseModel):
     call_id: str
     message: str
