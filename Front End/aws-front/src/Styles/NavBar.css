@@ -1,0 +1,87 @@
+.navbarAdmin {
+    display: flex;
+    justify-content: space-between; /* Distribuye los elementos de manera equitativa */
+    background-color: #acacac; /* Color de fondo de la barra de navegación */
+    color: white; /* Color del texto */
+    padding: 10px; /* Espaciado interno */
+  }
+ 
+  .nav-itemAdmin {
+    cursor: pointer;
+  }
+ 
+  .tab-contentAdmin {
+    margin-top: 20px;
+  }
+
+
+
+
+  
+  /* Elementos para calls */
+  .calls-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  @media screen and (min-width: 810px) { /* media query responsive */
+    .table-container {
+      background-color: #C9E8FD;
+    }
+    .reports-container {
+        background-color: #C9E8FD;
+      }
+  }
+
+
+  .calls-table {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%; /* Ajustar al ancho máximo disponible */
+  }
+  
+  /* Estilos para pantallas pequeñas */
+  @media screen and (max-width: 600px) {
+    .calls-table {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  }
+  
+
+  table {
+    border-collapse: separate;
+    border-spacing: 30px; 
+  }
+  .table-container {
+    border-radius: 20px; 
+    background-color: #C9E8FD;
+  }
+
+/* Elementos para Team */
+.team-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px; /* Espacio entre las columnas */
+}
+
+.metrics-section {
+  /* Estilos para la sección de Metrics */
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px; 
+}
+
+.generalData-container {
+    /* Estilos para la sección de data general */
+  display: inline-block;
+  background-color: transparent;
+  border-radius: 10px;
+  border: 2px solid black;
+  padding: 10px;
+  margin-top: 20px;
+  max-width: 100%; /* Ajusta el ancho máximo al 100% */
+  box-sizing: border-box; /* Incluye el padding y el border en el ancho total */
+}
+
