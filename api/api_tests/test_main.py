@@ -1,3 +1,6 @@
+"""
+This module contains the tests for the main module.
+"""
 from fastapi.testclient import TestClient
 #Import the FastAPI app from the main module
 from api.main import app
