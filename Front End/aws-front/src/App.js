@@ -11,16 +11,16 @@ function App() {
     <div className="App">
       <Router>
       <Switch>
-        <Route path="/" exact Component={AgentCall}>
-        </Route>
+        <Route path="/" exact Component={Home}/>
       </Switch>
       <Switch>
-        <Route path="/dashboard" exact Component={Dashboard}>
-        </Route>
+        <Route path="/adminDashboard" exact Component={Dashboard}/>
       </Switch>
       <Switch>
-        <Route path="/login" exact Component={Login}>
-        </Route>
+        <Route path="/agentDashboard" exact Component={AgentCall}/>
+      </Switch>
+      <Switch>
+        <Route path="/login" exact Component={Login}/>
       </Switch>
       </Router>
     </div>

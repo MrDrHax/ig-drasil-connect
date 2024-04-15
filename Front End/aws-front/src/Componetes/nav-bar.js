@@ -3,8 +3,6 @@ import "../Styles/nav-bar.css";
 import { Link } from "react-router-dom";
 // import {Nav, Navbar} from 'react-bootstrap';
 
-
-
 export default function NavBar() {
     return (
         <div className="navbar">
@@ -12,8 +10,9 @@ export default function NavBar() {
             </div>
             <div className="rightside">
             <Link className="link" to="/">Home</Link>
-            <Link className="link" to="/Dashboard">Dashboard</Link>
-            <Link className="link" to="/LogIn">Log In</Link>
+            <Link className="link" to="/adminDashboard">Admin Dashboard</Link>
+            <Link className="link" to="/agentDashboard">Agent Dashboard</Link>
+            <Link className="link" to="/login">Log In</Link>
             <Link className="link" to="/Contact">Contact</Link>
             </div>
         </div>   
