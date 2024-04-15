@@ -1,5 +1,6 @@
 import './App.css';
 import  Home  from './pages/Home';
+import Login from './pages/Login';
 import  Dashboard  from './pages/admin';
 import AgentCall from './pages/agentCall';
 import { NavBar } from './Componetes/nav-bar';
@@ -9,13 +10,16 @@ function App() {
   return (
     <div className="App">
       <Router>
-      <NavBar/>
       <Switch>
         <Route path="/" exact Component={AgentCall}>
         </Route>
       </Switch>
       <Switch>
         <Route path="/dashboard" exact Component={Dashboard}>
+        </Route>
+      </Switch>
+      <Switch>
+        <Route path="/login" exact Component={Login}>
         </Route>
       </Switch>
       </Router>
