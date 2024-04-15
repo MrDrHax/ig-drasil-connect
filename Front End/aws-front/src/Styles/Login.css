@@ -1,5 +1,6 @@
 body {
     background-color: rgb(255, 255, 255);
+    overflow: hidden;
 }
 
 Form {
@@ -68,7 +69,7 @@ button {
 
 .rightCard{
     width: 50vw;
-    height: 100vh;
+    height: 110vh;
     border-radius: 0%;
 
 }
@@ -131,8 +132,8 @@ button {
         height: 6vh;
     }
 
-    .keycloak {
-        width: 16.5vw;
+    .igdrasil {
+        width: 14vw;
         height: 6vh;
     }
 
