@@ -28,7 +28,7 @@ function LogIn() {
                 Log in here
               </Card.Text>
               {/* <Button className='button' variant="secondary"><img className='awsLogo' src={AmazonLogo} alt="Amazon Logo" /></Button> */}
-              <Button className='button' variant="secondary"><img className='keycloak' src={Keycloak} alt="Keycloak Logo" /></Button>
+              <Button style={{ width:'250px'}} className='button' variant="secondary"><img style={{ maxWidth:'auto', height:'auto'}}  className='keycloak' src={Keycloak} alt="Keycloak Logo" /></Button>
               <br/>
               <br/>
               <a href="http://">Forgot Password?</a>
