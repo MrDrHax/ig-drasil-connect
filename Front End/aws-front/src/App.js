@@ -1,7 +1,9 @@
 import './App.css';
 import  Home  from './pages/Home';
 import Login from './pages/Login';
-// import { NavBar } from './Componetes/nav-bar';
+import  Dashboard  from './pages/admin';
+import AgentCall from './pages/agentCall';
+import { NavBar } from './Componetes/nav-bar';
 import {BrowserRouter as Router, Route, Routes as Switch} from "react-router-dom";
 
 function App() {
@@ -9,7 +11,11 @@ function App() {
     <div className="App">
       <Router>
       <Switch>
-        <Route path="/" exact Component={Home}>
+        <Route path="/" exact Component={AgentCall}>
+        </Route>
+      </Switch>
+      <Switch>
+        <Route path="/dashboard" exact Component={Dashboard}>
         </Route>
       </Switch>
       <Switch>
@@ -20,6 +26,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
