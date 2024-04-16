@@ -52,7 +52,7 @@ async def get_ongoing_call_data() -> models.OngoingCallData:
     Returns data about agents connected, and in breaks, to see how many agents are available for calls.
     '''
 
-    return models.OngoingCallData(costumers=10, agents=5, agents_in_break=2, rating=4.5)
+    return models.OngoingCallData(costumers=10, agents=5, agents_in_break=2, rating=5.5)
 
 @router.get("/data/reconnected", tags=["data"])
 async def get_reconnected_calls() -> int:
@@ -72,7 +72,7 @@ async def get_angry_calls() -> int:
     To get the full list, go to /lists/angry
     '''
 
-    return 5
+    return 'a'
 
 
 @router.get("/data/rerouted", tags=["lists"])
@@ -81,4 +81,4 @@ async def get_rerouted_calls() -> int:
     Returns the number of calls that have been rerouted more than 3 times.
     '''
 
-    return 5
+    return 'a'

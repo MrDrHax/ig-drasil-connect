@@ -1,0 +1,374 @@
+body {
+    background-color: rgb(255, 255, 255);
+    overflow: hidden;
+}
+
+Form {
+    width: 30%;
+    height: 85%;
+    margin: auto;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 10px 5px 5px #5e5863;
+    background-color: rgb(252, 252, 252);
+}
+
+.mb-3 {
+    margin-bottom: 0.5rem;
+}
+
+a{
+    padding-top: 20px;
+}
+
+button {
+    padding-bottom: 10px;
+}
+
+.Container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+}
+
+.leftCard {
+    width: 50vw;
+    height: 100vh;
+    display: flex;
+    border-radius: 0%;
+    align-items: center;
+    justify-content: center;
+    background-color: #3c5468;
+}
+
+.t-logo {
+    padding-top: 1vh;
+}
+
+.ticket{
+    z-index: 1;
+    height: 88%;
+    padding-top: 5vh;
+}
+
+.text {
+    top: 46%;
+    left: 17%;
+    z-index: 0;
+    font-weight: 500;
+    font-size: 4.5vw;
+    color: #FFFFFF;
+    padding-top: 10px;
+    position: absolute;
+    margin-bottom: 1rem;
+    align-content: center;
+}
+
+.rightCard{
+    width: 50vw;
+    height: 110vh;
+    border-radius: 0%;
+
+}
+
+.awsText {
+    font-weight: 500;
+    font-size: 1.5rem;
+    padding-top: 240px;
+    margin-bottom: 1rem;
+    align-content: center;
+}
+
+.button{
+    /* border: #e48900;
+    border-radius: 12px;
+    background-color: #e48900; */
+
+    border: #265B6B;
+    border-radius: 12px;
+    background-color: #265B6B;
+}
+
+.awsLogo {
+    width: 150px;
+    height: 30px;
+    padding: 0.2rem;
+}
+
+/* This view is for full laptop screen (1920x1080) to 3/4 screen (1500x1080) */
+@media screen and (min-width: 1500px) and (max-width: 1920px) {
+    .t-logo {
+        width: 55%;
+        padding-top: 3vh;
+    }
+
+    .ticket{
+        height: 85%;
+        padding-top: 3vh;
+    }
+
+    .text {
+        top: 49.5%;
+        left: 26%;
+        font-size: 3vw;
+    }
+    
+    .awsText {
+        font-size: 4rem;
+        font-weight: 500;
+        margin-top: 5.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .awsLogo {
+        width: 16.5vw;
+        height: 6vh;
+    }
+
+    .igdrasil {
+        width: 14vw;
+        height: 6vh;
+    }
+
+    a{
+        font-size: 1.5vw;
+    }
+  }
+/* This view is for 3/4 screen (1499x1080) to 1/2 screen (1200x1080)*/
+@media screen and (min-width: 1200px) and (max-width: 1499px) {
+    .t-logo {
+        width: 55%;
+        padding-top: 3vh;
+    }
+
+    .ticket{
+        height: 80%;
+        padding-top: 10vh;
+    }
+
+    .text {
+        top: 49%;
+        left: 22%;
+        font-size: 3.5vw;
+    }
+    
+    .awsText {
+        font-size: 4rem;
+        font-weight: 500;
+        margin-top: 5.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .awsLogo {
+        width: 16.5vw;
+        height: 6vh;
+    }
+
+    a{
+        font-size: 1.5vw;
+    }
+}
+/* This view is for 1/2 (1199x1080) sceen to 1/4 screen (900x1080) */
+@media screen and (min-width: 900px) and (max-width: 1199px) {
+    .t-logo {
+        width: 55%;
+        padding-top: 7vh;
+    }
+
+    .ticket{
+        height: 70%;
+        padding-top: 18vh;
+    }
+
+    .text {
+        top: 49%;
+        left: 22%;
+        font-size: 3.5vw;
+    }
+    
+    .awsText {
+        font-size: 4rem;
+        font-weight: 500;
+        margin-top: 5.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .awsLogo {
+        width: 16.5vw;
+        height: 6vh;
+    }
+
+    a{
+        font-size: 1.5vw;
+    }
+}
+/* Mobile Media Queries */
+/* iPad screens were deemed to be within he following dimensions:
+    width: 1000-1400px
+    height: 700-1050px
+*/
+@media screen and (min-width: 1150px) and (max-width: 1400px) and (min-height: 1000px) and (max-height: 1050px){
+    .t-logo {
+        width: 55%;
+        padding-top: 4vh;
+    }
+
+    .ticket{
+        height: 80%;
+        padding-top: 10vh;
+    }
+
+    .text {
+        top: 49%;
+        left: 22%;
+        font-size: 3.5vw;
+    }
+    
+    .awsText {
+        font-size: 3.5rem;
+        font-weight: 500;
+        margin-top: 12vh;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .keycloak {
+        width: 16.5vw;
+        height: 7.5vh;
+    }
+
+    a{
+        font-size: 1.5vw;
+    }
+}
+
+@media screen and (min-width: 1150px) and (max-width: 1400px) and (min-height: 850px) and (max-height: 1050px){
+    .t-logo {
+        width: 55%;
+        padding-top: 4vh;
+    }
+
+    .ticket{
+        height: 80%;
+        padding-top: 10vh;
+    }
+
+    .text {
+        top: 49%;
+        left: 22%;
+        font-size: 3.5vw;
+    }
+    
+    .awsText {
+        font-size: 3.5rem;
+        font-weight: 500;
+        margin-top: 9vh;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .keycloak {
+        width: 16.5vw;
+        height: 7.5vh;
+    }
+
+    a{
+        font-size: 1.5vw;
+    }
+}
+
+@media screen and (min-height: 751px) and (max-height: 850px){
+    .t-logo {
+        width: 40%;
+        padding-top: 30vh;
+    }
+
+    .ticket{
+        height: 55%;
+        padding-top: 10vh;
+    }
+
+    .text {
+        top: 54.5%;
+        left: 26.5%;
+        font-size: 2.9vw;
+    }
+    
+    .awsText {
+        font-size: 3rem;
+        font-weight: 500;
+        margin-top: 4vh;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .keycloak {
+        width: 20vw;
+        height: 7.5vh;
+    }
+
+    a{
+        font-size: 2vw;
+    }
+}
+
+@media screen and (min-height: 700px) and (max-height: 750px){
+    .t-logo {
+        width: 55%;
+        padding-top: 30vh;
+    }
+
+    .ticket{
+        height: 55%;
+        padding-top: 10vh;
+    }
+
+    .text {
+        top: 52.5%;
+        left: 26%;
+        font-size: 3vw;
+    }
+    .awsText {
+        font-size: 3rem;
+        font-weight: 500;
+        margin-top: -2vh;
+        margin-bottom: 1.5rem;
+    }
+
+    .button{
+        border-radius: 12px;
+    }
+
+    .keycloak {
+        width: 20vw;
+        height: 7.5vh;
+    }
+
+    a{
+        font-size: 2vw;
+    }
+}
