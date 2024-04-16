@@ -27,6 +27,7 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
       - mongo_data:/data/db
+      - ./Docker/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
     networks:
       - backend_network
     restart: unless-stopped 
