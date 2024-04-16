@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Card} from 'react-bootstrap';
 import '../Styles/Login.css';
 import AmazonLogo from '../img/aws.svg';
-import Keycloak from '../img/keycloak.svg';
+import Igdrasil from '../img/ig-drasil.png';
 import TicketMasterLogo from '../img/ticketmaster.svg';
 import Ticket from '../img/ticket.svg';
 
@@ -28,7 +28,7 @@ function LogIn() {
                 Log in here
               </Card.Text>
               {/* <Button className='button' variant="secondary"><img className='awsLogo' src={AmazonLogo} alt="Amazon Logo" /></Button> */}
-              <Button style={{ width:'250px'}} className='button' variant="secondary"><img style={{ maxWidth:'auto', height:'auto'}}  className='keycloak' src={Keycloak} alt="Keycloak Logo" /></Button>
+              <Button style={{ width:'250px'}} className='button' variant="secondary"><img style={{ maxWidth:'auto', height:'auto'}}  className='igdrasil' src={Igdrasil} alt="Igdrasil Logo" /></Button>
               <br/>
               <br/>
               <a href="http://">Forgot Password?</a>
