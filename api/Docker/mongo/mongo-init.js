@@ -12,10 +12,9 @@ db.createCollection("agent_notes", {
                     bsonType: "array",
                     items: {
                         bsonType: "object",
-                        required: ["message", "author", "timestamp"],
+                        required: ["message", "timestamp"],
                         properties: {
                             message: { bsonType: "string" },
-                            author: { bsonType: "string" },
                             timestamp: { bsonType: "date" }
                         }
                     }
@@ -44,9 +43,8 @@ db.createCollection("supervisor_agent", {
             bsonType: "array",
             items: {
               bsonType: "object",
-              required: ["message_id", "sender", "timestamp", "content"],
+              required: ["sender", "timestamp", "content"],
               properties: {
-                message_id: { bsonType: "string" },
                 sender: { enum: ["supervisor", "agent"] },
                 timestamp: { bsonType: "date" },
                 content: { bsonType: "string" }
