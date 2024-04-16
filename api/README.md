@@ -15,3 +15,8 @@
 
         docker compose up -d
 
+
+# Fuentes
+
+https://www.mongodb.com/docs/manual/core/schema-validation/specify-json-schema/ 
+https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#mongodb-query-op.-jsonSchema
