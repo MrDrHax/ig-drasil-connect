@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import '../Styles/NavBar.css'; // Archivo de estilos para la barra de navegación
+import home from "../App.js"
 import BarChart from '../Componetes/BarChart';  
 import PieChart from '../Componetes/PieChart';
+import {BrowserRouter as Router, Route, Routes as Switch} from "react-router-dom";
+import AmazonLogo from '../img/home.svg'; 
 
 export default function NavBar() {
   // Estado para almacenar qué pestaña está activa
@@ -16,6 +19,13 @@ export default function NavBar() {
     <div>
       {/* Barra de navegación */}
       <div className="navbarAdmin">
+        <div
+          className={`navitemAdmin ${activeTab === 'Home' ? 'active' : ''}`} //en proceso de cambio
+          onClick={() => handleTabClick('Home')}
+        >
+          {/*Icono de casa*/}
+          <img className='navbaricon' src={AmazonLogo} alt="Home" />
+        </div>
         <div /* Barra de navegación sección de name que se expandirá para cuando haya llamadas */
           className={`navitemAdmin ${activeTab === 'Name' ? 'active' : ''}`}
           onClick={() => handleTabClick('Name')}

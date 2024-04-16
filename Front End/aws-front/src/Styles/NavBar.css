@@ -1,9 +1,10 @@
 .navbarAdmin {
     display: flex;
-    justify-content: space-between; /* Distribuye los elementos de manera equitativa */
+    justify-content:space-between; /* Distribuye los elementos de manera equitativa */
     background-color: #acacac; /* Color de fondo de la barra de navegación */
     color: white; /* Color del texto */
     padding: 10px; /* Espaciado interno */
+    padding-right: 40px;
   }
  
   .nav-itemAdmin {
@@ -85,3 +86,9 @@
   box-sizing: border-box; /* Incluye el padding y el border en el ancho total */
 }
 
+
+.navbaricon{ /*ajute al icono de la barra de admin dashboard*/
+  display: flex;
+  padding-left: 50px;
+  max-width: 100%; 
+}
