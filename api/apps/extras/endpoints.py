@@ -1,6 +1,13 @@
 from fastapi import APIRouter
 from . import models, crud
 
+#Imports for Authentication in cognito
+import requests
+import base64
+
+AUTH_DOMAIN='https://login.igdrasilteam.com/realms/IgDrasilConnect/'
+BASE64AUTH='QVdTX09JREM6UGRzdzJaZFp6czFDWFFhVTNQUlNFRHlrWXlFRjRkY1A='
+
 router = APIRouter(
     prefix="/extras", 
     tags=["extras"],
@@ -37,17 +44,38 @@ async def get_IAM(deviceID: str) -> str:
     Starts the IAM oauth process.
     '''
     return "example.com/IAM"
-
+ 
 @router.get("/IAM/callback", tags=["auth"])
-async def get_IAM_callback() -> models.Token:
+async def get_IAM_callback(code:str) -> models.Token:
     '''
     Returns the IAM token.
     Finishes the IAM oauth process.
 
     Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
     '''
+    #Endpoints
+    authorization_endpoint = AUTH_DOMAIN + "protocol/openid-connect/auth"
+    token_endpoint = AUTH_DOMAIN + "protocol/openid-connect/token"
+    userInfo_endpoint = AUTH_DOMAIN + "protocol/openid-connect/userinfo"
 
-    return models.Token(token="example_token", refresh="example_refresh", deviceID="example_deviceID")
+    keycloak_id = "AWS_OIDC"
+    keycloak_secret = "Pdsw2ZdZzs1CXQaU3PRSEDykYyEF4dcP"
+
+    #Create the request for the token
+    parameters = {'grant_type' : 'authorization_code', 'code' : code, 'client_id' : keycloak_id, 'redirect_uri' : 'http://localhost:8080/extras/IAM/callback'}
+    req_headers = {'Content-Type' : 'application/x-www-form-urlencoded', 'Authorization' : 'Basic ' + BASE64AUTH}
+    r = requests.request('POST', url = token_endpoint, data = parameters, headers=req_headers, verify=False)
+    #TODO: Add verification of the token with the keycloak certificate
+
+    #Saves the info returned from the token Endpoint
+    id_token = str(r.json().get("id_token", "NO ID TOKEN"))
+    access_token = str(r.json().get("access_token", "NO ACCESS TOKEN"))
+    refresh_token = str(r.json().get("refresh_token", "NO REFRESH TOKEN"))
+
+    #Create the request for the user info
+    r2 = requests.request('GET', url = userInfo_endpoint, headers= {'Authorization' : 'Bearer ' + access_token}, verify=False)
+
+    return models.Token(token= id_token, refresh= refresh_token, deviceID= str(r2.json()))
 
 @router.get("/IAM/refresh", tags=["auth"])
 async def get_IAM_refresh(refresh: str, deviceID: str) -> models.Token:
