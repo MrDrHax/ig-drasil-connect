@@ -1,37 +1,38 @@
 import React from 'react';
 import { Button, Card} from 'react-bootstrap';
-import '../Styles/Login.css';
-import AmazonLogo from '../img/aws.svg';
-import Igdrasil from '../img/ig-drasil.png';
-import TicketMasterLogo from '../img/ticketmaster.svg';
-import Ticket from '../img/ticket.svg';
+import '../Styles/Login.css'; // Importa el archivo CSS para estilos específicos de este componente
+import Igdrasil from '../img/ig-drasil.png'; // Importa la imagen de Igdrasil
+import TicketMasterLogo from '../img/ticketmaster.svg'; // Importa el logo de TicketMaster
+import Ticket from '../img/ticket.svg'; // Importa la imagen de un ticket
 
-
+// Definición del componente de inicio de sesión
 function LogIn() {
   return (
-    <div className='Container'>
+    <div className='Container'> {/* Contenedor principal con clase 'Container' */}
       <div>
-          <Card className='leftCard'>
+          <Card className='leftCard'> {/* Tarjeta izquierda con clase 'leftCard' */}
             <Card.Body>
-              <img className='t-logo' src={TicketMasterLogo} alt="TicketMaster Logo"/>
-              <img className='ticket' src={Ticket} alt='Ticketmaster Ticket'/>
-              <Card.Text className='text'>
+              <img className='t-logo' src={TicketMasterLogo} alt="TicketMaster Logo"/> {/* Logo de TicketMaster */}
+              <img className='ticket' src={Ticket} alt='Ticketmaster Ticket'/> {/* Imagen de un ticket */}
+              <Card.Text className='text'> {/* Texto de bienvenida */}
                 Welcome Back!
               </Card.Text>
             </Card.Body>
          </Card>
         </div>
          <div>
-         <Card className='rightCard'>
+         <Card className='rightCard'> {/* Tarjeta derecha con clase 'rightCard' */}
             <Card.Body> 
-              <Card.Text className='awsText'>
+              <Card.Text className='awsText'> {/* Texto de inicio de sesión */}
                 Log in here
               </Card.Text>
-              {/* <Button className='button' variant="secondary"><img className='awsLogo' src={AmazonLogo} alt="Amazon Logo" /></Button> */}
-              <Button style={{ width:'250px'}} className='button' variant="secondary"><img style={{ maxWidth:'auto', height:'auto'}}  className='igdrasil' src={Igdrasil} alt="Igdrasil Logo" /></Button>
+              {/* Botón de inicio de sesión con imagen */}
+              <Button style={{ width:'250px'}} className='button' variant="secondary">
+                <img style={{ maxWidth:'auto', height:'auto'}}  className='igdrasil' src={Igdrasil} alt="Igdrasil Logo" />
+              </Button>
               <br/>
               <br/>
-              <a href="http://">Forgot Password?</a>
+              <a href="http://">Forgot Password?</a> {/* Enlace para restablecer la contraseña */}
             </Card.Body>
          </Card>
         </div>
@@ -39,4 +40,4 @@ function LogIn() {
   );
 }
 
-export default LogIn;
+export default LogIn; // Exporta el componente de inicio de sesión
