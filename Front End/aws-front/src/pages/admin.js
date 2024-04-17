@@ -26,22 +26,21 @@ export default function NavBar() {
     <div>
       {/* Barra de navegación */}
       <div className="navbarAdmin">
-      <Link //Se crea el link hacia Home desde la barra de navegación (ícono de la casa)
-          to="/"
-          className={`navitemAdmin ${activeTab === 'Home' ? 'active' : ''}`}
-          onClick={() => handleTabClick('Home')}
-        >
-          {/* Icono de casa */}
-          <img className='navbaricon' src={AmazonLogo} alt="Home" />
-        </Link>
         <div /* Barra de navegación sección de name que se expandirá para cuando haya llamadas */
           className={`navitemAdmin ${activeTab === 'Name' ? 'active' : ''}`}
           onClick={() => handleTabClick('Name')}
         >
-          Name
+            Name
+        </div>
+        <div
+          /* Barra de navegación de team */
+          className={`navitemAdmin ${activeTab === 'Overall' ? 'active' : ''}`} /* parte de fer*/
+          onClick={() => handleTabClick('Overall')}
+        >
+          Overall
         </div>
         <div /* Barra de navegación de team */
-          className={`nav-itemAdmin ${activeTab === 'Team' ? 'active' : ''}`}
+          className={`navitemAdmin ${activeTab === 'Team' ? 'active' : ''}`}
           onClick={() => handleTabClick('Team')}
         >
           Team
@@ -69,6 +68,7 @@ export default function NavBar() {
        {/* Contenido de la pestaña activa */}
        <div className="tab-contentAdmin">
         {activeTab === 'Name' && <div>Contenido de la pestaña Name</div>}
+        {activeTab === 'Overall' && <div>Contenido de la pestaña Overall</div>}
         {activeTab === 'Team' && 
   <div className="team-container" /* contenido de team, gráficas y resumen */> 
     <div className="metrics-section" /* gráficas */>
