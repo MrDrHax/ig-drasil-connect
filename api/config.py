@@ -12,3 +12,7 @@ class Config:
     PORT = os.getenv('PORT', 8080)
     HOST = os.getenv('HOST', 'localhost')
     DEBUG = os.getenv('DEBUG', False)
+    AUTH_DOMAIN = os.getenv('AUTH_DOMAIN', '>_<')
+    BASE64AUTH = os.getenv('BASE64AUTH', '>_<')
+    MY_DOMAIN = os.getenv('MY_DOMAIN', '>_<')
+    KEYCLOAK_ID = os.getenv('KEYCLOAK_ID', '>_<')
