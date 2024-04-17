@@ -1,12 +1,10 @@
 from fastapi import APIRouter
 from . import models, crud
+from config import Config
 
 #Imports for Authentication in cognito
 import requests
 import base64
-
-AUTH_DOMAIN='https://login.igdrasilteam.com/realms/IgDrasilConnect/'
-BASE64AUTH='QVdTX09JREM6UGRzdzJaZFp6czFDWFFhVTNQUlNFRHlrWXlFRjRkY1A='
 
 router = APIRouter(
     prefix="/extras", 
@@ -54,16 +52,15 @@ async def get_IAM_callback(code:str) -> models.Token:
     Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
     '''
     #Endpoints
-    authorization_endpoint = AUTH_DOMAIN + "protocol/openid-connect/auth"
-    token_endpoint = AUTH_DOMAIN + "protocol/openid-connect/token"
-    userInfo_endpoint = AUTH_DOMAIN + "protocol/openid-connect/userinfo"
+    authorization_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/auth"
+    token_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/token"
+    userInfo_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/userinfo"
 
-    keycloak_id = "AWS_OIDC"
-    keycloak_secret = "Pdsw2ZdZzs1CXQaU3PRSEDykYyEF4dcP"
+    redirect_uri = Config.MY_DOMAIN + "extras/IAM/callback"
 
     #Create the request for the token
-    parameters = {'grant_type' : 'authorization_code', 'code' : code, 'client_id' : keycloak_id, 'redirect_uri' : 'http://localhost:8080/extras/IAM/callback'}
-    req_headers = {'Content-Type' : 'application/x-www-form-urlencoded', 'Authorization' : 'Basic ' + BASE64AUTH}
+    parameters = {'grant_type' : 'authorization_code', 'code' : code, 'client_id' : Config.KEYCLOAK_ID, 'redirect_uri' : redirect_uri}
+    req_headers = {'Content-Type' : 'application/x-www-form-urlencoded', 'Authorization' : 'Basic ' + Config.BASE64AUTH}
     r = requests.request('POST', url = token_endpoint, data = parameters, headers=req_headers, verify=False)
     #TODO: Add verification of the token with the keycloak certificate
 
