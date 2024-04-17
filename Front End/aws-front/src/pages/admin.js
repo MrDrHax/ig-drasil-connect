@@ -14,6 +14,14 @@ export default function NavBar() {
     setActiveTab(tabName);
   };
 
+  // Estado para almacenar el agente seleccionado en los mensajes
+  const [selectedAgent, setSelectedAgent] = useState(null);
+
+  // Función para cambiar de agente cuando se hace clic
+  const handleAgentClick = (agent) => {
+    setSelectedAgent(agent);
+  };
+
   return (
     <div>
       {/* Barra de navegación */}
@@ -127,7 +135,32 @@ export default function NavBar() {
 }
 
 
-        {activeTab === 'Messages' && <div>Contenido de la pestaña Messages</div>}
+{activeTab === 'Messages' && (
+  <div className="messages-container">
+    {/* Agent list on the left */}
+    <div className="agent-list">
+      {Array.from({ length: 10 }, (_, index) => index + 1).map(agent => (
+        <div key={agent} className={`agent-item ${selectedAgent === agent ? 'active' : ''}`} onClick={() => handleAgentClick(agent)}>
+          Agent {agent}
+        </div>
+      ))}
+    </div>
+
+    {/* Chat content on the right */}
+    <div className="chat-content">
+      {selectedAgent ? (
+        <div>
+          <h3>Chat for Agent {selectedAgent}</h3>
+          {/* Replace this with actual chat component */}
+          <div>Chat content for Agent {selectedAgent} goes here...</div>
+        </div>
+      ) : (
+        <div>Select an agent to start chatting</div>
+      )}
+    </div>
+  </div>
+)}
+
         {activeTab === 'Reports' && /* Sección de reportes data a cambiar con queries */
         
         <div className="calls-container"/*Hereda el formato y media queries de calls*/ >
