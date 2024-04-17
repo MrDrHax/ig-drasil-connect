@@ -5,6 +5,7 @@
     color: white; /* Color del texto */
     padding: 10px; /* Espaciado interno */
     padding-right: 40px;
+    padding-top: 10px;
   }
  
   .nav-itemAdmin {
@@ -89,6 +90,6 @@
 
 .navbaricon{ /*ajute al icono de la barra de admin dashboard*/
   display: flex;
-  padding-left: 50px;
-  max-width: 100%; 
+  margin-top: -18px;
+  padding-left: 20px;
 }
