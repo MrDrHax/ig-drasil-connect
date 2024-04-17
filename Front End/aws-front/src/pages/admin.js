@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import '../Styles/NavBar.css'; // Archivo de estilos para la barra de navegación
-import { Link } from "react-router-dom"; //Importamos Link para poder redirigir hacia las diferentes páginas
 import BarChart from '../Componetes/BarChart';  
 import PieChart from '../Componetes/PieChart';
-import AmazonLogo from '../img/home.svg'; 
 
 export default function NavBar() {
   // Estado para almacenar qué pestaña está activa
@@ -12,6 +10,7 @@ export default function NavBar() {
   // Función para cambiar la pestaña activa cuando se hace clic en un elemento de la barra de navegación
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
+    setSelectedAgent(null);
   };
 
   // Estado para almacenar el agente seleccionado en los mensajes

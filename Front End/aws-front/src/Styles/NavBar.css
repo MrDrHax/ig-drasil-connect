@@ -24,6 +24,11 @@
   border-right: none; /* Elimina el borde derecho del último elemento */
 }
 
+.navitemAdmin.active {
+  background-color: #B8ACD1;
+  color: black;
+}
+
   .navbarAdmin .nameadmin {
     background-color: #3C5468;
     padding-left: 100px;
@@ -138,3 +143,4 @@
 .chat-content {
   flex: 2;
 }
+
