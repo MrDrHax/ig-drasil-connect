@@ -93,3 +93,29 @@
   margin-top: -18px;
   padding-left: 20px;
 }
+
+.messages-container {
+  display: flex;
+}
+
+.agent-list {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.agent-item {
+  cursor: pointer;
+  padding: 10px;
+}
+
+.agent-item:hover {
+  background-color: #f0f0f0;
+}
+
+.agent-item.active {
+  background-color: #e0e0e0;
+}
+
+.chat-content {
+  flex: 2;
+}
