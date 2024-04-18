@@ -10,21 +10,40 @@ export function AgentList(page = 1, limit = 10) {
             name: "John Doe",
             queue: "Support",
             status: "connected",
+            requireHelp: false,
             id: 1
         },
         {
             avatar: "/img/team-2.jpeg",
-            name: "John Doe",
+            name: "Alex",
             queue: "Support",
             status: "disconnected",
+            requireHelp: false,
             id: 2
         },
         {
             avatar: "/img/team-2.jpeg",
-            name: "John Doe",
-            queue: "Support",
+            name: "Robbert",
+            queue: "Tickets",
             status: "on-call",
+            requireHelp: true,
             id: 3
+        },
+        {
+            avatar: "/img/team-2.jpeg",
+            name: "Alex",
+            queue: "Tickets",
+            status: "busy",
+            requireHelp: true,
+            id: 4
+        },
+        {
+            avatar: "/img/team-2.jpeg",
+            name: "Alex",
+            queue: "Refunds",
+            status: "on-break",
+            requireHelp: true,
+            id: 5
         }
     ]
 }

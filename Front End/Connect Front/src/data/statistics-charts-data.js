@@ -5,7 +5,7 @@ const websiteViewsChart = {
   height: 220,
   series: [
     {
-      name: "Views",
+      name: "Capcity",
       data: [50, 20, 10, 22, 50, 10, 40],
     },
   ],
@@ -20,7 +20,7 @@ const websiteViewsChart = {
     },
     xaxis: {
       ...chartsConfig.xaxis,
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
+      categories: ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7"],
     },
   },
 };
@@ -30,7 +30,7 @@ const dailySalesChart = {
   height: 220,
   series: [
     {
-      name: "Sales",
+      name: "Reports",
       data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
     },
   ],
@@ -39,9 +39,10 @@ const dailySalesChart = {
     colors: ["#0288d1"],
     stroke: {
       lineCap: "round",
+      curve: "smooth",
     },
     markers: {
-      size: 5,
+      size: 0,
     },
     xaxis: {
       ...chartsConfig.xaxis,
@@ -71,7 +72,7 @@ const completedTaskChart = {
   ],
   options: {
     ...chartsConfig,
-    colors: ["#388e3c"],
+    colors: ["#a020F0"],
     stroke: {
       lineCap: "round",
     },
@@ -107,22 +108,22 @@ const completedTasksChart = {
 export const statisticsChartsData = [
   {
     color: "white",
-    title: "Website View",
-    description: "Last Campaign Performance",
-    footer: "campaign sent 2 days ago",
+    title: "Queues",
+    description: "Table showing queue capacity",
+    footer: "Updated 2 min ago",
     chart: websiteViewsChart,
   },
   {
     color: "white",
-    title: "Daily Sales",
-    description: "15% increase in today sales",
-    footer: "updated 4 min ago",
+    title: "Monthly Reports",
+    description: "15% increas from last month",
+    footer: "updated 1 day ago",
     chart: dailySalesChart,
   },
   {
     color: "white",
-    title: "Completed Tasks",
-    description: "Last Campaign Performance",
+    title: "Unfinished calls",
+    description: "Shows amount of unfinished calls per month",
     footer: "just updated",
     chart: completedTasksChart,
   },

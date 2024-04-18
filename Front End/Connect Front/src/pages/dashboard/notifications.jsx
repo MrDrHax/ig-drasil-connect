@@ -45,44 +45,56 @@ export function Notifications() {
               color={color}
               onClose={() => setShowAlerts((current) => ({ ...current, [color]: false }))}
             >
-              A simple {color} alert with an <a href="#">example link</a>. Give
-              it a click if you like.
+              {color === "gray" && (
+                <span>This is an information alert message.</span>
+              )}
+              {color === "green" && (
+                <span>This is a logs alert message.</span>
+              )}
+              {color === "orange" && (
+                <span>This is an agent alert message.</span>
+              )}
+              {color === "red" && (
+                <span>This is an issue call alert message.</span>
+              )}
+              
             </Alert>
           ))}
         </CardBody>
       </Card>
-      <Card>
-        <CardHeader
-          color="transparent"
-          floated={false}
-          shadow={false}
-          className="m-0 p-4"
-        >
-          <Typography variant="h5" color="blue-gray">
-            Alerts with Icon
-          </Typography>
-        </CardHeader>
-        <CardBody className="flex flex-col gap-4 p-4">
-          {alerts.map((color) => (
-            <Alert
-              key={color}
-              open={showAlertsWithIcon[color]}
-              color={color}
-              icon={
-                <InformationCircleIcon strokeWidth={2} className="h-6 w-6" />
-              }
-              onClose={() => setShowAlertsWithIcon((current) => ({
-                ...current,
-                [color]: false,
-              }))}
-            >
-              A simple {color} alert with an <a href="#">example link</a>. Give
-              it a click if you like.
-            </Alert>
-          ))}
-        </CardBody>
-      </Card>
-      <MessageCard>
+     {/*
+     |<Card>
+     <CardHeader
+       color="transparent"
+       floated={false}
+       shadow={false}
+       className="m-0 p-4"
+     >
+       <Typography variant="h5" color="blue-gray">
+         Alerts with Icon
+       </Typography>
+     </CardHeader>
+     <CardBody className="flex flex-col gap-4 p-4">
+       {alerts.map((color) => (
+         <Alert
+           key={color}
+           open={showAlertsWithIcon[color]}
+           color={color}
+           icon={
+             <InformationCircleIcon strokeWidth={2} className="h-6 w-6" />
+           }
+           onClose={() => setShowAlertsWithIcon((current) => ({
+             ...current,
+             [color]: false,
+           }))}
+         >
+           A simple {color} alert with an <a href="#">example link</a>. Give
+           it a click if you like.
+         </Alert>
+       ))}
+     </CardBody>
+   </Card>
+   <MessageCard>
         <Typography variant="h5" color="blue-gray">
           Message Card
         </Typography>
@@ -90,6 +102,8 @@ export function Notifications() {
           This is a message card. It is used to display messages to the user.
         </Typography>
       </MessageCard>
+      */} 
+      
 
     </div>
   );

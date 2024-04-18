@@ -3,6 +3,7 @@ import {
     CardHeader,
     CardBody,
     Typography,
+    Input,
     Avatar,
     Chip,
     Tooltip,
@@ -15,22 +16,41 @@ import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { UsersIcon, CogIcon } from "@heroicons/react/24/solid";
 import { chartsConfig } from "@/configs";
-
+import React, { useState } from 'react';
 
 function getColorOfStatus(status) {
     switch (status) {
         case "connected":
             return "green";
-        case "disconected":
-            return "red";
+        case "disconnected":
+            return "black";
         case "on-call":
+            return "blue";
+        case "busy":
             return "orange";
+        case "on-break":
+            return "red";
+        default:
+            return "gray";
     }
 }
 
 export function Teams() {
+
+    let [searchQuery, setSearchQuery] = useState('');
+    let [filteredAgents, setFilteredAgents] = useState([]);
+
     let data = AgentList();
     let summaryData = AgentsSummary();
+
+    function handleSearch(event) {
+        let query = event.target.value.toLowerCase();
+        setSearchQuery(query);
+        let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
+        setFilteredAgents(filtered);
+    }
+
+    let agentsToDisplay = searchQuery ? filteredAgents : data;
 
     // var theThingToDo = {
     //     type: "pie",
@@ -59,6 +79,8 @@ export function Teams() {
 
     return (
         <div>
+            
+
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 <StatisticsCard
                     key="Connected"
@@ -131,20 +153,30 @@ export function Teams() {
             </div>
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card>
-                    <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-                        <Typography variant="h6" color="white">
+                    <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex">
+                        <Typography variant="h6" color="white" className="flex-none">
                             Agents
                         </Typography>
 
-                        <Typography variant="body2" color="white">
-                            TODO: add search and filters
+                        <div className="flex-grow"></div>
+
+                        <Typography variant="body2" color="white" class="flex-1">
+                            <div className="mr-auto md:mr-4 md:w-56">
+                                {/* Search bar */}
+                                <Input
+                                    color="white"
+                                    label="Search by name"
+                                    value={searchQuery}
+                                    onChange={handleSearch}
+                                />
+                            </div>
                         </Typography>
                     </CardHeader>
                     <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                         <table className="w-full min-w-[640px] table-auto">
                             <thead>
                                 <tr>
-                                    {["author", "queue", "status", ""].map((el) => (
+                                    {["author", "queue", "status", "needs help",""].map((el) => (
                                         <th
                                             key={el}
                                             className="border-b border-blue-gray-50 py-3 px-5 text-left"
@@ -160,8 +192,8 @@ export function Teams() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.map(
-                                    ({ avatar, name, queue, status, id }, key) => {
+                                {agentsToDisplay.map(
+                                    ({ avatar, name, queue, status, requireHelp, id }, key) => {
                                         const className = `py-3 px-5 ${key === data.length - 1
                                             ? ""
                                             : "border-b border-blue-gray-50"
@@ -195,6 +227,15 @@ export function Teams() {
                                                         value={status}
                                                         className="py-0.5 px-2 text-[11px] font-medium w-fit"
                                                     />
+                                                </td>
+                                                <td className={className}>
+                                                    <Typography
+                                                        as="a"
+                                                        href="#"
+                                                        className="text-xs font-semibold text-blue-gray-600"
+                                                    >
+                                                        {requireHelp ? "H" : "N"}
+                                                    </Typography>
                                                 </td>
                                                 <td className={className}>
                                                     <Typography
