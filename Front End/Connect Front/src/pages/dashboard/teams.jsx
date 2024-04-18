@@ -14,7 +14,7 @@ import {
 import { AgentList, AgentsSummary } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
-import { UsersIcon, CogIcon } from "@heroicons/react/24/solid";
+import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { chartsConfig } from "@/configs";
 import React, { useState } from 'react';
 
@@ -79,7 +79,7 @@ export function Teams() {
 
     return (
         <div>
-            
+
 
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 <StatisticsCard
@@ -176,7 +176,7 @@ export function Teams() {
                         <table className="w-full min-w-[640px] table-auto">
                             <thead>
                                 <tr>
-                                    {["author", "queue", "status", "needs help",""].map((el) => (
+                                    {["author", "queue", "status", "needs help", ""].map((el) => (
                                         <th
                                             key={el}
                                             className="border-b border-blue-gray-50 py-3 px-5 text-left"
@@ -228,14 +228,8 @@ export function Teams() {
                                                         className="py-0.5 px-2 text-[11px] font-medium w-fit"
                                                     />
                                                 </td>
-                                                <td className={className}>
-                                                    <Typography
-                                                        as="a"
-                                                        href="#"
-                                                        className="text-xs font-semibold text-blue-gray-600"
-                                                    >
-                                                        {requireHelp ? "H" : "N"}
-                                                    </Typography>
+                                                <td className={className}> 
+                                                    {requireHelp ? <ExclamationCircleIcon class="h-6 w-6 text-red-500" /> : <CheckCircleIcon class="h-6 w-6 text-green-500" />}
                                                 </td>
                                                 <td className={className}>
                                                     <Typography
