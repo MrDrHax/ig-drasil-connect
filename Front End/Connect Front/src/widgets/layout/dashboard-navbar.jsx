@@ -26,8 +26,7 @@ import {
   setOpenSidenav,
 } from "@/context";
 
-function handleTabClick(tab)
-{
+function handleTabClick(tab) {
   const history = useHistory();
   history.push(`/${tab}`);
 }
@@ -42,8 +41,8 @@ export function DashboardNavbar() {
     <Navbar
       color={fixedNavbar ? "white" : "transparent"}
       className={`rounded-xl transition-all ${fixedNavbar
-          ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
-          : "px-0 py-1"
+        ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
+        : "px-0 py-1"
         }`}
       fullWidth
       blurred={fixedNavbar}
@@ -80,7 +79,7 @@ export function DashboardNavbar() {
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'home' ? 'bg-blue-gray-400' : ''}`} 
+                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'home' ? 'bg-blue-gray-400' : ''}`}
               >
                 Home
               </Link>
@@ -106,11 +105,11 @@ export function DashboardNavbar() {
           </Typography>
         </div>
         <div className="flex items-center">
-         {/*
+          {/*
          <div className="mr-auto md:mr-4 md:w-56">
             <Input label="Search" />
           </div>
-         */} 
+         */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -119,14 +118,14 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-          <Link to="/auth/sign-in">
+          <Link to="https://igdrasilconnect.awsapps.com/start">
             <Button
               variant="text"
               color="blue-gray"
               className="hidden items-center gap-1 px-4 xl:flex normal-case"
             >
               <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-              Sign In
+              Alex
             </Button>
             <IconButton
               variant="text"
@@ -180,7 +179,7 @@ export function DashboardNavbar() {
                     color="blue-gray"
                     className="mb-1 font-normal"
                   >
-                    <strong>Issue with</strong> agent pedro 
+                    <strong>Issue with</strong> agent pedro
                   </Typography>
                   <Typography
                     variant="small"
