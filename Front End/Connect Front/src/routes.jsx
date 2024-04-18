@@ -5,11 +5,15 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  CircleStackIcon,
+  QueueListIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
 
-import { Teams } from "@/pages/dashboard/teams";
+import { Teams } from "@/pages/dashboard/teams"
+import { Queues } from "@/pages/dashboard/queues";
+
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -48,6 +52,12 @@ export const routes = [
         name: "team",
         path: "/team",
         element: <Teams />,
+      },
+      {
+        icon: <QueueListIcon {...icon} />,
+        name: "queues",
+        path: "/queues",
+        element: <Queues />,
       },
     ],
   },
