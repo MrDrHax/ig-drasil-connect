@@ -97,7 +97,7 @@ export function DashboardNavbar() {
                 Queues
               </Link>
               <Link
-                to="/dashboard/alerts"
+                to="/dashboard/notifications"
                 className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'alerts' ? 'bg-blue-gray-400' : ''}`}
               >
                 Alerts
@@ -106,9 +106,11 @@ export function DashboardNavbar() {
           </Typography>
         </div>
         <div className="flex items-center">
-          <div className="mr-auto md:mr-4 md:w-56">
+         {/*
+         <div className="mr-auto md:mr-4 md:w-56">
             <Input label="Search" />
           </div>
+         */} 
           <IconButton
             variant="text"
             color="blue-gray"
@@ -154,7 +156,7 @@ export function DashboardNavbar() {
                     color="blue-gray"
                     className="mb-1 font-normal"
                   >
-                    <strong>New message</strong> from Laur
+                    <strong>agent 1</strong> has connected a call
                   </Typography>
                   <Typography
                     variant="small"
@@ -167,7 +169,7 @@ export function DashboardNavbar() {
               </MenuItem>
               <MenuItem className="flex items-center gap-4">
                 <Avatar
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/small-logos/logo-spotify.svg"
+                  src="https://imgs.search.brave.com/YHSiLIxYYxfQCMAe51EOOPS0oevNKqtWXeUyDvJF7mU/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pMC53/cC5jb20vbmV3c3Bh/Y2stZWxzb2wuczMu/YW1hem9uYXdzLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/NC8wNC9NYXBhY2hl/LVBlZHJvLmpwZz9m/aXQ9ODMwLDYyMyZz/c2w9MQ"
                   alt="item-1"
                   size="sm"
                   variant="circular"
@@ -178,7 +180,7 @@ export function DashboardNavbar() {
                     color="blue-gray"
                     className="mb-1 font-normal"
                   >
-                    <strong>New album</strong> by Travis Scott
+                    <strong>Issue with</strong> agent pedro 
                   </Typography>
                   <Typography
                     variant="small"

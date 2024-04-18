@@ -9,10 +9,16 @@ export function reducer(state, action) {
     case "OPEN_SIDENAV": {
       return { ...state, openSidenav: action.value };
     }
+    case "THEME": {
+      return { ...state, theme: action.value };
+    }
+    case "FONT": {
+      return { ...state, theme: action.value };
+    }
     case "SIDENAV_TYPE": {
       return { ...state, sidenavType: action.value };
     }
-    case "SIDENAV_COLOR": {
+    case "NAV_COLOR": {
       return { ...state, sidenavColor: action.value };
     }
     case "TRANSPARENT_NAVBAR": {
@@ -38,6 +44,8 @@ export function MaterialTailwindControllerProvider({ children }) {
     transparentNavbar: true,
     fixedNavbar: false,
     openConfigurator: false,
+    theme: "light",
+    font: "normal",
   };
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);
@@ -73,10 +81,12 @@ MaterialTailwindControllerProvider.propTypes = {
 
 export const setOpenSidenav = (dispatch, value) =>
   dispatch({ type: "OPEN_SIDENAV", value });
-export const setSidenavType = (dispatch, value) =>
-  dispatch({ type: "SIDENAV_TYPE", value });
-export const setSidenavColor = (dispatch, value) =>
-  dispatch({ type: "SIDENAV_COLOR", value });
+export const setTheme = (dispatch, value) =>
+  dispatch({ type: "THEME", value });
+export const setFont = (dispatch, value) =>
+  dispatch({ type: "FONT", value });
+export const setNavColor = (dispatch, value) =>
+  dispatch({ type: "NAV_COLOR", value });
 export const setTransparentNavbar = (dispatch, value) =>
   dispatch({ type: "TRANSPARENT_NAVBAR", value });
 export const setFixedNavbar = (dispatch, value) =>

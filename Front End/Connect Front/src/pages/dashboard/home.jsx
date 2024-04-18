@@ -31,7 +31,7 @@ export function Home() {
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
+        {statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
             {...rest}
@@ -65,7 +65,7 @@ export function Home() {
           />
         ))}
       </div>
-      <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
+      {/* <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
           <CardHeader
             floated={false}
@@ -250,7 +250,7 @@ export function Home() {
             )}
           </CardBody>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }

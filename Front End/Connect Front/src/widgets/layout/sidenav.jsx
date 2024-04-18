@@ -24,7 +24,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
         openSidenav ? "translate-x-0" : "-translate-x-80"
       } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
     >
-      <div
+      {/* <div
         className={`relative`}
       >
         <Link to="/" className="py-6 px-8 text-center">
@@ -90,6 +90,10 @@ export function Sidenav({ brandImg, brandName, routes }) {
             ))}
           </ul>
         ))}
+      </div> */}
+
+      <div className="relative text-center text-gray-600">
+        <p>TODO: add connect Iframe</p>
       </div>
     </aside>
   );
