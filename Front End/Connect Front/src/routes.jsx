@@ -9,6 +9,8 @@ import {
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
 
+import { Teams } from "@/pages/dashboard/teams";
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -40,6 +42,12 @@ export const routes = [
         name: "notifications",
         path: "/notifications",
         element: <Notifications />,
+      },
+      {
+        icon: <InformationCircleIcon {...icon} />,
+        name: "team",
+        path: "/team",
+        element: <Teams />,
       },
     ],
   },

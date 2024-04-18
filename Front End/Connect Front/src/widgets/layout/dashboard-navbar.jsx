@@ -26,6 +26,12 @@ import {
   setOpenSidenav,
 } from "@/context";
 
+function handleTabClick(tab)
+{
+  const history = useHistory();
+  history.push(`/${tab}`);
+}
+
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
@@ -35,17 +41,16 @@ export function DashboardNavbar() {
   return (
     <Navbar
       color={fixedNavbar ? "white" : "transparent"}
-      className={`rounded-xl transition-all ${
-        fixedNavbar
+      className={`rounded-xl transition-all ${fixedNavbar
           ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
           : "px-0 py-1"
-      }`}
+        }`}
       fullWidth
       blurred={fixedNavbar}
     >
       <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
         <div className="capitalize">
-          <Breadcrumbs
+          {/* <Breadcrumbs
             className={`bg-transparent p-0 transition-all ${
               fixedNavbar ? "mt-1" : ""
             }`}
@@ -56,7 +61,7 @@ export function DashboardNavbar() {
                 color="blue-gray"
                 className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
               >
-                {layout}
+                le test
               </Typography>
             </Link>
             <Typography
@@ -66,9 +71,38 @@ export function DashboardNavbar() {
             >
               {page}
             </Typography>
-          </Breadcrumbs>
-          <Typography variant="h6" color="blue-gray">
+          </Breadcrumbs> */}
+          {/* <Typography variant="h6" color="blue-gray">
             {page}
+          </Typography> */}
+
+          <Typography variant="h6" color="blue-gray">
+            <div className="flex text-center">
+              <Link
+                to="/dashboard/home"
+                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'home' ? 'bg-blue-gray-400' : ''}`} 
+              >
+                Home
+              </Link>
+              <Link
+                to="/dashboard/team"
+                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'team' ? 'bg-blue-gray-400' : ''}`}
+              >
+                Team
+              </Link>
+              <Link
+                to="/dashboard/queues"
+                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'queues' ? 'bg-blue-gray-400' : ''}`}
+              >
+                Queues
+              </Link>
+              <Link
+                to="/dashboard/alerts"
+                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'alerts' ? 'bg-blue-gray-400' : ''}`}
+              >
+                Alerts
+              </Link>
+            </div>
           </Typography>
         </div>
         <div className="flex items-center">
