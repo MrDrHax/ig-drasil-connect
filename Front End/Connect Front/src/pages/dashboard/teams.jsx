@@ -29,8 +29,8 @@ function getColorOfStatus(status) {
 }
 
 export function Teams() {
-    var data = AgentList();
-    var summaryData = AgentsSummary();
+    let data = AgentList();
+    let summaryData = AgentsSummary();
 
     // var theThingToDo = {
     //     type: "pie",
