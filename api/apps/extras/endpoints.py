@@ -1,10 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from . import models, crud
 from config import Config
 
-#Imports for Authentication in cognito
+#Imports for Authentication in IAM Identity Center
 import requests
-import base64
 
 router = APIRouter(
     prefix="/extras", 
@@ -41,7 +40,8 @@ async def get_IAM(deviceID: str) -> str:
     Returns the IAM link.
     Starts the IAM oauth process.
     '''
-    return "example.com/IAM"
+    domain = Config.MY_DOMAIN + "protocol/openid-connect/authorize?response_type=code&client_id=" + Config.KEYCLOAK_ID + "&redirect_uri=" + Config.MY_DOMAIN + "extras/IAM/callback&scope=openid"
+    return domain
  
 @router.get("/IAM/callback", tags=["auth"])
 async def get_IAM_callback(code:str) -> models.Token:
@@ -72,7 +72,13 @@ async def get_IAM_callback(code:str) -> models.Token:
     #Create the request for the user info
     r2 = requests.request('GET', url = userInfo_endpoint, headers= {'Authorization' : 'Bearer ' + access_token}, verify=False)
 
-    return models.Token(token= id_token, refresh= refresh_token, deviceID= str(r2.json()))
+    #Get deviceID
+    try:
+        deviceID = str(r2.json().get("preferred_username", "NO DEVICE ID"))
+    except:
+        deviceID = "NO DEVICE ID"
+
+    return models.Token(id_token= id_token, access_token= access_token, refresh= refresh_token, deviceID= deviceID)
 
 @router.get("/IAM/refresh", tags=["auth"])
 async def get_IAM_refresh(refresh: str, deviceID: str) -> models.Token:
@@ -82,7 +88,7 @@ async def get_IAM_refresh(refresh: str, deviceID: str) -> models.Token:
     Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
     '''
 
-    return models.Token(token="example_token", refresh="example_refresh", deviceID="example_deviceID")
+    return models.Token(id_token="example_token", access_token="example_access_token", refresh="example_refresh", deviceID="example_deviceID")
 
 @router.get("/AI/summary/{callID}", tags=["AI"])
 async def get_AI_summary(callID: int) -> str:

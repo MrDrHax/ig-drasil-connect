@@ -10,6 +10,7 @@ class Extra(BaseModel):
 # This is intentionally left blank.
     
 class Token(BaseModel):
-    token: str
+    id_token: str
+    access_token: str
     refresh: str
     deviceID: str
