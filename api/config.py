@@ -14,5 +14,6 @@ class Config:
     DEBUG = os.getenv('DEBUG', False)
     AUTH_DOMAIN = os.getenv('AUTH_DOMAIN', '>_<')
     BASE64AUTH = os.getenv('BASE64AUTH', '>_<')
-    MY_DOMAIN = os.getenv('MY_DOMAIN', '>_<')
+    MY_DOMAIN = os.getenv('MY_DOMAIN', 'http://localhost:8080/')
     KEYCLOAK_ID = os.getenv('KEYCLOAK_ID', '>_<')
+    INSTANCE_ID = os.getenv('INSTANCE_ID', '>_<')
