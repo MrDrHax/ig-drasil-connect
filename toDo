@@ -1,0 +1,33 @@
+
+1. Schema de la base de datos
+- Terminar el schema de la base de datos:
+- Define las tablas necesarias para almacenar la información requerida por tu aplicación.
+- Especifica los campos de cada tabla, sus tipos de datos y restricciones (claves primarias, claves foráneas, etc.).
+- Considera la normalización de la base de datos para evitar la redundancia de datos y garantizar la integridad de los mismos.
+- Determinar qué campos genera la base de datos de AWS Connect:
+- Investiga la documentación de AWS Connect para identificar qué información se almacena automáticamente en su base de datos.
+- Puedes revisar los esquemas predefinidos proporcionados por AWS y adaptarlos según tus necesidades específicas.
+- Saber si AWS Connect cuenta con endpoints para hacer query hacia sus bases de datos:
+- Consulta la documentación oficial de AWS Connect para verificar si proporciona endpoints para realizar consultas directamente a su base de datos.
+- Si no proporciona endpoints directos, considera utilizar otras opciones como AWS Lambda o API Gateway para acceder a los datos de forma segura.
+
+2. Creación de la base de datos
+- Investigar cómo se trabajan los archivos JSON dentro de PostgreSQL:
+- PostgreSQL ofrece soporte nativo para campos JSON y JSONB, lo que te permite almacenar y consultar datos en formato JSON.
+- Investiga las funciones y operadores disponibles en PostgreSQL para trabajar con datos JSON.
+- Considera cómo estructurar tus tablas para aprovechar al máximo las capacidades de almacenamiento JSON de PostgreSQL.
+- Optar por MongoDB:
+- Evalúa las características y ventajas de MongoDB en comparación con PostgreSQL para determinar si se ajusta mejor a tus necesidades.
+- Considera factores como la flexibilidad del esquema, la escalabilidad y el rendimiento para tomar una decisión informada.
+- Usar un ORM para trabajar con la base de datos:
+- Investiga diferentes ORMs (Object-Relational Mapping) disponibles para Python, como SQLAlchemy u ORM de Django.
+- Elige un ORM que se integre bien con el tipo de base de datos que decidas utilizar y que te proporcione las funcionalidades necesarias para tu aplicación.
+
+3. Lógica de negocio
+- Determinar las rutas y los controladores:
+- Define las rutas de la API que expondrán tu aplicación y los controladores asociados que manejarán las solicitudes HTTP.
+- Utiliza un enfoque RESTful para diseñar tus rutas y controladores de manera coherente y escalable.
+- Determinar qué información hay que proteger de la base de datos:
+- Identifica los datos sensibles que deben protegerse y considera estrategias como la encriptación de datos, el acceso basado en roles y la limitación de acceso a través de vistas o procedimientos almacenados.
+- Determinar si se van a implementar middlewares para los endpoints:
+- Evalúa si es necesario implementar middlewares para agregar funcionalidades comunes a tus endpoints, como autenticación, autorización, registro de solicitudes, etc.
