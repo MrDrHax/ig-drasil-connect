@@ -96,10 +96,10 @@ export function DashboardNavbar() {
                 Queues
               </Link>
               <Link
-                to="/dashboard/notifications"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'alerts' ? 'bg-blue-gray-400' : ''}`}
+                to="/dashboard/agent"
+                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'agent' ? 'bg-blue-gray-400' : ''}`}
               >
-                Alerts
+                agent
               </Link>
             </div>
           </Typography>
