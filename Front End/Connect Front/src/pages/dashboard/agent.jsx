@@ -1,12 +1,38 @@
-import { StatisticsChart } from "@/widgets/charts";
+import React from "react";
 import {
-  statisticsCardsDataAgent as statisticsCardsData,
+  Typography,
+  Card,
+  CardHeader,
+  CardBody,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Avatar,
+  Tooltip,
+  Progress,
+  Accordion,
+  AccordionBody,
+  AccordionHeader,
+} from "@material-tailwind/react";
+import {
+  EllipsisVerticalIcon,
+  ArrowUpIcon,
+} from "@heroicons/react/24/outline";
+import {StatisticsCardAgent as StatisticsCard } from "@/widgets/cards";
+import { StatisticsChart } from "@/widgets/charts";
+// import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
+import {
+  statisticsCardsData,
   statisticsChartsData,
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
+
+
 
 export function Agent() {
   return (
