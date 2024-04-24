@@ -6,7 +6,7 @@ const websiteViewsChart = {
   series: [
     {
       name: "Capcity",
-      data: [50, 20, 10, 22, 50, 10, 40],
+      data: [40, 20, 10, 22, 50, 10, 40],
     },
   ],
   options: {

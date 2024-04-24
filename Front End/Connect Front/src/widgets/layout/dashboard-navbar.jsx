@@ -75,7 +75,7 @@ export function DashboardNavbar() {
             {page}
           </Typography> */}
 
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" color="black">
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
@@ -99,7 +99,7 @@ export function DashboardNavbar() {
                 to="/dashboard/agent"
                 className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'agent' ? 'bg-blue-gray-400' : ''}`}
               >
-                agent
+                Home agent
               </Link>
             </div>
           </Typography>

@@ -13,13 +13,13 @@ export function reducer(state, action) {
       return { ...state, theme: action.value };
     }
     case "FONT": {
-      return { ...state, theme: action.value };
+      return { ...state, font: action.value };
     }
     case "SIDENAV_TYPE": {
       return { ...state, sidenavType: action.value };
     }
     case "NAV_COLOR": {
-      return { ...state, sidenavColor: action.value };
+      return { ...state, navColor: action.value };
     }
     case "TRANSPARENT_NAVBAR": {
       return { ...state, transparentNavbar: action.value };
@@ -39,13 +39,13 @@ export function reducer(state, action) {
 export function MaterialTailwindControllerProvider({ children }) {
   const initialState = {
     openSidenav: false,
-    sidenavColor: "dark",
+    navColor: "dark",
     sidenavType: "white",
     transparentNavbar: true,
     fixedNavbar: false,
     openConfigurator: false,
     theme: "light",
-    font: "normal",
+    font: "Normal",
   };
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);
