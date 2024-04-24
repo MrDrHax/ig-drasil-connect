@@ -8,7 +8,7 @@ import {
   CircleStackIcon,
   QueueListIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+import { Home, Profile, Tables, Notifications, Agent } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
 
 import { Teams } from "@/pages/dashboard/teams"
@@ -59,6 +59,12 @@ export const routes = [
         path: "/queues",
         element: <Queues />,
       },
+      {
+        icon: <CircleStackIcon {...icon} />,
+        name: "agent",
+        path: "/agent",
+        element: <Agent />,
+      }
     ],
   },
   {

@@ -40,11 +40,22 @@ async def get_IAM(deviceID: str) -> str:
     Returns the IAM link.
     Starts the IAM oauth process.
     '''
-    domain = Config.MY_DOMAIN + "protocol/openid-connect/authorize?response_type=code&client_id=" + Config.KEYCLOAK_ID + "&redirect_uri=" + Config.MY_DOMAIN + "extras/IAM/callback&scope=openid"
+    # domain = Config.AUTH_DOMAIN + "protocol/openid-connect/authorize?response_type=code&client_id=" + Config.KEYCLOAK_ID + "&redirect_uri=" + Config.MY_DOMAIN + "extras/IAM/callback&scope=openid"
+    domain = f"{Config.AUTH_DOMAIN}protocol/openid-connect/auth?response_type=code&client_id={Config.KEYCLOAK_ID}&redirect_uri={Config.MY_DOMAIN}extras/IAM/callback&scope=openid"
     return domain
- 
+
+@router.get("/login", tags=["auth"])
+async def get_IAM(redirect: str) -> str:
+    '''
+    Returns the IAM link.
+    Starts the IAM oauth process.
+    '''
+    # domain = Config.AUTH_DOMAIN + "protocol/openid-connect/authorize?response_type=code&client_id=" + Config.KEYCLOAK_ID + "&redirect_uri=" + Config.MY_DOMAIN + "extras/IAM/callback&scope=openid"
+    domain = f"{Config.AUTH_DOMAIN}protocol/openid-connect/auth?response_type=code&client_id={Config.KEYCLOAK_ID}&redirect_uri={redirect}&scope=openid"
+    return domain
+
 @router.get("/IAM/callback", tags=["auth"])
-async def get_IAM_callback(code:str) -> models.Token:
+async def get_IAM_callback(code:str, redirect_uri:str) -> models.Token:
     '''
     Returns the IAM token.
     Finishes the IAM oauth process.
@@ -56,7 +67,7 @@ async def get_IAM_callback(code:str) -> models.Token:
     token_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/token"
     userInfo_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/userinfo"
 
-    redirect_uri = Config.MY_DOMAIN + "extras/IAM/callback"
+    # redirect_uri = Config.MY_DOMAIN + "extras/IAM/callback"
 
     #Create the request for the token
     parameters = {'grant_type' : 'authorization_code', 'code' : code, 'client_id' : Config.KEYCLOAK_ID, 'redirect_uri' : redirect_uri}

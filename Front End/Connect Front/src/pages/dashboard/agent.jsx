@@ -20,29 +20,24 @@ import {
   EllipsisVerticalIcon,
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { StatisticsCard } from "@/widgets/cards";
-import { StatisticsChart } from "@/widgets/charts";
-import { RecomendationCard } from "@/widgets/cards";
+import { StatisticsCard, CustomerCard, Lexcard } from "@/widgets/cards";
+// import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
 import {
-  statisticsCardsData,
-  statisticsChartsData,
+  statisticsCardsDataAgent as statisticsCardsData,
+  customerDataAgent,
+  lexRecommetionData,
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor } from "@/context";
 
 
 
-export function Home() {
-  const [open, setOpen] = React.useState(1);
- 
-  const handleOpen = (value) => setOpen(open === value ? 0 : value);
-
+export function Agent() {
   return (
     <div className="mt-12">
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-10 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         {statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
@@ -60,18 +55,19 @@ export function Home() {
           />
         ))}
       </div>
+
+      {/*Aqui es sobre los datos del usuario*/}
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        {statisticsChartsData.map((props) => (
-          <StatisticsChart
-            key={props.title}
-            {...props}
+       {customerDataAgent().map(({name,descripcion, footer, ...rest }) => (
+          <CustomerCard
+            key={name}
+            {...rest}
+            name={name}
+            descripcion={descripcion}
             footer={
-              <Typography
-                variant="small"
-                className="flex items-center font-normal text-blue-gray-600"
-              >
-                <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
-                &nbsp;{props.footer}
+              <Typography className="font-normal text-blue-gray-600">
+                <strong className={footer.color}>{footer.value}</strong>
+                &nbsp;{footer.label}
               </Typography>
             }
           />
@@ -80,7 +76,7 @@ export function Home() {
 
 {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+        <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
           <CardHeader
             floated={false}
             shadow={false}
@@ -120,8 +116,7 @@ export function Home() {
             <Notifications />
           </CardBody>
         </Card>
-        {/* Aquí esta para cambiar el Card de recomendaciones*/}
-        <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+        <Card className="border border-blue-gray-100 shadow-sm">
           <CardHeader
             floated={false}
             shadow={false}
@@ -129,34 +124,53 @@ export function Home() {
             className="m-0 p-6"
           >
             <Typography variant="h6" color="blue-gray" className="mb-2">
-              Recomendations
+              Orders Overview
             </Typography>
             <Typography
               variant="small"
               className="flex items-center gap-1 font-normal text-blue-gray-600"
             >
-              Next a list of recomendations for you
+              <ArrowUpIcon
+                strokeWidth={3}
+                className="h-3.5 w-3.5 text-green-500"
+              />
+              <strong>24%</strong> this month
             </Typography>
           </CardHeader>
           <CardBody className="pt-0">
-            <RecomendationCard 
-              title={<h2>Check Metrics</h2>} 
-              content={<p>Check the client info and metrics</p>}
-              id={1}
-              openID={open}
-              openhandler={() => handleOpen(1)}/>
-      <RecomendationCard 
-              title={<h2>Descelate the call</h2>} 
-              content={<p>Try to calm the client and understand his situation</p>}
-              id={2}
-              openID={open}
-              openhandler={() => handleOpen(2)}/>
-      <RecomendationCard 
-              title={<h2>Prueba</h2>} 
-              content={<p>Hello</p>}
-              id={3}
-              openID={open}
-              openhandler={() => handleOpen(3)}/>
+            {ordersOverviewData.map(
+              ({ icon, color, title, description }, key) => (
+                <div key={title} className="flex items-start gap-4 py-3">
+                  <div
+                    className={`relative p-1 after:absolute after:-bottom-6 after:left-2/4 after:w-0.5 after:-translate-x-2/4 after:bg-blue-gray-50 after:content-[''] ${
+                      key === ordersOverviewData.length - 1
+                        ? "after:h-0"
+                        : "after:h-4/6"
+                    }`}
+                  >
+                    {React.createElement(icon, {
+                      className: `!w-5 !h-5 ${color}`,
+                    })}
+                  </div>
+                  <div>
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="block font-medium"
+                    >
+                      {title}
+                    </Typography>
+                    <Typography
+                      as="span"
+                      variant="small"
+                      className="text-xs font-medium text-blue-gray-500"
+                    >
+                      {description}
+                    </Typography>
+                  </div>
+                </div>
+              )
+            )}
           </CardBody>
         </Card>
       </div> 
@@ -164,4 +178,4 @@ export function Home() {
   );
 }
 
-export default Home;
+export default Agent;

@@ -3,6 +3,7 @@ import {
   UserCircleIcon,
   ClockIcon,
   ChartBarIcon,
+  StarIcon
 } from "@heroicons/react/24/solid";
 
 export function statisticsCardsData() {
@@ -55,4 +56,94 @@ export function statisticsCardsData() {
   ];
 }
 
-export default statisticsCardsData;
+{/*seccion de las carta o recuadros de los datos del agente */}
+
+export function statisticsCardsDataAgent() {
+  console.warn("statisticsCardsData is not yet done")
+  return [
+    {
+      color: "green",
+      icon: UserGroupIcon,
+      title: "People to answer",
+      value: "80",
+      footer: {
+        color: "text-green-500",
+        value: "+32",
+        label: "than today's average",
+      },
+    },
+    {
+      color: "gray",
+      icon: UserCircleIcon,
+      title: "Productive time",
+      value: "6h 30m",
+      footer: {
+        color: "text-green-500",
+        value: "+20min",
+        label: "than expected",
+      },
+    },
+    {
+      color: "amber",
+      icon: StarIcon,
+      title: "Rating",
+      value: "75%",
+      footer: {
+        color: "text-red-500",
+        value: "-3%",
+        label: "than expected",
+      },
+    },
+    {
+      color: "blue",
+      icon: ClockIcon,
+      title: "Average call time",
+      value: "5:23",
+      footer: {
+        color: "text-red-500",
+        value: "+23s",
+        label: "than expected",
+      },
+    },
+  ];
+}
+
+export function customerDataAgent(){
+  return[
+    {
+      name:"Juan Perez",
+      descripcion:"The customer has a issue with ticket #1234, please check the status and provide a solution as soon as possible",
+      footer:{
+        color:"text-green-500",
+        value:"5",
+        label:"minutes ago"
+      }
+    },
+  ];
+}
+
+export function lexRecommetionData(){
+  return[
+    {
+      recomendation: "el usuario necesita que jale el rembolso",
+      footer:{
+        color:"text-green-500",
+        value:"3",
+        label:"minutes ago"
+      }
+    }
+  ];
+}
+
+export function infogeneral(){
+  return[
+    {
+      index:"1",
+      descripcion:"para compra de boletos"
+    }
+  ];
+}
+
+
+
+export default statisticsCardsData; statisticsCardsDataAgent; customerDataAgent; lexRecommetionData; infogeneral;

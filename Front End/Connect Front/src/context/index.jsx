@@ -4,6 +4,103 @@ import PropTypes from "prop-types";
 export const MaterialTailwind = React.createContext(null);
 MaterialTailwind.displayName = "MaterialTailwindContext";
 
+export const navColors = {
+  dark: "from-black to-black border-gray-200",
+  green: "from-green-400 to-green-600",
+  orange: "from-orange-400 to-orange-600",
+  red: "from-red-400 to-red-600",
+  pink: "from-pink-400 to-pink-600",
+};
+
+export function getBgColor(color) {
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { theme } =
+    controller;
+  
+
+  if (theme === "light") {
+    switch (color) {
+      case "dark":
+        return "bg-gray-500";
+      case "green":
+        return "bg-green-500";
+      case "orange":
+        return "bg-orange-500";
+      case "red":
+        return "bg-red-500";
+      case "pink":
+        return "bg-pink-500";
+      case "background":
+        return "bg-white";
+      case "background-cards":
+        return "bg-white";
+      case "search-bar":
+        return "bg-black";
+      default:
+        return "bg-white";
+    }
+  } else {
+    switch (color) {
+      case "dark":
+        return "bg-gray-800";
+      case "green":
+        return "bg-green-500";
+      case "orange":
+        return "bg-orange-500";
+      case "red":
+        return "bg-red-500";
+      case "pink":
+        return "bg-pink-500";
+      case "background":
+        return "bg-gray-900";
+      case "background-cards":
+        return "bg-gray-700";
+      case "search-bar":
+        return "bg-gray-800";
+      default:
+        return "bg-gray-100";
+    }
+  }
+}
+
+export function getTextColor(color) {
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { theme } =
+    controller;
+
+  if (theme === "light") {
+    switch (color) {
+      case "dark":
+        return "text-gray-500";
+      case "green":
+        return "text-green-500";
+      case "orange":
+        return "text-orange-500";
+      case "red":
+        return "text-red-500";
+      case "pink":
+        return "text-pink-500";
+      default:
+        return "text-black";
+    }
+  } else {
+    switch (color) {
+      case "dark":
+        return "text-gray-300";
+      case "green":
+        return "text-green-500";
+      case "orange":
+        return "text-orange-500";
+      case "red":
+        return "text-red-500";
+      case "pink":
+        return "text-pink-500";
+      default:
+        return "text-white";
+    }
+  }
+}
+
 export function reducer(state, action) {
   switch (action.type) {
     case "OPEN_SIDENAV": {
@@ -13,13 +110,14 @@ export function reducer(state, action) {
       return { ...state, theme: action.value };
     }
     case "FONT": {
-      return { ...state, theme: action.value };
+      return { ...state, font: action.value };
     }
     case "SIDENAV_TYPE": {
       return { ...state, sidenavType: action.value };
     }
     case "NAV_COLOR": {
-      return { ...state, sidenavColor: action.value };
+      // set global color for the navbar
+      return { ...state, navColor: action.value };
     }
     case "TRANSPARENT_NAVBAR": {
       return { ...state, transparentNavbar: action.value };
@@ -39,13 +137,13 @@ export function reducer(state, action) {
 export function MaterialTailwindControllerProvider({ children }) {
   const initialState = {
     openSidenav: false,
-    sidenavColor: "dark",
+    navColor: "dark",
     sidenavType: "white",
     transparentNavbar: true,
     fixedNavbar: false,
     openConfigurator: false,
     theme: "light",
-    font: "normal",
+    font: "Normal",
   };
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);

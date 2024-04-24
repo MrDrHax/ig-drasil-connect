@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import ReactDOMServer from 'react-dom/server';
 import { useLocation, Link } from "react-router-dom";
 import {
   Navbar,
@@ -24,26 +26,35 @@ import {
   useMaterialTailwindController,
   setOpenConfigurator,
   setOpenSidenav,
+  getBgColor,
 } from "@/context";
+import { getApiLoginPage, getNameFromToken } from "@/configs";
 
-function handleTabClick(tab)
-{
-  const history = useHistory();
+
+function handleTabClick(tab) {
   history.push(`/${tab}`);
 }
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
-  const { fixedNavbar, openSidenav } = controller;
+  const { navColor, fixedNavbar, openSidenav, theme } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+
+  const [loginUrl, setLoginUrl] = useState('');
+
+  useEffect(() => {
+    getApiLoginPage()
+      .then(data => setLoginUrl(data))
+      .catch(error => console.error('Error:', error));
+  }, []);
 
   return (
     <Navbar
       color={fixedNavbar ? "white" : "transparent"}
       className={`rounded-xl transition-all ${fixedNavbar
-          ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
-          : "px-0 py-1"
+        ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
+        : "px-0 py-1"
         }`}
       fullWidth
       blurred={fixedNavbar}
@@ -76,41 +87,41 @@ export function DashboardNavbar() {
             {page}
           </Typography> */}
 
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" color={theme === "light"? 'black' : 'white'}>
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'home' ? 'bg-blue-gray-400' : ''}`} 
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
               >
                 Home
               </Link>
               <Link
                 to="/dashboard/team"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'team' ? 'bg-blue-gray-400' : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
               >
                 Team
               </Link>
               <Link
                 to="/dashboard/queues"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'queues' ? 'bg-blue-gray-400' : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
               >
                 Queues
               </Link>
               <Link
-                to="/dashboard/notifications"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'alerts' ? 'bg-blue-gray-400' : ''}`}
+                to="/dashboard/agent"
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
               >
-                Alerts
+                Home agent
               </Link>
             </div>
           </Typography>
         </div>
         <div className="flex items-center">
-         {/*
+          {/*
          <div className="mr-auto md:mr-4 md:w-56">
             <Input label="Search" />
           </div>
-         */} 
+         */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -119,14 +130,14 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-          <Link to="/auth/sign-in">
+          <Link to="https://igdrasilconnect.awsapps.com/start">
             <Button
               variant="text"
               color="blue-gray"
               className="hidden items-center gap-1 px-4 xl:flex normal-case"
             >
               <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-              Sign In
+              {getNameFromToken()}
             </Button>
             <IconButton
               variant="text"
@@ -180,7 +191,7 @@ export function DashboardNavbar() {
                     color="blue-gray"
                     className="mb-1 font-normal"
                   >
-                    <strong>Issue with</strong> agent pedro 
+                    <strong>Issue with</strong> agent pedro
                   </Typography>
                   <Typography
                     variant="small"
