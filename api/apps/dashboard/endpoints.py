@@ -5,7 +5,6 @@ from config import Config
 
 import boto3
 
-
 router = APIRouter(
     prefix="/dashboard", 
     tags=["dashboard"], 
@@ -151,3 +150,44 @@ async def check_agent_availability():
     )
 
     return response['MetricResults']
+@router.get("/agent-status", response_model=List[dict])
+async def check_agent_availability():
+    """
+    Description:
+        Verifies the status of agents in Amazon Connect.
+        It can be one of four things:
+
+        * AVAILABLE: on-duty and not in call
+        * OFFLINE: not on-duty and disconnected
+        * BUSY: with an open thread or ongoing call
+        * NEEDS ASSISTANCE: needs help from supervisor
+
+    Parameters:
+        * InstanceId [REQUIRED][string]: amazon connect instance identified
+        * AgentStatusTypes [list]: The available agent status types
+        * PaginationConfig [dictionary]
+            * MaxItems [int]: total number of items to return
+            * PageSize [int]: the size of each page
+        
+    Read the docs:
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/paginator/ListAgentStatuses.html
+
+    @return 
+        List containing the availability status of agents. (Not yet known)
+    """
+
+    client = boto3.client('connect')
+    paginator = client.get_paginator('list_agent_statuses')
+
+    # Get info for the first routing profile
+    response_iterator = paginator.paginate(
+        InstanceId = Config.INSTANCE_ID,
+        AgentStatusTypes = [
+            'AVAILABLE','OFFLINE','BUSY','ON BREAK','NEEDS ASSISTANCE',
+        ],
+        PaginationConfig = {
+            'MaxItems': 50,
+            'PageSize': 50
+        })
+    
+    return response_iterator
