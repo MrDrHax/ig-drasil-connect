@@ -40,7 +40,8 @@ async def get_IAM(deviceID: str) -> str:
     Returns the IAM link.
     Starts the IAM oauth process.
     '''
-    domain = Config.MY_DOMAIN + "protocol/openid-connect/authorize?response_type=code&client_id=" + Config.KEYCLOAK_ID + "&redirect_uri=" + Config.MY_DOMAIN + "extras/IAM/callback&scope=openid"
+        
+    domain = f"{Config.AUTH_DOMAIN}protocol/openid-connect/auth?response_type=code&client_id={Config.KEYCLOAK_ID}&redirect_uri={Config.MY_DOMAIN}extras/IAM/callback&scope=openid"
     return domain
  
 @router.get("/IAM/callback", tags=["auth"])
