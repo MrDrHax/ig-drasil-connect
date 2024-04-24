@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cp .example.env .env
+
 # Check if pyenv is installed
 if ! command -v python3 -m venv &> /dev/null
 then
