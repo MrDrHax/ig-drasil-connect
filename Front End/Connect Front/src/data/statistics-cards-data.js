@@ -114,9 +114,15 @@ export function RecomendacionCardsAgent(){
       name:"Juan Perez",
       descripcion:"The customer has a issue with ticket #1234, please check the status and provide a solution as soon as possible",
       footer:{
-        
+        color:"text-green-500",
+        value:"5",
+        label:"minutes ago"
       }
     },
+    {
+      title: "Lex recommendation",
+      descripcion:"E"
+    }
   ];
 }
 
