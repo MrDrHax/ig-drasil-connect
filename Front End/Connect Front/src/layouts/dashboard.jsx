@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import {
@@ -9,9 +9,17 @@ import {
 } from "@/widgets/layout";
 import routes from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator, getBgColor } from "@/context";
+import { validateToken, getApiLoginPage } from "@/configs";
 
 
 export function Dashboard() {
+  if (validateToken()) {
+    getApiLoginPage()
+      .then(data => { console.log(data); window.location.href = data; })
+      .catch(error => console.error('Error trying to get login link:', error));
+    return <div>Redirecting...</div>;
+  }
+
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType, theme } = controller;
 

@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import ReactDOMServer from 'react-dom/server';
 import { useLocation, Link } from "react-router-dom";
 import {
   Navbar,
@@ -26,9 +28,10 @@ import {
   setOpenSidenav,
   getBgColor,
 } from "@/context";
+import { getApiLoginPage, getNameFromToken } from "@/configs";
+
 
 function handleTabClick(tab) {
-  const history = useHistory();
   history.push(`/${tab}`);
 }
 
@@ -37,6 +40,14 @@ export function DashboardNavbar() {
   const { navColor, fixedNavbar, openSidenav, theme } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+
+  const [loginUrl, setLoginUrl] = useState('');
+
+  useEffect(() => {
+    getApiLoginPage()
+      .then(data => setLoginUrl(data))
+      .catch(error => console.error('Error:', error));
+  }, []);
 
   return (
     <Navbar
@@ -126,7 +137,7 @@ export function DashboardNavbar() {
               className="hidden items-center gap-1 px-4 xl:flex normal-case"
             >
               <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-              Alex
+              {getNameFromToken()}
             </Button>
             <IconButton
               variant="text"
