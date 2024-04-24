@@ -22,12 +22,13 @@ import {
 } from "@heroicons/react/24/outline";
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
-// import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
+import { RecomendationCard } from "@/widgets/cards";
 import {
   statisticsCardsData,
   statisticsChartsData,
   projectsTableData,
   ordersOverviewData,
+  
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
@@ -138,12 +139,12 @@ export function Home() {
             </Typography>
           </CardHeader>
           <CardBody className="pt-0">
-          <Accordion open={open === 1}>
-        <AccordionHeader onClick={() => handleOpen(1)}>Use metrics to your advantage</AccordionHeader>
-        <AccordionBody>
-          Use the metrics to your advantage, check the customer history and make sure to have all the information needed.
-        </AccordionBody>
-      </Accordion>
+            <RecomendationCard 
+              title={<h2>Prueba</h2>} 
+              content={<p>Hello</p>}
+              id={1}
+              openID={open}
+              openhandler={() => handleOpen(1)}/>
       <Accordion open={open === 2}>
         <AccordionHeader onClick={() => handleOpen(2)}>
           Descalate the call
