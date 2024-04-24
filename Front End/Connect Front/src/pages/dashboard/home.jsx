@@ -28,10 +28,10 @@ import {
   statisticsChartsData,
   projectsTableData,
   ordersOverviewData,
-  
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
+import { getBgColor } from "@/context";
 
 
 
@@ -80,7 +80,7 @@ export function Home() {
 
 {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
+        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
             shadow={false}
@@ -121,7 +121,7 @@ export function Home() {
           </CardBody>
         </Card>
         {/* Aquí esta para cambiar el Card de recomendaciones*/}
-        <Card className="border border-blue-gray-100 shadow-sm">
+        <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
             shadow={false}

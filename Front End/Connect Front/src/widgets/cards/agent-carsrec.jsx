@@ -15,7 +15,7 @@ import {
             Data Customer
           </Typography>
           <Typography variant="h4" color="blue-gray">
-           name of Customer: {name}
+           Name of Customer: {name}
           </Typography>
           <Typography>
             Situation: {descripcion}

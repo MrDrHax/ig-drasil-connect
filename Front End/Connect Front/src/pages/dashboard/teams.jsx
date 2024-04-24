@@ -17,6 +17,7 @@ import { StatisticsChart } from "@/widgets/charts";
 import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { chartsConfig } from "@/configs";
 import React, { useState } from 'react';
+import { getBgColor } from "@/context";
 
 function getColorOfStatus(status) {
     switch (status) {
@@ -152,7 +153,7 @@ export function Teams() {
                 /> */}
             </div>
             <div className="mt-12 mb-8 flex flex-col gap-12">
-                <Card>
+                <Card  className={`${getBgColor("search-bar")}`}>
                     <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex">
                         <Typography variant="h6" color="white" className="flex-none">
                             Agents

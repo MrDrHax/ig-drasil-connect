@@ -7,7 +7,7 @@ import {
 
 export function RecomendationCard({title, content, id, openID, openhandler}) { 
     return(
-      <Accordion open={openID == id}>
+      <Accordion open={openID == id} >
         <AccordionHeader onClick={() => openhandler(id)}>
           {title}
         </AccordionHeader>
