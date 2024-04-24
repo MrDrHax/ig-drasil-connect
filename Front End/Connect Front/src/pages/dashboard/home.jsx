@@ -140,27 +140,23 @@ export function Home() {
           </CardHeader>
           <CardBody className="pt-0">
             <RecomendationCard 
-              title={<h2>Prueba</h2>} 
-              content={<p>Hello</p>}
+              title={<h2>Check Metrics</h2>} 
+              content={<p>Check the client info and metrics</p>}
               id={1}
               openID={open}
               openhandler={() => handleOpen(1)}/>
-      <Accordion open={open === 2}>
-        <AccordionHeader onClick={() => handleOpen(2)}>
-          Descalate the call
-        </AccordionHeader>
-        <AccordionBody>
-         Try to descalate the call with the customer, try to understand the customer and make him feel comfortable.
-        </AccordionBody>
-      </Accordion>
-      <Accordion open={open === 3}>
-        <AccordionHeader onClick={() => handleOpen(3)}>
-          Check the customer information
-        </AccordionHeader>
-        <AccordionBody>
-          Check the customer information, check the customer history and make sure to have all the information needed.
-        </AccordionBody>
-      </Accordion>
+      <RecomendationCard 
+              title={<h2>Descelate the call</h2>} 
+              content={<p>Try to calm the client and understand his situation</p>}
+              id={2}
+              openID={open}
+              openhandler={() => handleOpen(2)}/>
+      <RecomendationCard 
+              title={<h2>Prueba</h2>} 
+              content={<p>Hello</p>}
+              id={3}
+              openID={open}
+              openhandler={() => handleOpen(3)}/>
           </CardBody>
         </Card>
       </div> 

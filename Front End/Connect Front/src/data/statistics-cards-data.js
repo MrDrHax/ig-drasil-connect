@@ -107,10 +107,9 @@ export function statisticsCardsDataAgent() {
   ];
 }
 
-export function RecomendacionCardsAgent(){
+export function customerDataAgent(){
   return[
     {
-      title: "data of customer",
       name:"Juan Perez",
       descripcion:"The customer has a issue with ticket #1234, please check the status and provide a solution as soon as possible",
       footer:{
@@ -119,18 +118,31 @@ export function RecomendacionCardsAgent(){
         label:"minutes ago"
       }
     },
+  ];
+}
+
+export function lexRecommetionData(){
+  return[
     {
-      title: "Lex recommendation",
-      descripcion:"E"
+      recomendation: "el usuario necesita que jale el rembolso",
+      footer:{
+        color:"text-green-500",
+        value:"3",
+        label:"minutes ago"
+      }
     }
   ];
 }
 
-export default statisticsCardsData; statisticsCardsDataAgent;
+export function infogeneral(){
+  return[
+    {
+      index:"1",
+      descripcion:"para compra de boletos"
+    }
+  ];
+}
 
 
 
-
-
-
-
+export default statisticsCardsData; statisticsCardsDataAgent; customerDataAgent; lexRecommetionData; infogeneral;

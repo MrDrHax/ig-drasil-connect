@@ -24,6 +24,7 @@ import {
   useMaterialTailwindController,
   setOpenConfigurator,
   setOpenSidenav,
+  getBgColor,
 } from "@/context";
 
 function handleTabClick(tab) {
@@ -33,7 +34,7 @@ function handleTabClick(tab) {
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
-  const { fixedNavbar, openSidenav } = controller;
+  const { navColor, fixedNavbar, openSidenav, theme } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
 
@@ -75,29 +76,29 @@ export function DashboardNavbar() {
             {page}
           </Typography> */}
 
-          <Typography variant="h6" color="black">
+          <Typography variant="h6" color={theme === "light"? 'black' : 'white'}>
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'home' ? 'bg-blue-gray-400' : ''}`}
+                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
               >
                 Home
               </Link>
               <Link
                 to="/dashboard/team"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'team' ? 'bg-blue-gray-400' : ''}`}
+                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
               >
                 Team
               </Link>
               <Link
                 to="/dashboard/queues"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'queues' ? 'bg-blue-gray-400' : ''}`}
+                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
               >
                 Queues
               </Link>
               <Link
                 to="/dashboard/agent"
-                className={`navitemAdmin flex-initial w-32 cursor-pointer ${page === 'agent' ? 'bg-blue-gray-400' : ''}`}
+                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
               >
                 Home agent
               </Link>

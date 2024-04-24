@@ -8,15 +8,15 @@ import {
   Footer,
 } from "@/widgets/layout";
 import routes from "@/routes";
-import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
+import { useMaterialTailwindController, setOpenConfigurator, getBgColor } from "@/context";
 
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
-  const { sidenavType } = controller;
+  const { sidenavType, theme } = controller;
 
   return (
-    <div className="min-h-screen bg-blue-gray-50/50">
+    <div className={`min-h-screen ${getBgColor("background")}`}>
       <Sidenav
         routes={routes}
         brandImg={
