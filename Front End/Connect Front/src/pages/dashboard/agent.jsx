@@ -20,7 +20,7 @@ import {
   EllipsisVerticalIcon,
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import {StatisticsCardAgent as StatisticsCard } from "@/widgets/cards";
+import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 // import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
 import {
