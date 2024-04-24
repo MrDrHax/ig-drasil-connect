@@ -153,8 +153,8 @@ export function Teams() {
                 /> */}
             </div>
             <div className="mt-12 mb-8 flex flex-col gap-12">
-                <Card  className={`${getBgColor("search-bar")}`}>
-                    <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex">
+                <Card  className={`${getBgColor("background-cards")}`}>
+                    <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
                         <Typography variant="h6" color="white" className="flex-none">
                             Agents
                         </Typography>
