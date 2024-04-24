@@ -31,7 +31,11 @@ export function getBgColor(color) {
       case "pink":
         return "bg-pink-500";
       case "background":
-        return "bg-blue-gray-50/50";
+        return "bg-white";
+      case "background-cards":
+        return "bg-white";
+      case "search-bar":
+        return "bg-black";
       default:
         return "bg-white";
     }
@@ -49,8 +53,50 @@ export function getBgColor(color) {
         return "bg-pink-500";
       case "background":
         return "bg-gray-900";
+      case "background-cards":
+        return "bg-gray-700";
+      case "search-bar":
+        return "bg-gray-800";
       default:
         return "bg-gray-100";
+    }
+  }
+}
+
+export function getTextColor(color) {
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { theme } =
+    controller;
+
+  if (theme === "light") {
+    switch (color) {
+      case "dark":
+        return "text-gray-500";
+      case "green":
+        return "text-green-500";
+      case "orange":
+        return "text-orange-500";
+      case "red":
+        return "text-red-500";
+      case "pink":
+        return "text-pink-500";
+      default:
+        return "text-black";
+    }
+  } else {
+    switch (color) {
+      case "dark":
+        return "text-gray-300";
+      case "green":
+        return "text-green-500";
+      case "orange":
+        return "text-orange-500";
+      case "red":
+        return "text-red-500";
+      case "pink":
+        return "text-pink-500";
+      default:
+        return "text-white";
     }
   }
 }

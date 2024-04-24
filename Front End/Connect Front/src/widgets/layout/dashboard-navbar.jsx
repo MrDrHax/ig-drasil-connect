@@ -91,25 +91,25 @@ export function DashboardNavbar() {
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
-                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
               >
                 Home
               </Link>
               <Link
                 to="/dashboard/team"
-                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
               >
                 Team
               </Link>
               <Link
                 to="/dashboard/queues"
-                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
               >
                 Queues
               </Link>
               <Link
                 to="/dashboard/agent"
-                className={`navitemAdmin rounded flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
               >
                 Home agent
               </Link>

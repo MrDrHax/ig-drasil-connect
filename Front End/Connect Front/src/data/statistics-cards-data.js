@@ -3,6 +3,7 @@ import {
   UserCircleIcon,
   ClockIcon,
   ChartBarIcon,
+  StarIcon
 } from "@heroicons/react/24/solid";
 
 export function statisticsCardsData() {
@@ -78,13 +79,13 @@ export function statisticsCardsDataAgent() {
       value: "6h 30m",
       footer: {
         color: "text-green-500",
-        value: "+20",
+        value: "+20min",
         label: "than expected",
       },
     },
     {
-      color: "red",
-      icon: ChartBarIcon,
+      color: "amber",
+      icon: StarIcon,
       title: "Rating",
       value: "75%",
       footer: {
