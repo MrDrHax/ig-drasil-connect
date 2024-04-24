@@ -23,21 +23,13 @@ export function Notifications() {
     red: true,
   });
   const alerts = ["gray", "green", "orange", "red"];
-
+  {/* Creacion de las alertas
+    mx-auto: margin horizontal automatico
+    px-7: padding horizontal 7
+    my-5: margin vertical 5
+*/}
   return (
-    <div className="mx-auto my-20 flex max-w-screen-lg flex-col gap-8">
-      <Card>
-        <CardHeader
-          color="transparent"
-          floated={false}
-          shadow={false}
-          className="m-0 p-4"
-        >
-          <Typography variant="h5" color="blue-gray">
-            Alerts
-          </Typography>
-        </CardHeader>
-        <CardBody className="flex flex-col gap-4 p-4">
+    <div className="mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7 ">
           {alerts.map((color) => (
             <Alert
               key={color}
@@ -60,8 +52,7 @@ export function Notifications() {
               
             </Alert>
           ))}
-        </CardBody>
-      </Card>
+
      {/*
      |<Card>
      <CardHeader

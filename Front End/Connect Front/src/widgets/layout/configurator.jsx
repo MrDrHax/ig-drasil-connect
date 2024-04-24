@@ -118,7 +118,7 @@ export function Configurator() {
               variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "OpenDyslexic")}
             >
-              OpenDislexic
+              OpenDyslexic
             </Button>
             <Button
               variant={font === "Normal" ? "gradient" : "outlined"}
