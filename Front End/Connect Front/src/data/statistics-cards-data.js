@@ -55,13 +55,15 @@ export function statisticsCardsData() {
   ];
 }
 
+{/*seccion de las carta o recuadros de los datos del agente */}
+
 export function statisticsCardsDataAgent() {
   console.warn("statisticsCardsData is not yet done")
   return [
     {
       color: "green",
       icon: UserGroupIcon,
-      title: "people to answer",
+      title: "People to answer",
       value: "80",
       footer: {
         color: "text-green-500",
@@ -72,7 +74,7 @@ export function statisticsCardsDataAgent() {
     {
       color: "gray",
       icon: UserCircleIcon,
-      title: "productive time",
+      title: "Productive time",
       value: "6h 30m",
       footer: {
         color: "text-green-500",
@@ -83,7 +85,7 @@ export function statisticsCardsDataAgent() {
     {
       color: "red",
       icon: ChartBarIcon,
-      title: "Rakind",
+      title: "Rating",
       value: "75%",
       footer: {
         color: "text-red-500",
@@ -105,4 +107,24 @@ export function statisticsCardsDataAgent() {
   ];
 }
 
+export function RecomendacionCardsAgent(){
+  return[
+    {
+      title: "data of customer",
+      name:"Juan Perez",
+      descripcion:"The customer has a issue with ticket #1234, please check the status and provide a solution as soon as possible",
+      footer:{
+        
+      }
+    },
+  ];
+}
+
 export default statisticsCardsData; statisticsCardsDataAgent;
+
+
+
+
+
+
+

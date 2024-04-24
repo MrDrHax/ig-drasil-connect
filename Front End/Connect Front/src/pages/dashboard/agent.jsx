@@ -1,6 +1,7 @@
 import { StatisticsChart } from "@/widgets/charts";
 import {
   statisticsCardsDataAgent as statisticsCardsData,
+  statisticsChartsData,
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
