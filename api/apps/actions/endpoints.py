@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
+from config import Config
+
+import boto3
 
 router = APIRouter(
     prefix="/actions",
@@ -79,9 +82,21 @@ async def check_agent_availability():
         List containing the availability status of agents.
     """
 
-    agents_availability = [
-        {"agent_id": "123", "availability": "Available"},
-        {"agent_id": "456", "availability": "Unavailable"},
-        {"agent_id": "789", "availability": "Available"},
-    ]
-    return agents_availability
+    client = boto3.client('connect')
+
+    # Get info for the first routing profile
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'RoutingProfiles': [
+                '69e4c000-1473-42aa-9596-2e99fbd890e7',
+            ]
+        }
+    )
+
+    #agents_availability = [
+    #    {"agent_id": "123", "availability": "Available"},
+    #    {"agent_id": "456", "availability": "Unavailable"},
+    #    {"agent_id": "789", "availability": "Available"},
+    #]
+    return response['UserDataList']
