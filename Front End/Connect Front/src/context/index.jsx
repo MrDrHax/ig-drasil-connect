@@ -42,7 +42,7 @@ export function getBgColor(color) {
   } else {
     switch (color) {
       case "dark":
-        return "bg-gray-800";
+        return "bg-gray-100";
       case "green":
         return "bg-green-500";
       case "orange":
@@ -54,7 +54,7 @@ export function getBgColor(color) {
       case "background":
         return "bg-gray-900";
       case "background-cards":
-        return "bg-gray-700";
+        return "bg-gray-500";
       case "search-bar":
         return "bg-gray-800";
       default:
@@ -71,17 +71,21 @@ export function getTextColor(color) {
   if (theme === "light") {
     switch (color) {
       case "dark":
-        return "text-gray-500";
+        return "text-black-500";
       case "green":
         return "text-green-500";
+      case "white":
+        return "text-gray-500";
       case "orange":
         return "text-orange-500";
       case "red":
         return "text-red-500";
       case "pink":
         return "text-pink-500";
+      case "text-gray-300":
+        return "text-green-300";
       default:
-        return "text-black";
+        return "text-black-100";
     }
   } else {
     switch (color) {
@@ -97,7 +101,7 @@ export function getTextColor(color) {
         return "text-pink-500";
       default:
         return "text-white";
-    }
+    } 
   }
 }
 
