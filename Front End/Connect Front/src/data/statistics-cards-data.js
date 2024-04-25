@@ -3,6 +3,7 @@ import {
   UserCircleIcon,
   ClockIcon,
   ChartBarIcon,
+  StarIcon
 } from "@heroicons/react/24/solid";
 
 export function statisticsCardsData() {
@@ -78,13 +79,13 @@ export function statisticsCardsDataAgent() {
       value: "6h 30m",
       footer: {
         color: "text-green-500",
-        value: "+20",
+        value: "+20min",
         label: "than expected",
       },
     },
     {
-      color: "red",
-      icon: ChartBarIcon,
+      color: "amber",
+      icon: StarIcon,
       title: "Rating",
       value: "75%",
       footer: {
@@ -107,10 +108,9 @@ export function statisticsCardsDataAgent() {
   ];
 }
 
-export function RecomendacionCardsAgent(){
+export function customerDataAgent(){
   return[
     {
-      title: "data of customer",
       name:"Juan Perez",
       descripcion:"The customer has a issue with ticket #1234, please check the status and provide a solution as soon as possible",
       footer:{
@@ -119,18 +119,31 @@ export function RecomendacionCardsAgent(){
         label:"minutes ago"
       }
     },
+  ];
+}
+
+export function lexRecommetionData(){
+  return[
     {
-      title: "Lex recommendation",
-      descripcion:"E"
+      recomendation: "el usuario necesita que jale el rembolso",
+      footer:{
+        color:"text-green-500",
+        value:"3",
+        label:"minutes ago"
+      }
     }
   ];
 }
 
-export default statisticsCardsData; statisticsCardsDataAgent;
+export function infogeneral(){
+  return[
+    {
+      index:"1",
+      descripcion:"para compra de boletos"
+    }
+  ];
+}
 
 
 
-
-
-
-
+export default statisticsCardsData; statisticsCardsDataAgent; customerDataAgent; lexRecommetionData; infogeneral;

@@ -7,12 +7,16 @@ import {
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
+import { 
+  getBgColor,
+  useMaterialTailwindController, 
+} from "@/context";
 
 export function StatisticsChart({ color, chart, title, description, footer }) {
   return (
-    <Card className="border border-blue-gray-100 shadow-sm">
+    <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
       <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
-        <Chart {...chart} />
+        <Chart {...chart} className={`${getBgColor("background-cards")}`} />
       </CardHeader>
       <CardBody className="px-6 pt-0">
         <Typography variant="h6" color="blue-gray">

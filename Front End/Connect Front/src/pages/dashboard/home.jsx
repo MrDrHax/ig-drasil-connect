@@ -22,7 +22,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
-// import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
+import { RecomendationCard } from "@/widgets/cards";
 import {
   statisticsCardsData,
   statisticsChartsData,
@@ -31,6 +31,7 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
+import { getBgColor } from "@/context";
 
 
 
@@ -79,7 +80,7 @@ export function Home() {
 
 {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
+        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
             shadow={false}
@@ -120,7 +121,7 @@ export function Home() {
           </CardBody>
         </Card>
         {/* Aquí esta para cambiar el Card de recomendaciones*/}
-        <Card className="border border-blue-gray-100 shadow-sm">
+        <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
             shadow={false}
@@ -138,28 +139,24 @@ export function Home() {
             </Typography>
           </CardHeader>
           <CardBody className="pt-0">
-          <Accordion open={open === 1}>
-        <AccordionHeader onClick={() => handleOpen(1)}>Use metrics to your advantage</AccordionHeader>
-        <AccordionBody>
-          Use the metrics to your advantage, check the customer history and make sure to have all the information needed.
-        </AccordionBody>
-      </Accordion>
-      <Accordion open={open === 2}>
-        <AccordionHeader onClick={() => handleOpen(2)}>
-          Descalate the call
-        </AccordionHeader>
-        <AccordionBody>
-         Try to descalate the call with the customer, try to understand the customer and make him feel comfortable.
-        </AccordionBody>
-      </Accordion>
-      <Accordion open={open === 3}>
-        <AccordionHeader onClick={() => handleOpen(3)}>
-          Check the customer information
-        </AccordionHeader>
-        <AccordionBody>
-          Check the customer information, check the customer history and make sure to have all the information needed.
-        </AccordionBody>
-      </Accordion>
+            <RecomendationCard 
+              title={<h2>Check Metrics</h2>} 
+              content={<p>Check the client info and metrics</p>}
+              id={1}
+              openID={open}
+              openhandler={() => handleOpen(1)}/>
+      <RecomendationCard 
+              title={<h2>Descelate the call</h2>} 
+              content={<p>Try to calm the client and understand his situation</p>}
+              id={2}
+              openID={open}
+              openhandler={() => handleOpen(2)}/>
+      <RecomendationCard 
+              title={<h2>Prueba</h2>} 
+              content={<p>Hello</p>}
+              id={3}
+              openID={open}
+              openhandler={() => handleOpen(3)}/>
           </CardBody>
         </Card>
       </div> 
