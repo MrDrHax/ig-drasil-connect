@@ -26,7 +26,7 @@ import { RecomendationCard } from "@/widgets/cards";
 import {
   statisticsCardsDataAgent as statisticsCardsData,
   customerDataAgent,
-  lexRecommetionData,
+  lexRecommendationData,
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
@@ -37,6 +37,11 @@ import { getBgColor } from "@/context";
 
 
 export function Agent() {
+
+  const [open, setOpen] = React.useState(1);
+ 
+  const handleOpen = (value) => setOpen(open === value ? 0 : value);
+
   return (
     <div className="mt-12">
       <div className="mb-10 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -58,23 +63,43 @@ export function Agent() {
         ))}
       </div>
 
-      {/*Aqui es sobre los datos del usuario*/}
-      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-       {customerDataAgent().map(({name,descripcion, footer, ...rest }) => (
-          <CustomerCard
-            key={name}
-            {...rest}
-            name={name}
-            descripcion={descripcion}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
-      </div>
+      {/*Aqui es la tarjeta importa de los datos del usuario*/}
+      <div className="p-4 mb-10">
+  <div className="grid grid-cols-2 gap-4">
+    {customerDataAgent().map(({name, descripcion, footer, ...rest }) => (
+      <CustomerCard
+        key={name}
+        {...rest}
+        name={name}
+        descripcion={descripcion}
+        footer={
+          <Typography className="font-normal text-blue-gray-600">
+            <strong className={footer.color}>{footer.value}</strong>
+            &nbsp;{footer.label}
+          </Typography>
+        }
+        className="p-4 rounded-lg bg-white shadow-md"
+      />
+    ))}
+
+    {lexRecommendationData().map(({recomendation, footer, ...rest }) => (
+      <Lexcard
+        key={recomendation}
+        {...rest}
+        recomendation={recomendation}
+        footer={
+          <Typography className="font-normal text-blue-gray-600">
+            <strong className={footer.color}>{footer.value}</strong>
+            &nbsp;{footer.label}
+          </Typography>
+        }
+        className="p-4 rounded-lg bg-white shadow-md"
+      />
+    ))}
+  </div>
+</div>
+
+
 
 {/*Aqui es sobre el sistema de alerta del home page */}
   <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -127,31 +152,31 @@ export function Agent() {
       className="m-0 p-6"
     >
       <Typography variant="h6" color="blue-gray" className="mb-2">
-        Recomendations
+        Recommendations
       </Typography>
       <Typography
         variant="small"
         className="flex items-center gap-1 font-normal text-blue-gray-600"
       >
-        Next a list of recomendations for you
+        Next, a list of recommendations for you:
       </Typography>
     </CardHeader>
     <CardBody className="pt-0">
       <RecomendationCard 
         title={<h2>Check Metrics</h2>} 
-        content={<p>Check the client info and metrics</p>}
+        content={<p>Check the client information and metrics.</p>}
         id={1}
         openID={open}
         openhandler={() => handleOpen(1)}/>
   <RecomendationCard 
-        title={<h2>Descelate the call</h2>} 
-        content={<p>Try to calm the client and understand his situation</p>}
+        title={<h2>De-escalate the call</h2>} 
+        content={<p>Try to calm the client and understand his situation.</p>}
         id={2}
         openID={open}
         openhandler={() => handleOpen(2)}/>
   <RecomendationCard 
-        title={<h2>Prueba</h2>} 
-        content={<p>Hello</p>}
+        title={<h2>Average time response</h2>} 
+        content={<p>Try to pay attention to incoming calls, time is valuable for our clients.</p>}
         id={3}
         openID={open}
         openhandler={() => handleOpen(3)}/>

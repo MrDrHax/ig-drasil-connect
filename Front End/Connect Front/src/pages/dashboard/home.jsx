@@ -129,31 +129,31 @@ export function Home() {
             className="m-0 p-6"
           >
             <Typography variant="h6" color="blue-gray" className="mb-2">
-              Recomendations
+              Recommendations
             </Typography>
             <Typography
               variant="small"
               className="flex items-center gap-1 font-normal text-blue-gray-600"
             >
-              Next a list of recomendations for you
+              Next, a list of recommendations for you:
             </Typography>
           </CardHeader>
           <CardBody className="pt-0">
             <RecomendationCard 
               title={<h2>Check Metrics</h2>} 
-              content={<p>Check the client info and metrics</p>}
+              content={<p>Check the client information and metrics.</p>}
               id={1}
               openID={open}
               openhandler={() => handleOpen(1)}/>
       <RecomendationCard 
-              title={<h2>Descelate the call</h2>} 
-              content={<p>Try to calm the client and understand his situation</p>}
+              title={<h2>De-escalate the call</h2>} 
+              content={<p>Try to calm the client and understand his situation.</p>}
               id={2}
               openID={open}
               openhandler={() => handleOpen(2)}/>
       <RecomendationCard 
-              title={<h2>Prueba</h2>} 
-              content={<p>Hello</p>}
+              title={<h2>Average time response</h2>} 
+              content={<p>Try to pay attention to incoming calls, time is valuable for our clients.</p>}
               id={3}
               openID={open}
               openhandler={() => handleOpen(3)}/>
