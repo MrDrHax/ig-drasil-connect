@@ -100,7 +100,7 @@ export function DashboardNavbar() {
                 to="/dashboard/team"
                 className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
               >
-                Team
+                Agents
               </Link>
               <Link
                 to="/dashboard/queues"
