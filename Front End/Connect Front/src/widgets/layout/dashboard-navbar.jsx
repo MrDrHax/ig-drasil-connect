@@ -27,6 +27,7 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
   getBgColor,
+  getTextColor
 } from "@/context";
 import { getApiLoginPage, getNameFromToken } from "@/configs";
 
@@ -150,7 +151,7 @@ export function DashboardNavbar() {
           <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
-                <BellIcon className="h-5 w-5 text-blue-gray-500" />
+                <BellIcon className={`h-10 w-5 ${getTextColor("dark")}`} />
               </IconButton>
             </MenuHandler>
             <MenuList className="w-max border-0">

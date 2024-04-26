@@ -71,7 +71,7 @@ export function getTextColor(color) {
   if (theme === "light") {
     switch (color) {
       case "dark":
-        return "text-black-500";
+        return "text-black-900";
       case "green":
         return "text-green-500";
       case "white":
@@ -90,7 +90,7 @@ export function getTextColor(color) {
   } else {
     switch (color) {
       case "dark":
-        return "text-gray-300";
+        return "text-gray-500";
       case "green":
         return "text-green-500";
       case "orange":
