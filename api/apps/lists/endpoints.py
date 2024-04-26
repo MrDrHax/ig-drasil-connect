@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated
 from . import crud, models
+from AAA.requireToken import requireToken
 
 router = APIRouter(
     prefix="/lists", 
@@ -84,7 +85,7 @@ async def get_angry_calls(qpams: Annotated[QueryParams, Depends()]) -> models.Li
                            pagination="1-3/3")
 
 @router.get("/agents", tags=["agents"])
-async def get_agents(qpams: Annotated[QueryParams, Depends()]) -> models.AgentsDataList:
+async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[str, Depends(requireToken)]) -> models.AgentsDataList:
     '''
     Returns a list of all available agents (even on break).
 

@@ -8,6 +8,7 @@ import {
     Chip,
     Tooltip,
     Progress,
+    Alert,
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
@@ -19,6 +20,8 @@ import { parsePaginationString } from "@/configs/api-tools";
 import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController } from "@/context";
+
+import { useAlert } from "@/context/alerts";
 
 function getColorOfStatus(status) {
     switch (status) {
@@ -62,9 +65,13 @@ export function Teams() {
         // setFilteredAgents(filtered);
     }
 
+    const { showAlertWithMessage } = useAlert();
+
     function updateData(page = 1) {
         let query = searchQuery ? "name=" + searchQuery : null;
         let skip = (page - 1) * 10;
+
+        setIsLoaded(false);
 
         AgentList(skip, 10, query, "name", "asc").then((data) => {
             const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
@@ -79,7 +86,11 @@ export function Teams() {
             setData(data.data);
             setIsLoaded(true);
         }).catch((error) => {
-            console.error("Error while fetching data from agents", error);
+            setIsLoaded(true);
+
+            showAlertWithMessage("red", "" + error, 10000);
+
+            console.error(error);
         });
     }
 
