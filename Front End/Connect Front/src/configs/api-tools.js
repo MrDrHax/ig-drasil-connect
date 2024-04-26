@@ -44,6 +44,34 @@ export function getNameFromToken() {
     return data.preferred_username;
 }
 
+export const parsePaginationString = (paginationString) => {
+    const [range, totalItems] = paginationString.split('/');
+    const [start, end] = range.split('-');
+
+    const itemsPerPage = end - start + 1;
+    const currentPage = Math.ceil(start / itemsPerPage);
+
+    return {
+        currentPage,
+        itemsPerPage,
+        totalItems: parseInt(totalItems),
+    };
+};
+
+export function addTokenToHeader(request) {
+    // TODO check what token is the neccesary one
+
+    // let token = sessionStorage.getItem('token');
+    let access_token = sessionStorage.getItem('access_token');
+    // let refresh = sessionStorage.getItem('refresh');
+
+    // request.headers.set('Authorization', 'Bearer ' + token);
+    request.headers.set('Authorization', 'Bearer ' + access_token);
+    // request.headers.set('Refresh-Token', refresh);
+
+    return request;
+}
+
 export async function storeToken(data) {
     let token = data.id_token;
     let access_token = data.access_token;

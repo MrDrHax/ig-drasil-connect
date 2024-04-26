@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated
 from . import crud, models
+from AAA.requireToken import requireToken
 
 router = APIRouter(
     prefix="/lists", 
@@ -17,11 +18,15 @@ router = APIRouter(
 )
 
 class QueryParams:
-    def __init__(self, q: str | None = None, skip: int = 0, limit: int = 100, sortBy: tuple[str, str] | None = None):
+    def __init__(self, q: str | None = None, skip: int = 0, limit: int = 100, sortByDat: str | None = None, sortBy: str = 'asc'):
         self.q = q
         self.skip = skip
         self.limit = limit
-        self.sortBy = sortBy 
+        if not sortByDat or not sortBy:
+            self.sortBy = None
+        else:
+            self.sortBy = (sortByDat, sortBy)
+
 
 @router.get("/queues", tags=["queues"])
 async def get_queues(qpams: Annotated[QueryParams, Depends()]) -> models.QueueDataList:
@@ -80,18 +85,26 @@ async def get_angry_calls(qpams: Annotated[QueryParams, Depends()]) -> models.Li
                            pagination="1-3/3")
 
 @router.get("/agents", tags=["agents"])
-async def get_agents(qpams: Annotated[QueryParams, Depends()]) -> models.AgentsDataList:
+async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[str, Depends(requireToken)]) -> models.AgentsDataList:
     '''
     Returns a list of all available agents (even on break).
 
     To see details, go to summary/agents/{agentID}
+
+    statuses: "connected", "disconnected", "on-call", "busy", "on-break"
     '''
 
-    return models.AgentsDataList(pagination="1-4/4",
-        data=[models.AgentsDataListItem(agentID="a", name="Ron", status="Available", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="b", name="Jane", status="Available", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="c", name="John", status="Available", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="d", name="Ron", status="Available", calls=5, rating=4.5)])
+    if (qpams.skip != 0):
+        return models.AgentsDataList(pagination="5-8/8",
+        data=[models.AgentsDataListItem(agentID="adsfg", name="cheff", status="connected", calls=5, rating=4.5), 
+            models.AgentsDataListItem(agentID="bbcvn", name="dude", status="connected", calls=5, rating=4.5), 
+            models.AgentsDataListItem(agentID="cewrt", name="robert", status="connected", calls=5, rating=4.5), 
+            models.AgentsDataListItem(agentID="dfghj", name="test", status="connected", calls=5, rating=4.5, requireHelp=True)])
+    return models.AgentsDataList(pagination="1-4/8",
+        data=[models.AgentsDataListItem(agentID="adsfg", name="Ron", status="connected", calls=5, rating=4.5), 
+            models.AgentsDataListItem(agentID="bbcvn", name="Jane", status="connected", calls=5, rating=4.5), 
+            models.AgentsDataListItem(agentID="cewrt", name="John", status="connected", calls=5, rating=4.5), 
+            models.AgentsDataListItem(agentID="dfghj", name="Ron", status="connected", calls=5, rating=4.5, requireHelp=True)])
 
 @router.get("/rerouted", tags=["calls"])
 async def get_rerouted_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:

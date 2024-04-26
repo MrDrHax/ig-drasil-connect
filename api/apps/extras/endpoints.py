@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
 from . import models, crud
 from config import Config
+from starlette.responses import RedirectResponse
+from AAA.requireToken import oauthScheme
 
 #Imports for Authentication in IAM Identity Center
 import requests
@@ -43,6 +45,13 @@ async def get_IAM(deviceID: str) -> str:
     # domain = Config.AUTH_DOMAIN + "protocol/openid-connect/authorize?response_type=code&client_id=" + Config.KEYCLOAK_ID + "&redirect_uri=" + Config.MY_DOMAIN + "extras/IAM/callback&scope=openid"
     domain = f"{Config.AUTH_DOMAIN}protocol/openid-connect/auth?response_type=code&client_id={Config.KEYCLOAK_ID}&redirect_uri={Config.MY_DOMAIN}extras/IAM/callback&scope=openid"
     return domain
+
+@router.get("/apiToken", tags=["auth"])
+async def get_apiToken() -> str:
+    '''
+    Returns the API token.
+    '''
+    return RedirectResponse(oauthScheme)
 
 @router.get("/login", tags=["auth"])
 async def get_IAM(redirect: str) -> str:

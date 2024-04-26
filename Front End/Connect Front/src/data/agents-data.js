@@ -1,51 +1,33 @@
-export function AgentList(page = 1, limit = 10) {
-    //   return fetch(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=${limit}`)
-    //     .then((res) => res.json())
-    //     .then((data) => data);
-    console.warn("AgentList function is not implemented!!!");
+import { getApiPath, addTokenToHeader } from "@/configs/api-tools";
 
-    return [
-        {
-            avatar: "/img/team-2.jpeg",
-            name: "John Doe",
-            queue: "Support",
-            status: "connected",
-            requireHelp: false,
-            id: 1
-        },
-        {
-            avatar: "/img/team-2.jpeg",
-            name: "Alex",
-            queue: "Support",
-            status: "disconnected",
-            requireHelp: false,
-            id: 2
-        },
-        {
-            avatar: "/img/team-2.jpeg",
-            name: "Robbert",
-            queue: "Tickets",
-            status: "on-call",
-            requireHelp: true,
-            id: 3
-        },
-        {
-            avatar: "/img/team-2.jpeg",
-            name: "Alex",
-            queue: "Tickets",
-            status: "busy",
-            requireHelp: true,
-            id: 4
-        },
-        {
-            avatar: "/img/team-2.jpeg",
-            name: "Alex",
-            queue: "Refunds",
-            status: "on-break",
-            requireHelp: true,
-            id: 5
-        }
-    ]
+export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
+    let url = getApiPath() + `lists/agents?skip=${skip}&limit=${limit}&sortByDat=${sortbydat}&sortBy=${sortby}`;
+
+    // fill in the query
+    let query = ""
+
+    if (search) {
+        query += search;
+    }
+
+    if (query) {
+        url += `&q=${query}`;
+    }
+
+    let request = new Request(url);
+
+    // add token to header
+    addTokenToHeader(request);
+
+    // call the api
+    let response = await fetch(request);
+
+    if (!response.ok) {
+        // raise error
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+
+    return await response.json();
 }
 
 export function AgentDetails(id) {

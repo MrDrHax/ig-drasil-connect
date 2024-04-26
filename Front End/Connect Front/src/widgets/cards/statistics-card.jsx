@@ -9,6 +9,7 @@ import {
 import PropTypes from "prop-types";
 import { 
   getBgColor,
+  getTextColor,
   useMaterialTailwindController, } from "@/context";
 
 export function StatisticsCard({ color, icon, title, value, footer }) {
@@ -28,10 +29,10 @@ export function StatisticsCard({ color, icon, title, value, footer }) {
         {icon}
       </CardHeader>
       <CardBody className="p-4 text-right">
-        <Typography variant="small" className="font-normal text-blue-gray-600" color={theme === "light"? 'black' : 'white'} >
+        <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
           {title}
         </Typography>
-        <Typography variant="h4" color="blue-gray">
+        <Typography variant="h4" color="blue-gray" className={`${getTextColor("dark")}`}>
 
           {value}
         </Typography>
