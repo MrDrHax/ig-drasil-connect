@@ -76,7 +76,7 @@ import {
   
   export function Lexcard({ recomendation, footer }) {
     return (
-      <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+      <Card  className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
         <CardBody className="p-4 text-right">
           <Typography variant="h4" className={`font-bold text-justify text-blue-gray-600 ${getTextColor("dark")}`} >
             Al/n, your virtual assistant:

@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
 import { 
   getBgColor,
+  getTextColor,
   useMaterialTailwindController, 
 } from "@/context";
 
@@ -19,10 +20,10 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
         <Chart {...chart} className={`${getBgColor("background-cards")}`} />
       </CardHeader>
       <CardBody className="px-6 pt-0">
-        <Typography variant="h6" color="blue-gray">
+        <Typography variant="h6" color="blue-gray" className={`${getTextColor("dark")}`}>
           {title}
         </Typography>
-        <Typography variant="small" className="font-normal text-blue-gray-600">
+        <Typography variant="small" className={`font-normal text-blue-gray-600 ${getTextColor("dark")}`}>
           {description}
         </Typography>
       </CardBody>
