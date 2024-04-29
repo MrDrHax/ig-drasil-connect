@@ -3,6 +3,9 @@ from typing import Annotated
 from . import crud, models
 from AAA.requireToken import requireToken
 
+import boto3
+from config import Config
+
 router = APIRouter(
     prefix="/lists", 
     tags=["lists"], 
@@ -94,17 +97,43 @@ async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[
     statuses: "connected", "disconnected", "on-call", "busy", "on-break"
     '''
 
-    if (qpams.skip != 0):
-        return models.AgentsDataList(pagination="5-8/8",
-        data=[models.AgentsDataListItem(agentID="adsfg", name="cheff", status="connected", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="bbcvn", name="dude", status="connected", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="cewrt", name="robert", status="connected", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="dfghj", name="test", status="connected", calls=5, rating=4.5, requireHelp=True)])
-    return models.AgentsDataList(pagination="1-4/8",
-        data=[models.AgentsDataListItem(agentID="adsfg", name="Ron", status="connected", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="bbcvn", name="Jane", status="connected", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="cewrt", name="John", status="connected", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="dfghj", name="Ron", status="connected", calls=5, rating=4.5, requireHelp=True)])
+    client = boto3.client('connect')
+
+    # Get info for the first routing profile
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'RoutingProfiles': [
+                '69e4c000-1473-42aa-9596-2e99fbd890e7',
+            ]
+        }
+    )
+
+    try :
+        list = response['UserDataList']
+        parsed = [models.AgentsDataListItem(
+                                  agentID=str(userData['User']['Id']), 
+                                  name="Unknown", 
+                                  status=userData['Status']['StatusName'], 
+                                  requireHelp=userData['Status']['StatusName'] == "Needs Assistance", calls=5, rating=4.5) 
+                                  for userData in list]
+        
+        return models.AgentsDataList(pagination="1-1/1", data=parsed)
+        
+
+    except Exception as e:
+    
+        if (qpams.skip != 0):
+            return models.AgentsDataList(pagination="5-8/8",
+            data=[models.AgentsDataListItem(agentID="adsfg", name="cheff", status="connected", calls=5, rating=4.5), 
+                models.AgentsDataListItem(agentID="bbcvn", name="dude", status="connected", calls=5, rating=4.5), 
+                models.AgentsDataListItem(agentID="cewrt", name="robert", status="connected", calls=5, rating=4.5), 
+                models.AgentsDataListItem(agentID="dfghj", name="test", status="connected", calls=5, rating=4.5, requireHelp=True)])
+        return models.AgentsDataList(pagination="1-4/8",
+            data=[models.AgentsDataListItem(agentID="adsfg", name="Ron", status="connected", calls=5, rating=4.5), 
+                models.AgentsDataListItem(agentID="bbcvn", name="Jane", status="connected", calls=5, rating=4.5), 
+                models.AgentsDataListItem(agentID="cewrt", name="John", status="connected", calls=5, rating=4.5), 
+                models.AgentsDataListItem(agentID="dfghj", name="Ron", status="connected", calls=5, rating=4.5, requireHelp=True)])
 
 @router.get("/rerouted", tags=["calls"])
 async def get_rerouted_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:
