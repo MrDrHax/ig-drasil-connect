@@ -68,8 +68,8 @@ export function Dashboard() {
         <Configurator />
         <IconButton
           size="lg"
-          color="white"
-          className="fixed bottom-8 right-8 z-40 rounded-full shadow-blue-gray-900/10"
+          color="blue-gray"
+          className="fixed bottom-2 right-8 z-40 rounded-full shadow-blue-gray-900/10"
           ripple={false}
           onClick={() => setOpenConfigurator(dispatch, true)}
         >
