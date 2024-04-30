@@ -265,7 +265,7 @@ export function Teams() {
                                                             <td className={className}>
                                                                 <Typography
                                                                     as="a"
-                                                                    href="#"
+                                                                    href="/dashboard/profile"
                                                                     className="text-xs font-semibold text-blue-gray-600"
                                                                 >
                                                                     View
