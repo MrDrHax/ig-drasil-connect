@@ -21,11 +21,12 @@ import {
   statisticsCardsDataAgent as statisticsCardsData,
   customerDataAgent,
   lexRecommendationData,
+  messageData
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
 import { getBgColor } from "@/context";
-import {TwitterChatboxTextarea , textArea } from "@/widgets/chat";
+import {TwitterChatboxTextarea ,ChatMessage } from "@/widgets/chat";
 
 
 
@@ -195,12 +196,16 @@ export function Agent() {
         </div>
       </CardHeader>
       <CardBody className="overflow-y-scroll px-0 pt-0 pb-2">
-        <Notifications />
+        {messageData.map(({ message, rol }) => (
+          <ChatMessage message={message} rol={rol} />
+        ))}
+
       </CardBody>
       <CardBody className="p-4">
         <TwitterChatboxTextarea />
       </CardBody>
     </Card>
+        
 
   </div>
   );

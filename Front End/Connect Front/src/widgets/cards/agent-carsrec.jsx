@@ -13,6 +13,7 @@ import {
 
   {/* esta carta es para la informacion de los usuarios*/}
   export function CustomerCard({ name,description, footer }) {
+    
     const controller = useMaterialTailwindController();
     const theme = controller;
     {/* En los className llaman a la función que esta manejando el background o el color de texto */}

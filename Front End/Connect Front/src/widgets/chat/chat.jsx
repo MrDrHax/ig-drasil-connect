@@ -1,4 +1,4 @@
-import { Textarea, Button, IconButton, Typography } from "@material-tailwind/react";
+import { Textarea, Button, IconButton, Typography, CardHeader, CardBody, CardFooter } from "@material-tailwind/react";
 import { LinkIcon } from "@heroicons/react/24/outline";
  
 export function TwitterChatboxTextarea() {
@@ -40,12 +40,26 @@ export function TwitterChatboxTextarea() {
 
 {/*Aqui es los textos*/}
 
-export function textArea(){
+
+
+export function ChatMessage ({ message, rol }){
+  const isAgent = rol === 'agent';//defines si el rol es de un agente o supervisor para acomodar el mensaje
+
   return (
-    <Typography variant="h4" className={`font-bold text-justify text-blue-gray-600 ${getTextColor("dark")}`}>
-     Customer data
-    </Typography>
+    <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
+      <card className=" rounded-[100px] border border-gray-900 bg-gray-900/5">
+        <CardBody>
+          <Typography color="black" className="text-base ">
+            {message} 
+          </Typography>
+          <Typography  color="blue-gray" className="text-right text-[0.7rem] g" >
+              15:30
+            </Typography>
+        </CardBody>
+
+      </card>
+    </div>
   );
 }
 
-export default TwitterChatboxTextarea; textArea;
+export default TwitterChatboxTextarea; ChatMessage;
