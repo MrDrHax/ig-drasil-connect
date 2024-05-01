@@ -135,9 +135,9 @@ export function DashboardNavbar() {
             <Button
               variant="text"
               color="blue-gray"
-              className="hidden items-center gap-1 px-4 xl:flex normal-case"
+              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTextColor("dark")}`}
             >
-              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+              <UserCircleIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
               {getNameFromToken()}
             </Button>
             <IconButton
@@ -145,7 +145,7 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="grid xl:hidden"
             >
-              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+              <UserCircleIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
             </IconButton>
           </Link>
           <Menu>
@@ -231,7 +231,7 @@ export function DashboardNavbar() {
             color="blue-gray"
             onClick={() => setOpenConfigurator(dispatch, true)}
           >
-            <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
+            <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
           </IconButton>
         </div>
       </div>

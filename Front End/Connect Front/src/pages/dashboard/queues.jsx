@@ -11,17 +11,22 @@ import {
   } from "@material-tailwind/react";
   import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
   import { agentQueue, projectsTableData } from "@/data";
+
+  import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+
   
   export function Queues() {
+    const controller = useMaterialTailwindController();
+
     return (
       <div className="mt-12 mb-8 flex flex-col gap-12">
-        <Card>
-          <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
+        <Card className={`w-full ${getBgColor("background-cards")}`}>
+          <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getBgColor("search-bar")}`}>
             <Typography variant="h6" color="white">
-              Agents´  Queue
+              Agent Queue
             </Typography>
           </CardHeader>
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className={`overflow-x-scroll px-0 pt-0 pb-2 ${getBgColor("background-cards")}`}>
             <table className="w-full min-w-[640px] table-auto">
               <thead>
                 <tr>
@@ -32,7 +37,7 @@ import {
                     >
                       <Typography
                         variant="small"
-                        className="text-[11px] font-bold uppercase text-blue-gray-400"
+                        className={`text-[11px] font-bold uppercase ${getTextColor('black')}`}
                       >
                         {el}
                       </Typography>
@@ -58,7 +63,7 @@ import {
                               <Typography
                                 variant="small"
                                 color="blue-gray"
-                                className="font-semibold"
+                                className={`font-semibold ${getTextColor('black')}`}
                               >
                                 {name}
                               </Typography>
@@ -67,7 +72,7 @@ import {
                           </div>
                         </td>
                         <td className={className}>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
+                          <Typography className={`text-xs font-semibold ${getTextColor('black')}`}>
                             {ongoingCalls}
                           </Typography>
                            {/*<Typography className="text-xs font-normal text-blue-gray-500">
@@ -93,14 +98,14 @@ import {
                           <div className="w-10/12">
                             <Typography
                               variant="small"
-                              className="mb-1 block text-xs font-medium text-blue-gray-600"
+                              className={`mb-1 block text-xs font-medium ${getTextColor('black')}`} 
                             >
                               {usage}%
                             </Typography>
                             <Progress
                               value={usage}
                               variant="gradient"
-                              color={"gray"}
+                              color={usage <= 50 ? "green" : usage > 50 && usage <= 80 ? "orange" : "red"}
                               className="h-1"
                             />
                           </div>
