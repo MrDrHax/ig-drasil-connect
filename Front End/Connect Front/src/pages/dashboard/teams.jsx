@@ -185,7 +185,7 @@ export function Teams() {
                         <table className="w-full min-w-[640px] table-auto">
                             <thead>
                                 <tr>
-                                    {["name", "queue", "status", "needs help", ""].map((el, i) => (
+                                    {["name", "Routing Profile", "status", "needs help", ""].map((el, i) => (
                                         <th
                                             key={i}
                                             className="border-b border-blue-gray-50 py-3 px-5 text-left"
@@ -265,7 +265,7 @@ export function Teams() {
                                                             <td className={className}>
                                                                 <Typography
                                                                     as="a"
-                                                                    href="/dashboard/profile"
+                                                                    href={"/dashboard/profile?" + agentID}
                                                                     className="text-xs font-semibold text-blue-gray-600"
                                                                 >
                                                                     View

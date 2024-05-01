@@ -34,7 +34,7 @@ class AgentsDataListItem(BaseModel):
     status: str = Field("No status", description="The current status of the agent.", example="Available")
     calls: int = Field(0, description="The amount of calls the agent has taken today.", example=5)
     rating: float = Field(0, description="The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going", example=4.5)
-    queue: str = Field("No queue", description="The queue the agent is currently in.", example="Support")
+    queue: str = Field("No routing profile", description="The queue the agent is currently in.", example="Support")
     requireHelp: bool = Field(False, description="If the agent requires help or not.", example=False)
 
 class AgentsDataList(BaseModel):
