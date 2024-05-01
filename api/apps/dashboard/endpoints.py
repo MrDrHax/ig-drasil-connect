@@ -87,6 +87,69 @@ async def get_rerouted_calls() -> int:
 
     return 'a'
 
+@router.get("/list-users-data", response_model=List[dict])
+async def list_users_data():
+    """
+    Description:
+        Return a list of agents of an instance.
+    
+    Parameters:
+        * InstanceId [REQUIRED][string]: id of the Amazon Connect instance.
+        * NextToken [string]: id of the Amazon Connect instance.
+        * MaxResults [integer]: id of the Amazon Connect instance. Default=100
+
+    @return 
+        List containing the agents of an instance.
+    """
+
+    client = boto3.client('connect')
+
+    # Get info about the users of said instance
+    response = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    return response['UserSummaryList']
+
+
+@router.get("/get-current-metric-data", response_model=List[dict])
+async def check_agent_availability():
+    """
+    Description:
+        Real-time information of the call.
+    Parameters:
+        * InstanceId [REQUIRED][string]: id of the Amazon Connect instance.
+        * Filters [REQUIRED][dictionary]:  
+            - 
+
+    Read the docs:
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/client/get_current_metric_data.html#
+
+    @return 
+        Metrics about an on-going call.
+    """    
+
+
+    client = boto3.client('connect')
+
+    # Get info for the first routing profile
+    response = client.get_current_metric_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'RoutingProfiles': [
+                '69e4c000-1473-42aa-9596-2e99fbd890e7',
+                
+            ]
+        },
+        CurrentMetrics=[
+        {
+            'Name': 'AGENTS_ONLINE',
+            'Unit': 'COUNT'
+        },
+        ]
+    )
+
+    return response['MetricResults']
+ 
 @router.get("/agent-status", response_model=List[dict])
 async def check_agent_availability():
     """
