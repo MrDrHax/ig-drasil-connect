@@ -26,8 +26,7 @@ import {
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
 import { getBgColor } from "@/context";
-import {TwitterChatboxTextarea ,ChatMessage } from "@/widgets/chat";
-
+import ChatBox from '@/widgets/chat/chatbox.jsx';
 
 
 export function Agent() {
@@ -181,31 +180,9 @@ export function Agent() {
   </Card>
   </div>
 
-  {/* Aquí estael chat del agente*/}
-  <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
-      <CardHeader
-        floated={false}
-        shadow={false}
-        color="transparent"
-        className="m-0 flex items-center justify-between p-6"
-      >
-        <div>
-          <Typography variant="h6" color="blue-gray" className="mb-1">
-            Chat
-          </Typography>
-        </div>
-      </CardHeader>
-      <CardBody className="overflow-y-scroll px-0 pt-0 pb-2">
-        {messageData.map(({ message, rol }) => (
-          <ChatMessage message={message} rol={rol} />
-        ))}
-
-      </CardBody>
-      <CardBody className="p-4">
-        <TwitterChatboxTextarea />
-      </CardBody>
-    </Card>
-        
+    
+  {/* Aqui es para el chat del agente*/}
+  <ChatBox/>
 
   </div>
   );

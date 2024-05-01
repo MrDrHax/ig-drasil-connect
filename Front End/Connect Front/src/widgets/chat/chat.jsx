@@ -38,16 +38,22 @@ export function TwitterChatboxTextarea() {
   );
 }
 
-{/*Aqui es los textos*/}
-
-
-
+/**
+ * Renders a chat message component.
+ *
+ * @param {Object} props - The properties of the chat message.
+ * @param {string} props.message - The content of the chat message.
+ * @param {string} props.rol - The role of the chat message sender.
+ * @return {JSX.Element} The chat message component.
+ */
 export function ChatMessage ({ message, rol }){
-  const isAgent = rol === 'agent';//defines si el rol es de un agente o supervisor para acomodar el mensaje
+  {/* Defines the color of the card based on the role of the message sender. */}
+  const isAgent = rol === 'agent';
 
   return (
     <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
-      <card className=" rounded-[100px] border border-gray-900 bg-gray-900/5">
+      {/* Change the color of the card based on the role of the message sender. */}
+      <card className={`rounded-[100px] border border-gray-900 ${isAgent ?'bg-green-500/10' : 'bg-gray-900/10'}`}>
         <CardBody>
           <Typography color="black" className="text-base ">
             {message} 
