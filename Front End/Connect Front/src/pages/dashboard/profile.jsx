@@ -25,6 +25,8 @@ import ChatBox from "@/widgets/chat/chatbox";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
 import React, { useState } from "react";
 
+import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+
 /**
  * Renders the user profile page with tabs for app and chat views.
  *
@@ -32,11 +34,13 @@ import React, { useState } from "react";
  */
 export function Profile() {
 
+  const controller = useMaterialTailwindController();
+
   const [view, setView] = useState('app');
 
   return (
     <>    
-      <Card className="mx-3 mb-6 lg:mx-4 border border-blue-gray-100">
+      <Card className={`mx-3 mb-6 lg:mx-4 border border-blue-gray-100 ${getTextColor("dark")} ${getBgColor("background-cards")}`}>
         <CardBody className="p-4">
           {/* Header */}
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">

@@ -10,7 +10,8 @@ import PropTypes from "prop-types";
 import { 
   getBgColor,
   getTextColor,
-  useMaterialTailwindController, } from "@/context";
+  useMaterialTailwindController,
+} from "@/context";
 
 export function StatisticsCard({ color, icon, title, value, footer }) {
 

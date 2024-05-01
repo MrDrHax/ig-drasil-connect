@@ -9,20 +9,27 @@ import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
 import { 
   getBgColor,
+  getTextColor,
   useMaterialTailwindController, 
 } from "@/context";
 
+import { chartsConfig } from "@/configs";
+
 export function StatisticsChart({ color, chart, title, description, footer }) {
+
+  const controller = useMaterialTailwindController();
+  const theme = controller;
+
   return (
     <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
       <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
-        <Chart {...chart} className={`${getBgColor("background-cards")}`} />
+        <Chart {...chart} className={`${getBgColor("background-cards")}`}/>
       </CardHeader>
       <CardBody className="px-6 pt-0">
-        <Typography variant="h6" color="blue-gray">
+        <Typography variant="h6" color="blue-gray" className={`${getTextColor("dark")}`}>
           {title}
         </Typography>
-        <Typography variant="small" className="font-normal text-blue-gray-600">
+        <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
           {description}
         </Typography>
       </CardBody>

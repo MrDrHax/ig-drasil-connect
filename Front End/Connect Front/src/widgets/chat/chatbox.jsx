@@ -9,7 +9,7 @@ import {
 import {
   messageData
 } from "@/data";
-import { getBgColor } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
 import {TwitterChatboxTextarea ,ChatMessage } from "@/widgets/chat";
 
 /**
@@ -18,6 +18,8 @@ import {TwitterChatboxTextarea ,ChatMessage } from "@/widgets/chat";
  * @return {JSX.Element} The chat box component.
  */
 export function ChatBox() {
+    const controller = useMaterialTailwindController();
+    const { theme } = controller;
 
     return (
         <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
@@ -28,7 +30,7 @@ export function ChatBox() {
             className="m-0 flex items-center justify-between p-6"
             >
                 <div>
-                    <Typography variant="h6" color="blue-gray" className="mb-1">
+                    <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor("dark")}`}>
                     Chat
                     </Typography>
                 </div>

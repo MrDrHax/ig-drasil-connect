@@ -19,7 +19,7 @@ export const chartsConfig = {
     },
     labels: {
       style: {
-        colors: "#37474f",
+        colors: "#777777",
         fontSize: "13px",
         fontFamily: "inherit",
         fontWeight: 300,
@@ -29,7 +29,7 @@ export const chartsConfig = {
   yaxis: {
     labels: {
       style: {
-        colors: "#37474f",
+        colors: "#777777",
         fontSize: "13px",
         fontFamily: "inherit",
         fontWeight: 300,

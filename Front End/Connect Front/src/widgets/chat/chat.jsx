@@ -1,14 +1,20 @@
 import { Textarea, Button, IconButton, Typography, CardHeader, CardBody, CardFooter } from "@material-tailwind/react";
 import { LinkIcon } from "@heroicons/react/24/outline";
+
+import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController } from "@/context";
  
 export function TwitterChatboxTextarea() {
+
+  const controller = useMaterialTailwindController();
+  const { theme } = controller;
+
   return (
-    <div className="flex min-w-full flex-row items-center gap-2 rounded-[99px] border border-gray-900/10 bg-gray-900/5 p-2">
+    <div className={`flex min-w-full flex-row items-center gap-2 rounded-[99px] border ${getBorderColor("search-bar")} ${getBgColor("background-cards")} ${getTextColor("dark")} p-2`}>
       <Textarea
         rows={1}
         resize={true}
         placeholder="Your Message"
-        className="min-h-full !border-0 focus:border-transparent"
+        className={`min-h-full !border-0 focus:border-transparent ${getTextColor("dark")}`}
         containerProps={{
           className: "grid h-full",
         }}
@@ -17,7 +23,7 @@ export function TwitterChatboxTextarea() {
         }}
       />
       <div>
-        <IconButton variant="text" className="rounded-full">
+        <IconButton variant="text" className={`rounded-full ${getTextColor("dark")}`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -50,15 +56,18 @@ export function ChatMessage ({ message, rol }){
   {/* Defines the color of the card based on the role of the message sender. */}
   const isAgent = rol === 'agent';
 
+  const controller = useMaterialTailwindController();
+  const { theme } = controller;
+
   return (
     <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
       {/* Change the color of the card based on the role of the message sender. */}
-      <card className={`rounded-[100px] border border-gray-900 ${isAgent ?'bg-green-500/10' : 'bg-gray-900/10'}`}>
+      <card className={`rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}>
         <CardBody>
-          <Typography color="black" className="text-base ">
+          <Typography color="black" className={`text-base ${getTextColor('dark')}`}>
             {message} 
           </Typography>
-          <Typography  color="blue-gray" className="text-right text-[0.7rem] g" >
+          <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTextColor('dark')}`} >
               15:30
             </Typography>
         </CardBody>
