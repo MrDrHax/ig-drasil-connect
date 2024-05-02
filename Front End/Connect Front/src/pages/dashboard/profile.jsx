@@ -11,6 +11,7 @@ import {
   Switch,
   Tooltip,
   Button,
+  TabPanel,
   Rating,
 } from "@material-tailwind/react";
 import {
@@ -21,12 +22,26 @@ import {
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
+import ChatBox from "@/widgets/chat/chatbox";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
+
+
+import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
 import { AgentDetails } from "@/data/agents-data";
 import React, { useEffect, useState } from 'react';
 
 
+/**
+ * Renders the user profile page with tabs for app and chat views.
+ *
+ * @return {JSX.Element} The user profile page JSX element.
+ */
 export function Profile() {
+
+  const controller = useMaterialTailwindController();
+
+  const [view, setView] = useState('app');
+
   
   /*const [dataToDisplay, setData] = useState([]);
 
@@ -40,12 +55,10 @@ export function Profile() {
   } */
 
   return (
-    <>
-      <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
-        <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
-      </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+    <>    
+      <Card className={`mx-3 mb-6 lg:mx-4 border border-blue-gray-100 ${getTextColor("dark")} ${getBgColor("background-cards")}`}>
         <CardBody className="p-4">
+          {/* Header */}
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center gap-6">
               <Avatar
@@ -71,14 +84,15 @@ export function Profile() {
 
               </div>
             </div>
+            {/* Tab Navigation */}
             <div className="w-96">
-              <Tabs value="app">
+              <Tabs value='app'>
                 <TabsHeader>
-                  <Tab value="app">
+                  <Tab value="app" onClick={() => setView('app')}>
                     <InformationCircleIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                     Information
                   </Tab>
-                  <Tab value="message">
+                  <Tab value="chat" onClick={() => setView('chat')}>
                     <ChatBubbleLeftEllipsisIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
                     Message
                   </Tab>
@@ -86,6 +100,7 @@ export function Profile() {
               </Tabs>
             </div>
           </div>
+          
           <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
             <ProfileInfoCard
               title="About agent"

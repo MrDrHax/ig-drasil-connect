@@ -31,14 +31,15 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor } from "@/context";
-
-
+import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
  
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
+
+  const controller = useMaterialTailwindController();
+  const theme = controller;
 
   return (
     <div className="mt-12">
@@ -52,7 +53,7 @@ export function Home() {
               className: "w-6 h-6 text-white",
             })}
             footer={
-              <Typography className="font-normal text-blue-gray-600">
+              <Typography className={`font-normal ${getTextColor('dark')}`}>
                 <strong className={footer.color}>{footer.value}</strong>
                 &nbsp;{footer.label}
               </Typography>
@@ -68,9 +69,9 @@ export function Home() {
             footer={
               <Typography
                 variant="small"
-                className="flex items-center font-normal text-blue-gray-600"
+                className={`flex items-center font-normal ${getTextColor('dark')}`}
               >
-                <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
+                <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
                 &nbsp;{props.footer}
               </Typography>
             }
@@ -78,7 +79,7 @@ export function Home() {
         ))}
       </div>
 
-{/*Aqui es sobre el sistema de alerta del home page */}
+      {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
@@ -88,7 +89,7 @@ export function Home() {
             className="m-0 flex items-center justify-between p-6"
           >
             <div>
-              <Typography variant="h6" color="blue-gray" className="mb-1">
+              <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor('dark')}`}>
                 Alerts
               </Typography>
               <Typography
@@ -120,6 +121,7 @@ export function Home() {
             <Notifications />
           </CardBody>
         </Card>
+
         {/* Aquí esta para cambiar el Card de recomendaciones*/}
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
@@ -128,7 +130,7 @@ export function Home() {
             color="transparent"
             className="m-0 p-6"
           >
-            <Typography variant="h6" color="blue-gray" className="mb-2">
+            <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor('dark')}`}>
               Recommendations
             </Typography>
             <Typography

@@ -5,7 +5,7 @@ const websiteViewsChart = {
   height: 220,
   series: [
     {
-      name: "Capcity",
+      name: "Capacity",
       data: [50, 20, 10, 22, 50],
     },
   ],
@@ -24,8 +24,6 @@ const websiteViewsChart = {
       labels: {
         style: {
           fontSize: "12px",
-          fontWeight: 400,
-          colors: "#808080",
         },
       }
     },

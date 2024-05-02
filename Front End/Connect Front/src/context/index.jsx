@@ -84,6 +84,8 @@ export function getBgColor(color) {
         return "bg-white";
       case "search-bar":
         return "bg-black";
+      case "gray":
+        return "bg-gray-200";
       default:
         return "bg-white";
     }
@@ -105,6 +107,8 @@ export function getBgColor(color) {
         return "bg-gray-900";
       case "search-bar":
         return "bg-gray-800";
+      case "gray":
+        return "bg-gray-600";
       default:
         return "bg-gray-100";
     }
@@ -208,8 +212,6 @@ export function MaterialTailwindControllerProvider({ children }) {
     theme: "light",
     font: "Normal",
   };
-
-  theme = initialState.theme;
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);
   const value = React.useMemo(
