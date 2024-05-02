@@ -35,7 +35,7 @@ export function ChatBox() {
                     </Typography>
                 </div>
             </CardHeader>
-            <CardBody className="overflow-y-scroll px-0 pt-0 pb-2">
+            <CardBody className="overflow-y-scroll border border-blue-gray-100 px-0 pt-0 pb-2 " style={{ maxHeight: '400px'}}>
             {messageData.map(({ message, rol }) => (
                 <ChatMessage message={message} rol={rol} />
             ))}
