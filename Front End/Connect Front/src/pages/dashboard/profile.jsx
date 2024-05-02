@@ -28,25 +28,16 @@ import React, { useEffect, useState } from 'react';
 
 export function Profile() {
   
-
   /*const [dataToDisplay, setData] = useState([]);
 
-  function  updateData()
+  function updateData()
   {
     AgentDetails(id).then((data) => {
       setData(data.data);
     }).catch((error) => {
-
-      //showAlertWithMessage("red", "" + error, 10000);
-
       console.error(error);
-  });
-  }
-
-  useEffect(() => {
-    updateData();
-  }); */
-
+    });
+  } */
 
   return (
     <>
@@ -68,10 +59,7 @@ export function Profile() {
                 <Typography variant="h5" color="blue-gray" className="mb-1">
                   Unknown
                 </Typography>
-                <Typography
-                  variant="small"
-                  className="font-normal text-blue-gray-600"
-                >
+                <Typography variant="small" className="font-normal text-blue-gray-600">
                   Agent
                 </Typography>
                 <div className="flex items-center gap-2 font-bold text-blue-gray-500">
@@ -100,7 +88,7 @@ export function Profile() {
           </div>
           <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
             <ProfileInfoCard
-              title="Profile Information"
+              title="About agent"
               description="Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
               details={{
                 "name": "Alec M. Thompson",
@@ -122,22 +110,23 @@ export function Profile() {
             />
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-3">
-                Platform Settings
+                Contact evaluation
               </Typography>
+              <Typography variant="small" className="font-normal text-blue-gray-600">
+                  Last customer calls
+                </Typography>
               <ul className="flex flex-col gap-6">
                 {conversationsData.map((props) => (
                   <MessageCard
                     key={props.name}
                     {...props}
-                    action={
-                      <Button variant="text" size="sm">
-                        reply
-                      </Button>
-                    }
                   />
                 ))}
               </ul>
             </div>
+
+            
+            
           </div>
           
         </CardBody>

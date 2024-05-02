@@ -30,7 +30,7 @@ export async function AgentList(skip = 0, limit = 10, search = null, sortbydat =
     return await response.json();
 }
 
-export function AgentDetails(id) {
+export async function AgentDetails(id) {
     console.warn("AgentDetails function is not implemented!!!");
 
     return {
