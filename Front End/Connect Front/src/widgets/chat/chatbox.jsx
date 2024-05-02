@@ -22,7 +22,7 @@ export function ChatBox() {
     const { theme } = controller;
 
     return (
-        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} `}>
             <CardHeader
             floated={false}
             shadow={false}
@@ -35,7 +35,7 @@ export function ChatBox() {
                     </Typography>
                 </div>
             </CardHeader>
-            <CardBody className="overflow-y-scroll border border-blue-gray-100 px-0 pt-0 pb-2 " style={{ maxHeight: '400px'}}>
+            <CardBody className={`overflow-y-scroll border border-${getTextColor("dark")} px-0 pt-0 pb-2 ` } style={{ maxHeight: '400px'}} >
             {messageData.map(({ message, rol }) => (
                 <ChatMessage message={message} rol={rol} />
             ))}
