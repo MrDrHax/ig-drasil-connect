@@ -62,7 +62,7 @@ export function ChatMessage ({ message, rol,hour}){
   return (
      <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
         {/* Change the color of the card based on the role of the message sender. */}
-        <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '1px' }}>
+        <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '300px' }}>
           <CardBody>
           <Typography color="black" className={`text-base ${getTextColor('dark')}`}>
               {message} 
