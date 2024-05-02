@@ -25,11 +25,14 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor } from "@/context";
+import { getBgColor,getTextColor, useMaterialTailwindController } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
 
 
 export function Agent() {
+
+  const controller = useMaterialTailwindController();
+  const theme = controller;
 
   const [open, setOpen] = React.useState(1);
  
@@ -66,7 +69,7 @@ export function Agent() {
         name={name}
         descripcion={descripcion}
         footer={
-          <Typography className="font-normal text-blue-gray-600">
+          <Typography className={`font-normal ${getTextColor('dark')}`}>
             <strong className={footer.color}>{footer.value}</strong>
             &nbsp;{footer.label}
           </Typography>
@@ -81,7 +84,7 @@ export function Agent() {
         {...rest}
         recomendation={recomendation}
         footer={
-          <Typography className="font-normal text-blue-gray-600">
+          <Typography className={`font-normal ${getTextColor('dark')}`}>
             <strong className={footer.color}>{footer.value}</strong>
             &nbsp;{footer.label}
           </Typography>

@@ -52,7 +52,7 @@ export function TwitterChatboxTextarea() {
  * @param {string} props.rol - The role of the chat message sender.
  * @return {JSX.Element} The chat message component.
  */
-export function ChatMessage ({ message, rol }){
+export function ChatMessage ({ message, rol}){
   {/* Defines the color of the card based on the role of the message sender. */}
   const isAgent = rol === 'agent';
 
