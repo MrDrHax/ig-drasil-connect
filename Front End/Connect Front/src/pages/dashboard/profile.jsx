@@ -119,7 +119,7 @@ export function Profile() {
               }}
               action={
                 <Tooltip content="Edit Profile">
-                  <PencilIcon className="h-4 w-4 cursor-pointer text-blue-gray-500" />
+                  <PencilIcon className={`h-4 w-4 cursor-pointer ${getTextColor("dark")}`} />
                 </Tooltip>
               }
             />
@@ -127,7 +127,7 @@ export function Profile() {
               <Typography variant="h6" color="blue-gray" className="mb-3">
                 Contact evaluation
               </Typography>
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
                   Last customer calls
                 </Typography>
               <ul className="flex flex-col gap-6">
