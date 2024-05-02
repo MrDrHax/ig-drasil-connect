@@ -52,7 +52,7 @@ export function TwitterChatboxTextarea() {
  * @param {string} props.rol - The role of the chat message sender.
  * @return {JSX.Element} The chat message component.
  */
-export function ChatMessage ({ message, rol}){
+export function ChatMessage ({ message, rol,hour}){
   {/* Defines the color of the card based on the role of the message sender. */}
   const isAgent = rol === 'agent';
 
@@ -60,21 +60,48 @@ export function ChatMessage ({ message, rol}){
   const { theme } = controller;
 
   return (
-    <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
-      {/* Change the color of the card based on the role of the message sender. */}
-      <card className={`rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}>
+     <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
+        {/* Change the color of the card based on the role of the message sender. */}
+        <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '1px' }}>
+          <CardBody>
+          <Typography color="black" className={`text-base ${getTextColor('dark')}`}>
+              {message} 
+            </Typography>
+            <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTextColor('dark')}`} >
+                {isAgent ? "You": "Supervisor"} {hour}
+              </Typography>
+          </CardBody>
+
+        </card>
+      </div>
+    );
+  }
+
+export function ChatMsupervisor ({ message, rol,hour}){
+  {/* Defines the color of the card based on the role of the message sender. */}
+  const isSupervisor = rol === 'supervisor';
+  
+  const controller = useMaterialTailwindController();
+  const { theme } = controller;
+  
+  return (
+    <div className={`flex ${isSupervisor ? 'justify-end' : 'justify-start'} mx-5`}>
+    {/* Change the color of the card based on the role of the message sender. */}
+      <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isSupervisor ? getBgColor('green') : getBgColor('gray')}`}>
         <CardBody>
           <Typography color="black" className={`text-base ${getTextColor('dark')}`}>
             {message} 
           </Typography>
           <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTextColor('dark')}`} >
-              15:30
-            </Typography>
+            {isSupervisor ? "You": "agent"} {hour} 
+          </Typography>
         </CardBody>
-
       </card>
     </div>
   );
 }
+  
 
-export default TwitterChatboxTextarea; ChatMessage;
+
+
+export default TwitterChatboxTextarea; ChatMessage; ChatMsupervisor;

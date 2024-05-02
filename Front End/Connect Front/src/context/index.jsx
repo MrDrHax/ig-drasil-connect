@@ -40,6 +40,7 @@ export function getBorderColor(color) {
     switch (color) {
       case "dark":
         return "border-gray-100";
+      
       case "green":
         return "border-green-500";
       case "orange":
@@ -129,6 +130,8 @@ export function getTextColor(color) {
       case "contrast":
         return "text-white";
       case "gray":
+        return "text-gray-600";
+      case "bgray":
         return "text-gray-800";
       case "green":
         return "text-green-500";
@@ -161,6 +164,8 @@ export function getTextColor(color) {
         return "text-red-500";
       case "pink":
         return "text-pink-500";
+      case "gray":
+        return "text-black";
       default:
         return "text-white";
     } 
