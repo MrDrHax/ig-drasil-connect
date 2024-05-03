@@ -22,7 +22,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
-import ChatBox from "@/widgets/chat/chatbox";
+import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
 
 
@@ -130,20 +130,28 @@ export function Profile() {
               <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
                   Last customer calls
                 </Typography>
-              <ul className="flex flex-col gap-6">
-                {conversationsData.map((props) => (
-                  <MessageCard
-                    key={props.name}
-                    {...props}
-                  />
-                ))}
-              </ul>
+                <ul className="flex flex-col gap-6">
+                  {conversationsData.map((props) => (
+                    <MessageCard
+                      key={props.name}
+                      {...props}
+                      action={
+                        <Button variant="text" size="sm">
+                          reply
+                        </Button>
+                      }
+                    />
+                  ))}
+                </ul>
+              </div>
             </div>
-
-            
-            
-          </div>
-          
+          {/* Chat Content */}
+          {
+            view === 'chat' && (
+            <div className="gird-cols-1 mb-12 grid gap-12 px-4" style={{ visibility: view === 'chat' ? 'visible' : 'hidden' }}>
+              <ChatBoxSupervisor/>
+            </div>
+          )}
         </CardBody>
       </Card>
     </>

@@ -38,6 +38,7 @@ module.exports = withMT({
           orange: "#FFA500",
           red: "#f44336",
           pink: "#ec407a",
+          bgray: "#bf360c"
         }
       }
     }
