@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
-import ChatBox from "@/widgets/chat/chatbox";
+import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
 import React, { useState } from "react";
 
@@ -158,7 +158,7 @@ export function Profile() {
           {
             view === 'chat' && (
             <div className="gird-cols-1 mb-12 grid gap-12 px-4" style={{ visibility: view === 'chat' ? 'visible' : 'hidden' }}>
-              <ChatBox />
+              <ChatBoxSupervisor/>
             </div>
           )}
         </CardBody>

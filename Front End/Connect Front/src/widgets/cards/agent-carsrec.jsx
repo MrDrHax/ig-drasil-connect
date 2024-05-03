@@ -20,13 +20,13 @@ import {
     return (
       <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
         <CardBody className="p-4 text-right">
-          <Typography variant="h4" className={`font-bold text-justify text-blue-gray-600 ${getTextColor("dark")}`}>
+          <Typography variant="h4" className={`font-bold text-justify ${getTextColor("dark")}`}>
             Customer data
           </Typography>
-          <Typography variant="paragraph" className={`text-justify text-blue-gray-600 ${getTextColor("dark")}`}>
+          <Typography variant="paragraph" className={`text-justify ${getTextColor("dark")}`}>
            <span className="font-bold text-blue-gray">Name of Customer: </span> {name}
           </Typography>
-          <Typography variant="paragraph" className={`text-justify text-blue-gray-600 ${getTextColor("dark")}`}>
+          <Typography variant="paragraph" className={`text-justify  ${getTextColor("dark")}`}>
            <span className="font-bold text-blue-gray">Condition: </span> {description}
           </Typography>
         </CardBody>
@@ -77,12 +77,12 @@ import {
   
   export function Lexcard({ recomendation, footer }) {
     return (
-      <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+      <Card className={`border shadow-sm ${getBgColor("background-cards")}`}>
         <CardBody className="p-4 text-right">
-          <Typography variant="h4" className={`font-bold text-justify text-blue-gray-600 ${getTextColor("dark")}`} >
+          <Typography variant="h4" className={`font-bold text-justify  ${getTextColor("dark")}`} >
             Al/n, your virtual assistant:
           </Typography>
-          <Typography variant="paragraph" className={`p-1 text-justify text-blue-gray-600 ${getTextColor("dark")}`}>
+          <Typography variant="paragraph" className={`p-1 text-justify  ${getTextColor("dark")}`}>
           <span className="font-bold text-blue-gray"> Recommends: </span> {recomendation} 😊
           </Typography>
         </CardBody>
