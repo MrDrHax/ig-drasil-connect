@@ -20,7 +20,6 @@ import {
   Cog6ToothIcon,
   PencilIcon,
 } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
 import { StatisticsChart } from "@/widgets/charts";
@@ -29,8 +28,8 @@ import { platformSettingsData, conversationsData, projectsData, statisticsCharts
 
 import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
 import { AgentDetails } from "@/data/agents-data";
-import React, { useEffect, useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
 
 /**
  * Renders the user profile page with tabs for app and chat views.
@@ -42,21 +41,26 @@ export function Profile() {
   const controller = useMaterialTailwindController();
 
   const [view, setView] = useState('app');
+  const [dataToDisplay, setData] = useState([]);
 
-  
-  /*const [dataToDisplay, setData] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  searchParams.get("profile")
 
-  function updateData()
-  {
-    AgentDetails(id).then((data) => {
-      setData(data.data);
-    }).catch((error) => {
-      console.error(error);
+
+  function updateData() {
+
+    AgentDetails(searchParams.get("profile")).then((data) => {
+      setData(data);
     });
-  } */
+  }
+
+  //Call the function just once
+  useEffect(() => {
+    updateData();
+  }, []);
 
   return (
-    <>    
+    <>
       <Card className={`mx-3 mb-6 lg:mx-4 border border-blue-gray-100 ${getTextColor("dark")} ${getBgColor("background-cards")}`}>
         <CardBody className="p-4">
           {/* Header */}
@@ -71,7 +75,7 @@ export function Profile() {
               />
               <div>
                 <Typography variant="h5" color="blue-gray" className="mb-1">
-                  Unknown
+                  {dataToDisplay.name}
                 </Typography>
                 <Typography variant="small" className="font-normal text-blue-gray-600">
                   Agent
@@ -102,14 +106,17 @@ export function Profile() {
             </div>
           </div>
         
-          <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
+          {/* Profile Information */}
+          { view === 'app' && (
+            
+            <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
             <ProfileInfoCard
               title="About agent"
               description="Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
               details={{
-                "name": "Alec M. Thompson",
-                mobile: "(44) 123 1234 123",
-                email: "alecthompson@mail.com",
+                "name": dataToDisplay.name,
+                mobile: dataToDisplay.mobile,
+                email: dataToDisplay.email,
                 proficiencies: (
                   <div className="flex items-center gap-4">
                     <i className="fa-brands fa-facebook text-blue-700" />
@@ -142,15 +149,16 @@ export function Profile() {
                   ))}
                 </ul>
               </div>
-            </div>
 
             {/* Add Average Rating Over Months Chart */}
-            <div>
-              <Typography variant="h6" color="blue-gray" className={`font-normal ${getTextColor("dark")}`}>
-                Average rating over months
-              </Typography>
-              <StatisticsChart chart={statisticsChartsData[3].chart} /> {/* Pass the chart object */}
+              <div>
+                <Typography variant="h6" color="blue-gray" className={`font-normal ${getTextColor("dark")}`}>
+                  Average rating over months
+                </Typography>
+                <StatisticsChart chart={statisticsChartsData[3].chart} /> {/* Pass the chart object */}
+              </div>
             </div>
+          )}
             
           {/* Chat Content */}
           {

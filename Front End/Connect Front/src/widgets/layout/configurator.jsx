@@ -2,10 +2,10 @@ import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Button,
+  ButtonGroup,
   IconButton,
   Switch,
   Typography,
-  Chip,
 } from "@material-tailwind/react";
 import {
   useMaterialTailwindController,
@@ -17,6 +17,8 @@ import {
   setFont,
   setFixedNavbar,
   navColors,
+  getTheme,
+  getBorderColor,
 } from "@/context";
 
 function formatNumber(number, decPlaces) {
@@ -107,42 +109,55 @@ export function Configurator() {
           <Typography variant="small" className={`font-normal ${getTextColor('gray')}`}>
             Choose between a dislexyc accesible font and normal font.
           </Typography>
+
+          {/* Font selector */}
+
           <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
             <Button
-              variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
+              className={`${getTextColor('contrast')} ${font === "OpenDyslexic" ? getBgColor(navColor) : getBgColor("background")}`}
+              // variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "OpenDyslexic")}
             >
               OpenDyslexic
             </Button>
             <Button
-              variant={font === "Normal" ? "gradient" : "outlined"}
+              className={`${getTextColor('contrast')} ${font === "Normal" ? getBgColor(navColor) : getBgColor("background")}`}
+              // variant={font === "Normal" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "Normal")}
             >
               Normal
             </Button>
           </div>
+
+
         </div>
         <div className="mb-12">
-          <Typography variant="h6" className={`font-normal ${getTextColor('gray')}`}>
+          <Typography variant="h6" className={`font-normal ${getTextColor('dark')}`}>
             Color pallete
           </Typography>
           <Typography variant="small" className={`font-normal ${getTextColor('gray')}`}>
             Choose between dark and light modes.
           </Typography>
+
+
+          {/* Theme selector */}
+
           <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
             <Button
-              variant={theme === "dark" ? "gradient" : "outlined"}
+              className= {`${getTextColor('contrast')} ${getTheme() === "dark" ? getBgColor(navColor) : getBgColor("background")}`}
               onClick={() => setTheme(dispatch, "dark")}
             >
               Dark
             </Button>
             <Button
-              variant={theme === "light" ? "gradient" : "outlined"}
+              className= {`${getTextColor('contrast')} ${getTheme() === "light" ? getBgColor(navColor) : getBgColor("background")}`}
               onClick={() => setTheme(dispatch, "light")}
             >
               Light
             </Button>
           </div>
+
+
         </div>
         <div className="mb-12">
           <hr />
