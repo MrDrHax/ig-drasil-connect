@@ -24,3 +24,15 @@ class OngoingCallData(BaseModel):
     '''How many agents are currently taking a break.'''
     rating: float = Field(0, examples=[4.5, 3.5, 5.0])
     '''The average rating of a call. Range is 0 to 5'''
+
+class AgentProfileData(BaseModel):
+    name: str = Field(...)
+    '''The name of the agent.'''
+    queue: str = Field('Support', examples=['Support', 'Finance', 'Sales'])
+    '''The queue the agent is in.'''
+    rating: float = Field(0, examples=[4.5, 3.5, 5.0])
+    '''The average rating of the agent. Range is 0 to 5'''
+    email: str = Field(...)
+    '''The email of the agent.'''  
+    mobile: str = Field(...)
+    '''The mobile of the agent.'''

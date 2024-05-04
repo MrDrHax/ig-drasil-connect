@@ -27,7 +27,8 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
   getBgColor,
-  getTextColor
+  getTextColor,
+  getTheme
 } from "@/context";
 import { getApiLoginPage, getNameFromToken } from "@/configs";
 
@@ -88,7 +89,7 @@ export function DashboardNavbar() {
             {page}
           </Typography> */}
 
-          <Typography variant="h6" color={theme === "light"? 'black' : 'white'}>
+          <Typography variant="h6" color={getTheme() === "light"? 'black' : 'white'}>
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
@@ -135,9 +136,9 @@ export function DashboardNavbar() {
             <Button
               variant="text"
               color="blue-gray"
-              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTextColor("dark")}`}
+              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTextColor("contrast")}`}
             >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
+              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
               {getNameFromToken()}
             </Button>
             <IconButton
@@ -145,13 +146,13 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="grid xl:hidden"
             >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
+              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
             </IconButton>
           </Link>
           <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
-                <BellIcon className={`h-10 w-5 ${getTextColor("dark")}`} />
+                <BellIcon className={`h-10 w-5 ${getTextColor("contrast")}`} />
               </IconButton>
             </MenuHandler>
             <MenuList className="w-max border-0">
@@ -231,7 +232,7 @@ export function DashboardNavbar() {
             color="blue-gray"
             onClick={() => setOpenConfigurator(dispatch, true)}
           >
-            <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
+            <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
           </IconButton>
         </div>
       </div>
