@@ -23,7 +23,8 @@ import {
 import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
-import { platformSettingsData, conversationsData, projectsData } from "@/data";
+import { StatisticsChart } from "@/widgets/charts";
+import { platformSettingsData, conversationsData, projectsData, statisticsChartsData } from "@/data";
 
 
 import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
@@ -100,7 +101,7 @@ export function Profile() {
               </Tabs>
             </div>
           </div>
-          
+        
           <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
             <ProfileInfoCard
               title="About agent"
@@ -124,9 +125,6 @@ export function Profile() {
               }
             />
             <div>
-              <Typography variant="h6" color="blue-gray" className="mb-3">
-                Contact evaluation
-              </Typography>
               <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
                   Last customer calls
                 </Typography>
@@ -145,6 +143,15 @@ export function Profile() {
                 </ul>
               </div>
             </div>
+
+            {/* Add Average Rating Over Months Chart */}
+            <div>
+              <Typography variant="h6" color="blue-gray" className={`font-normal ${getTextColor("dark")}`}>
+                Average rating over months
+              </Typography>
+              <StatisticsChart chart={statisticsChartsData[3].chart} /> {/* Pass the chart object */}
+            </div>
+            
           {/* Chat Content */}
           {
             view === 'chat' && (
