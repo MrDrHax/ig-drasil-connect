@@ -11,7 +11,19 @@ class ConnectedUsers(BaseModel):
     title: str = Field("Connected users", examples=["Connected users"])
     user_amount: int = Field(0, examples=[10, 20, 30])
     footer_data: int = Field(0, examples=[10, 20, 30])
-    footer_txt: str = Field("That's today's average.", examples=["That's today's average."])    
+    footer_txt: str = Field("That's today's average.", examples=["That's today's average."])  
+
+class ConnectedAgents(BaseModel):
+    id: int = Field(0, examples=[1, 2, 3])
+    title: str = Field("Connected agents", examples=["Connected agents"])
+    agent_amount: int = Field(0, examples=[10, 20, 30])
+    footer_data: int = Field(0, examples=[10, 20, 30])
+    footer_txt: str = Field("That's today's average.", examples=["That's today's average."])
+    
+class Capacity(BaseModel):
+    title: str = Field("Capacity name", examples=["Capacity 1", "Capacity 2", "Capacity 3"])
+    percentaje: float = Field(0.0, examples=[10.0, 20.0, 30.0])
+    description: str = Field("Capacity description", examples=["Capacity 1 description", "Capacity 2 description", "Capacity 3 description"])  
 
 class AverageCallTime(BaseModel):
     title: str = Field("Average call time", examples=["Average call time"])
@@ -75,3 +87,4 @@ class OngoingCallData(BaseModel):
     '''How many agents are currently taking a break.'''
     rating: float = Field(0, examples=[4.5, 3.5, 5.0])
     '''The average rating of a call. Range is 0 to 5'''
+    

@@ -39,7 +39,12 @@ async def get_connected_users() -> List[models.ConnectedUsers]:
     return models.ConnectedUsers(id=1, title="Connected users", user_amount=10, footer_data=10, footer_txt="That's today's average.")
         
     
-
+@router.get("/capacity", tags=["cards"])
+async def get_capacity() -> models.Capacity:
+    '''
+    Returns the capacity
+    '''
+    return models.Capacity(title="Capacity name", percentaje=10.0, description="Capacity description")
 
 @router.get("/average_call_time", tags=["cards"])
 async def get_average_call_time() -> models.AverageCallTime:
@@ -47,6 +52,13 @@ async def get_average_call_time() -> models.AverageCallTime:
     Returns the average call time.
     '''
     return models.AverageCallTime(title="Average call time", average=10.0, above_average=20.0, footer_txt="+23s more than expected")
+
+@router.get("/connected_agents", tags=["cards"])
+async def get_connected_agents() -> models.ConnectedAgents:
+    '''
+    Returns the amount of connected agents.
+    '''
+    return models.ConnectedAgents(id=1, title="Connected agents", agent_amount=10, footer_data=10, footer_txt="That's today's average.")
 
 @router.get("/graph/unfinished_calls", tags=["graph"])
 async def get_unfinished_calls_graph() -> models.UnfinishedCallsGraph:
@@ -209,6 +221,7 @@ async def check_agent_availability():
     )
 
     return response['MetricResults']
+
 @router.get("/agent-status", response_model=List[dict])
 async def check_agent_availability():
     """
