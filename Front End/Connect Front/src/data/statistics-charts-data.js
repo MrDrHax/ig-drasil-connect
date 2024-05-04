@@ -1,4 +1,5 @@
 import { chartsConfig } from "@/configs";
+import { data } from "autoprefixer";
 
 const websiteViewsChart = {
   type: "bar",
@@ -70,6 +71,41 @@ const dailySalesChart = {
   },
 };
 
+const averageRatingChart = {
+  type: "line",
+  height: 220,
+  series: [
+    {
+    name: "Rating",
+    data: [3, 5, 5, 4, 5, 3, 4, 3, 5, 5],
+    },
+  ],
+  options: {
+    ...chartsConfig,
+    colors: ["#ff5722"],
+    stroke: {
+      lineCap: "round",
+    },
+    markers: {
+      size: 0,
+    },
+    xaxis: {
+      ...chartsConfig.xaxis,
+      categories: [
+        "Jan",
+        "Feb",
+        "March",
+        "Apr",
+        "May",
+        "June",
+        "July",
+        "Aug",
+        "Sep",
+      ],
+    },
+  }
+}
+
 const completedTaskChart = {
   type: "line",
   height: 220,
@@ -136,6 +172,13 @@ export const statisticsChartsData = [
     footer: "just updated",
     chart: completedTasksChart,
   },
+  {
+    color: "yellow",
+    title: "Average rating over the months",
+    description: "The clients rated the agent with the following stars",
+    footer: "Updated 2 min ago",
+    chart: averageRatingChart,
+  }
 ];
 
 export default statisticsChartsData;
