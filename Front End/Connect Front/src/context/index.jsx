@@ -40,6 +40,7 @@ export function getBorderColor(color) {
     switch (color) {
       case "dark":
         return "border-gray-100";
+      
       case "green":
         return "border-green-500";
       case "orange":
@@ -84,6 +85,8 @@ export function getBgColor(color) {
         return "bg-white";
       case "search-bar":
         return "bg-black";
+      case "gray":
+        return "bg-gray-200";
       default:
         return "bg-white";
     }
@@ -105,6 +108,8 @@ export function getBgColor(color) {
         return "bg-gray-900";
       case "search-bar":
         return "bg-gray-800";
+      case "gray":
+        return "bg-gray-600";
       default:
         return "bg-gray-100";
     }
@@ -125,6 +130,8 @@ export function getTextColor(color) {
       case "contrast":
         return "text-white";
       case "gray":
+        return "text-gray-600";
+      case "bgray":
         return "text-gray-800";
       case "green":
         return "text-green-500";
@@ -157,6 +164,8 @@ export function getTextColor(color) {
         return "text-red-500";
       case "pink":
         return "text-pink-500";
+      case "gray":
+        return "text-black";
       default:
         return "text-white";
     } 
@@ -208,8 +217,6 @@ export function MaterialTailwindControllerProvider({ children }) {
     theme: "light",
     font: "Normal",
   };
-
-  theme = initialState.theme;
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);
   const value = React.useMemo(

@@ -138,7 +138,7 @@ export function Teams() {
                     value="10"
                     icon={<UsersIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
+                        <Typography className={`font-normal ${getTextColor('black')}`}>
                             <strong className="text-green-500">10</strong>
                             &nbsp; connected
                         </Typography>
@@ -154,7 +154,7 @@ export function Teams() {
                     value="30%"
                     icon={<CogIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
+                        <Typography className={`font-normal ${getTextColor('black')}`}>
                             <strong className="text-green-500">3/5</strong>
                             &nbsp; agents on call
                         </Typography>
@@ -185,14 +185,14 @@ export function Teams() {
                         <table className="w-full min-w-[640px] table-auto">
                             <thead>
                                 <tr>
-                                    {["name", "queue", "status", "needs help", ""].map((el, i) => (
+                                    {["name", "Routing Profile", "status", "needs help", ""].map((el, i) => (
                                         <th
                                             key={i}
                                             className="border-b border-blue-gray-50 py-3 px-5 text-left"
                                         >
                                             <Typography
                                                 variant="small"
-                                                className="text-[11px] font-bold uppercase text-blue-gray-400"
+                                                className={`text-[11px] font-bold uppercase ${getTextColor('dark')}`}
                                             >
                                                 {el}
                                             </Typography>
@@ -216,7 +216,7 @@ export function Teams() {
                                                 <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                     <Typography
                                                         variant="small"
-                                                        className="text-[1em] font-semibold text-blue-gray-600"
+                                                        className={`text-[1em] font-semibold ${getTextColor('dark')}`}
                                                     >
                                                         List is empty
                                                     </Typography>
@@ -238,8 +238,7 @@ export function Teams() {
                                                                     <div>
                                                                         <Typography
                                                                             variant="small"
-                                                                            color="blue-gray"
-                                                                            className="font-semibold"
+                                                                            className={`font-semibold ${getTextColor('dark')}`}
                                                                         >
                                                                             {name}
                                                                         </Typography>
@@ -247,7 +246,7 @@ export function Teams() {
                                                                 </div>
                                                             </td>
                                                             <td className={className}>
-                                                                <Typography className="text-xs font-semibold text-blue-gray-600">
+                                                                <Typography className={`text-xs font-semibold ${getTextColor('dark')}`}>
                                                                     {queue}
                                                                 </Typography>
                                                             </td>
@@ -265,8 +264,8 @@ export function Teams() {
                                                             <td className={className}>
                                                                 <Typography
                                                                     as="a"
-                                                                    href="/dashboard/profile"
-                                                                    className="text-xs font-semibold text-blue-gray-600"
+                                                                    href={"/dashboard/profile?" + agentID}
+                                                                    className={`text-xs font-semibold ${getTextColor('dark')}`}
                                                                 >
                                                                     View
                                                                 </Typography>

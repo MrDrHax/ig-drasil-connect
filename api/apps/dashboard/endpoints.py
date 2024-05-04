@@ -87,7 +87,6 @@ async def get_rerouted_calls() -> int:
 
     return 'a'
 
-
 @router.get("/list-users-data", response_model=List[dict])
 async def list_users_data():
     """
@@ -150,6 +149,7 @@ async def check_agent_availability():
     )
 
     return response['MetricResults']
+ 
 @router.get("/agent-status", response_model=List[dict])
 async def check_agent_availability():
     """
