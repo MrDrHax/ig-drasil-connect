@@ -31,12 +31,22 @@ async def get_cards() -> models.TopCards:
     ]
     return cards
 
+@router.get("/connected-users" , tags=["users"], response_model=List[models.ConnectedUsers])
+async def get_connected_users() -> List[models.ConnectedUsers]:
+    '''
+    Returns the amount of connected users.
+    '''
+    return models.ConnectedUsers(id=1, title="Connected users", user_amount=10, footer_data=10, footer_txt="That's today's average.")
+        
+    
+
+
 @router.get("/average_call_time", tags=["cards"])
 async def get_average_call_time() -> models.AverageCallTime:
     '''
     Returns the average call time.
     '''
-    return models.AverageCallTime(title="Average call time", average=10.0, above_average=20.0)
+    return models.AverageCallTime(title="Average call time", average=10.0, above_average=20.0, footer_txt="+23s more than expected")
 
 @router.get("/graph/unfinished_calls", tags=["graph"])
 async def get_unfinished_calls_graph() -> models.UnfinishedCallsGraph:
@@ -245,10 +255,13 @@ async def check_agent_availability():
 # @router.get("/list-recommenders", response_model=List[dict])
 # async def list_recommenders():
 #     client = boto3.client('connect')
-#     response = client.list_recommenders(
-#     datasetGroupArn='string',
-#     nextToken='string',
-#     maxResults=123
-# )
-#     return response['recommenders']
+#     paginator = client.get_paginator('list_recommenders')
+#     response_iterator = paginator.paginate(
+#         datasetGroupArn = Config.DATASET_GROUP_ARN,
+#         PaginationConfig = {
+#             'MaxItems': 50,
+#             'PageSize': 50
+#         })
+#     return response_iterator
+        
 

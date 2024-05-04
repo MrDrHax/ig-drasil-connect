@@ -5,6 +5,13 @@ class TopCards(BaseModel):
     name: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
     price: float = Field(0.0, examples=[10.0, 20.0, 30.0])
     description: str = Field("Card description", examples=["Card 1 description", "Card 2 description", "Card 3 description"]) 
+    
+class ConnectedUsers(BaseModel):
+    id: int = Field(0, examples=[1, 2, 3])
+    title: str = Field("Connected users", examples=["Connected users"])
+    user_amount: int = Field(0, examples=[10, 20, 30])
+    footer_data: int = Field(0, examples=[10, 20, 30])
+    footer_txt: str = Field("That's today's average.", examples=["That's today's average."])    
 
 class AverageCallTime(BaseModel):
     title: str = Field("Average call time", examples=["Average call time"])
@@ -12,6 +19,8 @@ class AverageCallTime(BaseModel):
     average: float = Field(0.0, examples=[10.0, 20.0, 30.0])
     '''The average time of a call in seconds.'''
     above_average: float = Field(0.0, examples=[10.0, 20.0, 30.0])
+    '''The footer text of the card.'''
+    footer_txt: str = Field("+23s more than expected" , examples=["+23s more than expected", "+10s more than expected", "+5s more than expected"])
 
 
 class UnfinishedCallsGraph(BaseModel):
