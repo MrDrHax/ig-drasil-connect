@@ -20,6 +20,75 @@ router = APIRouter(
     }
 )
 
+@router.get("/cards", tags=["cards"] , response_model=List[models.TopCards])
+async def get_cards() -> models.TopCards:
+    '''
+    Returns the cards that will be displayed on the dashboard.
+    '''
+    cards = [
+        models.TopCards(id=1, name="Card 1", price=10.0, description="Card 1 description"),
+        models.TopCards(id=2, name="Card 2", price=20.0, description="Card 2 description"),
+        models.TopCards(id=3, name="Card 3", price=30.0, description="Card 3 description")
+    ]
+    return cards
+
+@router.get("/connected-users" , tags=["users"], response_model=List[models.ConnectedUsers])
+async def get_connected_users() -> List[models.ConnectedUsers]:
+    '''
+    Returns the amount of connected users.
+    '''
+    return models.ConnectedUsers(id=1, title="Connected users", user_amount=10, footer_data=10, footer_txt="That's today's average.")
+        
+    
+@router.get("/capacity", tags=["cards"])
+async def get_capacity() -> models.Capacity:
+    '''
+    Returns the capacity
+    '''
+    return models.Capacity(title="Capacity name", percentaje=10.0, description="Capacity description")
+
+@router.get("/average_call_time", tags=["cards"])
+async def get_average_call_time() -> models.AverageCallTime:
+    '''
+    Returns the average call time.
+    '''
+    return models.AverageCallTime(title="Average call time", average=10.0, above_average=20.0, footer_txt="+23s more than expected")
+
+@router.get("/connected_agents", tags=["cards"])
+async def get_connected_agents() -> models.ConnectedAgents:
+    '''
+    Returns the amount of connected agents.
+    '''
+    return models.ConnectedAgents(id=1, title="Connected agents", agent_amount=10, footer_data=10, footer_txt="That's today's average.")
+
+@router.get("/graph/unfinished_calls", tags=["graph"])
+async def get_unfinished_calls_graph() -> models.UnfinishedCallsGraph:
+    
+
+    return models.UnfinishedCallsGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent"])
+
+@router.get("/queue_supervisors", tags=["data"])
+async def get_queue_supervisors() -> List[models.QueueSupervisor]:
+    '''
+    Returns the queue supervisors.
+    '''
+    return [
+        models.QueueSupervisor(id=1, name="Supervisor 1", calls=10, status="online", usage=10.0),
+        models.QueueSupervisor(id=2, name="Supervisor 2", calls=20, status="offline", usage=20.0),
+        models.QueueSupervisor(id=3, name="Supervisor 3", calls=30, status="online", usage=30.0)
+    ]
+
+@router.get("/agent_visualisation", tags=["data"])
+async def get_agent_visualisation() -> List[models.AgentVisualisation]:
+    '''
+    Returns the agent visualisation.
+    '''
+    return [
+        models.AgentVisualisation(connected_users=10, usage_level=10.0, agent_name="Agent 1", queue="Queue 1", status="online", help=True),
+        models.AgentVisualisation(connected_users=20, usage_level=20.0, agent_name="Agent 2", queue="Queue 2", status="offline", help=False),
+        models.AgentVisualisation(connected_users=30, usage_level=30.0, agent_name="Agent 3", queue="Queue 3", status="online", help=True)
+    ]    
+
 @router.get("/graph/usage", tags=["graph"])
 async def get_usage_graph() -> models.UsageGraph:
     '''
@@ -31,7 +100,7 @@ async def get_usage_graph() -> models.UsageGraph:
     Will not consider the number of agents in break or disconnected.
     '''
 
-    return models.UsageGraph(data=[20,30,50], labels=["1", "2", "3", "4", "5"])
+    return models.UsageGraph(data=[20,30,50,40,10], labels=["1", "2", "3", "4", "5"])
 
 @router.get("/graph/connection_status", tags=["graph"])
 async def get_connection_status_graph() -> models.UsageGraph:
@@ -102,6 +171,8 @@ async def list_users_data():
     @return 
         List containing the agents of an instance.
     """
+    
+    
 
     client = boto3.client('connect')
 
@@ -150,7 +221,7 @@ async def check_agent_availability():
     )
 
     return response['MetricResults']
- 
+
 @router.get("/agent-status", response_model=List[dict])
 async def check_agent_availability():
     """
@@ -224,3 +295,18 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
     except Exception as e:
         print("Error:")
         return models.AgentProfileData(name=id, queue='Unknown', rating=0, email='Unknown', mobile='Unknown')
+
+
+# @router.get("/list-recommenders", response_model=List[dict])
+# async def list_recommenders():
+#     client = boto3.client('connect')
+#     paginator = client.get_paginator('list_recommenders')
+#     response_iterator = paginator.paginate(
+#         datasetGroupArn = Config.DATASET_GROUP_ARN,
+#         PaginationConfig = {
+#             'MaxItems': 50,
+#             'PageSize': 50
+#         })
+#     return response_iterator
+        
+

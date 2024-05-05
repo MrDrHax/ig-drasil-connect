@@ -70,9 +70,9 @@ export function getBorderColor(color) {
 }
 
 export function getBgColor(color) {
-  // const [controller, dispatch] = useMaterialTailwindController();
-  // const { theme } =
-  //   controller;
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { theme } =
+    controller;
   
 
   if (theme === "light") {
@@ -125,9 +125,9 @@ export function getBgColor(color) {
 }
 
 export function getTextColor(color) {
-  // const [controller, dispatch] = useMaterialTailwindController();
-  // const { theme } =
-  //   controller;
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { theme } =
+    controller;
 
   if (theme === "light") {
     switch (color) {

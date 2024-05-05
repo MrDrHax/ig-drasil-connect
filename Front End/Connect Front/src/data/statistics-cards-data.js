@@ -87,7 +87,7 @@ export function statisticsCardsDataAgent() {
       color: "amber",
       icon: StarIcon,
       title: "Rating",
-      value: "75%",
+      value: "70%",
       footer: {
         color: "text-red-500",
         value: "-3%",

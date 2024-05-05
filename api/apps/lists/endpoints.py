@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
 from . import crud, models
 from AAA.requireToken import requireToken
+import AAA.userType as userType
 
 import boto3
 from config import Config
@@ -123,6 +124,9 @@ async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[
 
     statuses: "connected", "disconnected", "on-call", "busy", "on-break"
     '''
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
 
