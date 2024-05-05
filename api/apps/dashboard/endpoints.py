@@ -4,6 +4,7 @@ from typing import List
 from config import Config
 
 import boto3
+from config import Config
 
 router = APIRouter(
     prefix="/dashboard", 
@@ -191,3 +192,35 @@ async def check_agent_availability():
         })
     
     return response_iterator
+
+@router.get("/agent-profile", tags=["profile"])
+async def get_agent_profile(id: str) -> models.AgentProfileData:
+    '''
+    Returns the profile of an agent.
+
+    To get the full list, go to /lists/agents
+    '''
+    try:
+        client = boto3.client('connect')
+        response = client.describe_user(
+            InstanceId=Config.INSTANCE_ID,
+            UserId=id
+        )
+
+
+        FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
+        Agent_email = response["User"]["Username"]
+
+        try:
+            Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
+        except:
+            Agent_mobile = "Unknown"
+
+        print(FullName, Agent_email, Agent_mobile)
+
+
+        return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile)
+
+    except Exception as e:
+        print("Error:")
+        return models.AgentProfileData(name=id, queue='Unknown', rating=0, email='Unknown', mobile='Unknown')

@@ -12,7 +12,15 @@ export const navColors = {
   pink: "from-pink-400 to-pink-600",
 };
 
-let theme = "";
+let theme = localStorage.getItem("theme");
+if (theme === null) {
+  localStorage.setItem("theme", "light");
+  theme = "light";
+}
+
+export function getTheme() {
+  return theme;
+}
 
 export function getBorderColor(color) {
   if (theme === "light") {
@@ -40,6 +48,7 @@ export function getBorderColor(color) {
     switch (color) {
       case "dark":
         return "border-gray-100";
+      
       case "green":
         return "border-green-500";
       case "orange":
@@ -127,8 +136,10 @@ export function getTextColor(color) {
       case "white":
         return "text-white";
       case "contrast":
-        return "text-white";
+        return "text-black";
       case "gray":
+        return "text-gray-600";
+      case "bgray":
         return "text-gray-800";
       case "green":
         return "text-green-500";
@@ -161,6 +172,8 @@ export function getTextColor(color) {
         return "text-red-500";
       case "pink":
         return "text-pink-500";
+      case "text-gray-300":
+        return "text-green-300";
       default:
         return "text-white";
     } 
@@ -246,8 +259,11 @@ MaterialTailwindControllerProvider.propTypes = {
 
 export const setOpenSidenav = (dispatch, value) =>
   dispatch({ type: "OPEN_SIDENAV", value });
-export const setTheme = (dispatch, value) =>
+export const setTheme = (dispatch, value) => 
+{
+  localStorage.setItem("theme", value);
   dispatch({ type: "THEME", value });
+}
 export const setFont = (dispatch, value) =>
   dispatch({ type: "FONT", value });
 export const setNavColor = (dispatch, value) =>

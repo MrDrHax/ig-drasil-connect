@@ -2,19 +2,23 @@ import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Button,
+  ButtonGroup,
   IconButton,
   Switch,
   Typography,
-  Chip,
 } from "@material-tailwind/react";
 import {
   useMaterialTailwindController,
+  getBgColor, 
+  getTextColor,
   setOpenConfigurator,
   setNavColor,
   setTheme,
   setFont,
   setFixedNavbar,
   navColors,
+  getTheme,
+  getBorderColor,
 } from "@/context";
 
 function formatNumber(number, decPlaces) {
@@ -58,16 +62,16 @@ export function Configurator() {
 
   return (
     <aside
-      className={`fixed top-0 right-0 z-50 h-screen w-96 bg-white px-2.5 shadow-lg transition-transform duration-300 ${
+      className={`fixed top-0 right-0 z-50 h-screen w-96  ${getBgColor("background-cards")} px-2.5 shadow-lg transition-transform duration-300 ${
         openConfigurator ? "translate-x-0" : "translate-x-96"
       }`}
     >
       <div className="flex items-start justify-between px-6 pt-8 pb-6">
         <div>
-          <Typography variant="h5" color="blue-gray">
+          <Typography variant="h5" className={`font-normal ${getTextColor('bgray')}`}>
             Dashboard Configurator
           </Typography>
-          <Typography className="font-normal text-blue-gray-600">
+          <Typography className={`font-normal ${getTextColor('gray')}`}>
             See our dashboard options.
           </Typography>
         </div>
@@ -81,7 +85,7 @@ export function Configurator() {
       </div>
       <div className="py-4 px-6">
         <div className="mb-12">
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" className={`font-normal ${getTextColor('bgray')}`}>
             Nav colors
           </Typography>
           <div className="mt-3 flex items-center gap-2">
@@ -99,53 +103,66 @@ export function Configurator() {
           </div>
         </div>
         <div className="mb-12">
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" className={`font-normal ${getTextColor('dark')}`}>
             Font type
           </Typography>
-          <Typography variant="small" color="gray">
+          <Typography variant="small" className={`font-normal ${getTextColor('gray')}`}>
             Choose between a dislexyc accesible font and normal font.
           </Typography>
-          <div className="mt-3 flex items-center gap-2">
+
+          {/* Font selector */}
+
+          <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
             <Button
-              variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
+              className={`${getTextColor('contrast')} ${font === "OpenDyslexic" ? getBgColor(navColor) : getBgColor("background")}`}
+              // variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "OpenDyslexic")}
             >
               OpenDyslexic
             </Button>
             <Button
-              variant={font === "Normal" ? "gradient" : "outlined"}
+              className={`${getTextColor('contrast')} ${font === "Normal" ? getBgColor(navColor) : getBgColor("background")}`}
+              // variant={font === "Normal" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "Normal")}
             >
               Normal
             </Button>
           </div>
+
+
         </div>
         <div className="mb-12">
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" className={`font-normal ${getTextColor('dark')}`}>
             Color pallete
           </Typography>
-          <Typography variant="small" color="gray">
+          <Typography variant="small" className={`font-normal ${getTextColor('gray')}`}>
             Choose between dark and light modes.
           </Typography>
-          <div className="mt-3 flex items-center gap-2">
+
+
+          {/* Theme selector */}
+
+          <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
             <Button
-              variant={theme === "dark" ? "gradient" : "outlined"}
+              className= {`${getTextColor('contrast')} ${getTheme() === "dark" ? getBgColor(navColor) : getBgColor("background")}`}
               onClick={() => setTheme(dispatch, "dark")}
             >
               Dark
             </Button>
             <Button
-              variant={theme === "light" ? "gradient" : "outlined"}
+              className= {`${getTextColor('contrast')} ${getTheme() === "light" ? getBgColor(navColor) : getBgColor("background")}`}
               onClick={() => setTheme(dispatch, "light")}
             >
               Light
             </Button>
           </div>
+
+
         </div>
         <div className="mb-12">
           <hr />
           <div className="flex items-center justify-between py-5">
-            <Typography variant="h6" color="blue-gray">
+            <Typography variant="h6" className={`font-normal ${getTextColor('gray')}`}>
               Navbar Fixed
             </Typography>
             <Switch

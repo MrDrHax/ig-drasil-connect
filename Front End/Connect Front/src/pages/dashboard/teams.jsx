@@ -264,7 +264,7 @@ export function Teams() {
                                                             <td className={className}>
                                                                 <Typography
                                                                     as="a"
-                                                                    href={"/dashboard/profile?" + agentID}
+                                                                    href={"/dashboard/profile?profile=" + agentID}
                                                                     className={`text-xs font-semibold ${getTextColor('dark')}`}
                                                                 >
                                                                     View

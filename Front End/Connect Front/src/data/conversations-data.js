@@ -1,27 +1,27 @@
 export const conversationsData = [
   {
     img: "/img/team-1.jpeg",
-    name: "Sophie B.",
-    message: "Hi! I need more information...",
+    name: "Customer 1",
+    message: "Thanks for your awesome time!",
   },
   {
     img: "/img/team-2.jpeg",
-    name: "Alexander",
+    name: "Customer 2",
     message: "Awesome work, can you...",
   },
   {
     img: "/img/team-3.jpeg",
-    name: "Ivanna",
-    message: "About files I can...",
+    name: "Customer 3",
+    message: "You solved my problem!",
   },
   {
     img: "/img/team-4.jpeg",
-    name: "Peterson",
+    name: "Customer 4",
     message: "Have a great afternoon...",
   },
   {
     img: "/img/bruce-mars.jpeg",
-    name: "Bruce Mars",
+    name: "Customer 5",
     message: "Hi! I need more information...",
   },
 ];

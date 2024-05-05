@@ -25,19 +25,22 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor } from "@/context";
+import { getBgColor,getTextColor, useMaterialTailwindController } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
 
 
 export function Agent() {
+
+  const controller = useMaterialTailwindController();
+  const theme = controller;
 
   const [open, setOpen] = React.useState(1);
  
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
   return (
-    <div className="mt-12">
-      <div className="mb-10 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+    <div className="mt-8">
+      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         {statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
@@ -66,7 +69,7 @@ export function Agent() {
         name={name}
         descripcion={descripcion}
         footer={
-          <Typography className="font-normal text-blue-gray-600">
+          <Typography className={`font-normal ${getTextColor('dark')}`}>
             <strong className={footer.color}>{footer.value}</strong>
             &nbsp;{footer.label}
           </Typography>
@@ -81,7 +84,7 @@ export function Agent() {
         {...rest}
         recomendation={recomendation}
         footer={
-          <Typography className="font-normal text-blue-gray-600">
+          <Typography className={`font-normal ${getTextColor('dark')}`}>
             <strong className={footer.color}>{footer.value}</strong>
             &nbsp;{footer.label}
           </Typography>
