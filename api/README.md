@@ -22,6 +22,8 @@ Each app has the following files:
 - models.py: Defines the data models for the app.
 - endpoints.py: Defines the API endpoints for the app.
 
+> Note: you can nor run by using `python -m main.py` (the -m is **VERY** necessary) 
+
 ## Setup
 
 1. Clone the repository.

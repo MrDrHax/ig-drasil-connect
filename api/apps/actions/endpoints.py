@@ -4,6 +4,9 @@ from config import Config
 
 import boto3
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/actions",
     tags=["actions"],
