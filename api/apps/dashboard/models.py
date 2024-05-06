@@ -34,15 +34,42 @@ class AverageCallTime(BaseModel):
     '''The footer text of the card.'''
     footer_txt: str = Field("+23s more than expected" , examples=["+23s more than expected", "+10s more than expected", "+5s more than expected"])
 
+class QueuesGraph(BaseModel):
+    title: str = Field("Queues", examples=["Queues"])
+    ''' The title of the graph.'''
+    data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
+    '''The data to be displayed in the graph.'''
+    labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent","Transfers", "Delivery"], ["Finance", "Support", "Sales","Transfers", "Delivery"]])
+    '''The labels for the data. Will be the same length as the data list.'''
+    info: str = Field("Graph showing queue capacity", examples=["Graph showing queue capacity"])
+    '''The info of the graph.'''
+    footer_txt: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
 
 class UnfinishedCallsGraph(BaseModel):
     title: str = Field("Unfinished calls", examples=["Unfinished calls"])
     ''' The title of the graph.'''
     data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
     '''The data to be displayed in the graph.'''
-    labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent"], ["Finance", "Support", "Sales"]])
+    labels: list[str] = Field([], examples=[["-1hr","-50m", "-30m", "-10m", "0m"], ["-1hr","-50m", "-30m", "-10m", "0m"]])
     '''The labels for the data. Will be the same length as the data list.'''
+    info: str = Field("Graph showing unfinished calls", examples=["Graph showing unfinished calls"])
+    '''The info of the graph.'''
+    footer: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"]) 
     
+class AverageCallRating(BaseModel):
+    title: str = Field("Average call rating", examples=["Average call rating"])
+    ''' The title of the card.'''
+    id: int = Field(0, examples=[1, 2, 3])
+    '''The id of the info.'''
+    Rating: int = Field([], examples=[50, 20, 90, 70, 100])
+    '''The average rating of a call. Range is 0 to 100'''
+    KPI: list[int]= Field([], examples=[50, 20, 90, 70, 100])
+    '''The KPI of the card. Range is 0 to 100'''
+    labels: list[str] = Field([], examples=[["-1hr","-50m", "-30m", "-10m", "0m"], ["-1hr","-50m", "-30m", "-10m", "0m"]])
+    '''The labels for the data. Will be the same length as the data list.'''
+    info: str = Field("Graph showing average call rating + important KPIs", examples=["Graph showing average call rating + important KPIs"])
+    '''The info of the graph.'''
+    footer: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])    
 class QueueSupervisor(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
     name: str = Field("Supervisor name", examples=["Supervisor 1", "Supervisor 2", "Supervisor 3"])
@@ -52,17 +79,14 @@ class QueueSupervisor(BaseModel):
     '''The status of the queue supervisor. Can be either "online" or "offline".'''
     
 class AgentVisualisation(BaseModel):
-    connected_users: int = Field(0, examples=[10, 20, 30])
-    '''How many users are currently connected to an agent.'''
-    usage_level: float = Field(0.0, examples=[10.0, 20.0, 30.0])
-    '''The usage level of the agent. 0 to 100.'''
-    agent_name: str = Field("Agent name", examples=["Agent 1", "Agent 2", "Agent 3"])
+    agent_name: str = Field("Agent name", examples=["John Doe", "Jane Doe", "John Smith"])
     '''The name of the agent.'''
-    queue: str = Field("Queue name", examples=["Queue 1", "Queue 2", "Queue 3"])
-    '''The name of the queue the agent is connected to.'''
-    status: str = Field("online", examples=["online", "offline"])
-    '''The status of the agent. Can be either "online" or "offline".'''
-    help: bool = Field(False, examples=[True, False])    
+    routing_profile: str = Field("Routing profile", examples=["Routing profile 1", "Routing profile 2", "Routing profile 3"])
+    '''The routing profile of the agent.'''
+    status: str = Field("Available", examples=["Available", "Busy", "Away"])
+    '''The status of the agent. Can be either "Available", "Busy" or "Away".'''
+    needs_help: bool = Field(True, examples=[True, False])
+    '''If the agent needs help or not.'''
 class DashboardItem(BaseModel):
     id: int
     name: str

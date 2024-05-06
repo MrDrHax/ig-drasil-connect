@@ -32,8 +32,8 @@ async def get_cards() -> models.TopCards:
     ]
     return cards
 
-@router.get("/connected-users" , tags=["users"], response_model=List[models.ConnectedUsers])
-async def get_connected_users() -> List[models.ConnectedUsers]:
+@router.get("/connected-users" , tags=["cards"])
+async def get_connected_users() -> models.ConnectedUsers:
     '''
     Returns the amount of connected users.
     '''
@@ -65,7 +65,24 @@ async def get_connected_agents() -> models.ConnectedAgents:
 async def get_unfinished_calls_graph() -> models.UnfinishedCallsGraph:
     
 
-    return models.UnfinishedCallsGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent"])
+    return models.UnfinishedCallsGraph(data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], info="Graph showing unfinished calls", footer="Updated 2 min ago")
+
+@router.get("/graph/average_call_rating", tags=["graph"])
+async def get_average_call_rating_graph() -> models.AverageCallRating:
+    
+    return models.AverageCallRating(data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], info="Graph showing average call rating", footer="Updated 2 min ago")
+
+@router.get("/graph/queues", tags=["graph"])
+async def get_queues_graph() -> models.QueuesGraph:
+    '''
+    Returns a graph of what queues is being used and capacity of each queue.
+    
+    100 means the queue is full, 0 means the queue is empty.
+    Anything over a 100 is considered an overflow. (waiting users)
+    
+    '''
+
+    return models.QueuesGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent","Transfers", "Delivery"], info="Graph showing queue capacity", footer_txt="Updated 2 min ago")
 
 @router.get("/queue_supervisors", tags=["data"])
 async def get_queue_supervisors() -> List[models.QueueSupervisor]:
@@ -84,9 +101,9 @@ async def get_agent_visualisation() -> List[models.AgentVisualisation]:
     Returns the agent visualisation.
     '''
     return [
-        models.AgentVisualisation(connected_users=10, usage_level=10.0, agent_name="Agent 1", queue="Queue 1", status="online", help=True),
-        models.AgentVisualisation(connected_users=20, usage_level=20.0, agent_name="Agent 2", queue="Queue 2", status="offline", help=False),
-        models.AgentVisualisation(connected_users=30, usage_level=30.0, agent_name="Agent 3", queue="Queue 3", status="online", help=True)
+        models.AgentVisualisation(agent_name="John Doe", routing_profile="Routing profile 1", status="Available"),
+        models.AgentVisualisation(agent_name="Jane Doe", routing_profile="Routing profile 2", status="Busy"),
+        models.AgentVisualisation(agent_name="John Smith", routing_profile="Routing profile 3", status="Away")
     ]    
 
 @router.get("/graph/usage", tags=["graph"])
