@@ -4,6 +4,9 @@ from config import Config
 from starlette.middleware.base import BaseHTTPMiddleware
 from AAA.userType import testToken
 
+import logging
+logger = logging.getLogger(__name__)
+
 oauthScheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=f"{Config.AUTH_DOMAIN}protocol/openid-connect/auth",
     tokenUrl=f"{Config.AUTH_DOMAIN}protocol/openid-connect/token",
@@ -30,7 +33,7 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
         response = Response("Internal server error", status_code=500)
         try:
             # Check if the access token has expired
-            # Fix this to check for the token in the header
+            # TODO: Fix this to check for the token in the header
             if 'access_token' in request.cookies and 'refresh_token' in request.cookies:
                 access_token = request.cookies['access_token']
                 refresh_token = request.cookies['refresh_token']
@@ -40,7 +43,8 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
                     request.cookies['access_token'] = access_token
                 response = await call_next(request)
             else:
+                logger.warning(f"No access token found in the request: {request.url.path}")
                 response = await call_next(request)
         except Exception as e:
-            print(e)
+            logger.error(f"Error in TokenRefreshMiddleware: {e}")
         return response

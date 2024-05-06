@@ -1,6 +1,9 @@
 from fastapi import APIRouter
 from . import crud, models
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/summaries", 
     tags=["summaries"], 

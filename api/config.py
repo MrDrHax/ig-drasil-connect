@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
 
+import logging
+logger = logging.getLogger(__name__)
+
 # Determine if we're running on an Ubuntu server
 if os.name == 'posix' and os.uname().release == 'ubuntu':
     load_dotenv('.env')
@@ -17,3 +20,13 @@ class Config:
     MY_DOMAIN = os.getenv('MY_DOMAIN', 'http://localhost:8080/')
     KEYCLOAK_ID = os.getenv('KEYCLOAK_ID', '>_<')
     INSTANCE_ID = os.getenv('INSTANCE_ID', '>_<')
+
+
+def logConfig():
+    config = "Configuration:\n"
+
+    for key, value in Config.__dict__.items():
+        if key.isupper():
+            config += f"{key}: {value}\n"
+
+    logger.debug(config)

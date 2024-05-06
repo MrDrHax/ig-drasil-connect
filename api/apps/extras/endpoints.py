@@ -7,6 +7,9 @@ from AAA.requireToken import oauthScheme
 #Imports for Authentication in IAM Identity Center
 import requests
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/extras", 
     tags=["extras"],

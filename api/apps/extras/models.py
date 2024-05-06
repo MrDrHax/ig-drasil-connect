@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 
+import logging
+logger = logging.getLogger(__name__)
+
 # Define your models here. For example:
 class Extra(BaseModel):
     id: int

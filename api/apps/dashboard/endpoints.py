@@ -6,6 +6,9 @@ from config import Config
 import boto3
 from config import Config
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/dashboard", 
     tags=["dashboard"], 
