@@ -1,11 +1,28 @@
 from pydantic import BaseModel, Field
 
-class TopCards(BaseModel):
+class GenericCard(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
     name: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
-    price: float = Field(0.0, examples=[10.0, 20.0, 30.0])
-    description: str = Field("Card description", examples=["Card 1 description", "Card 2 description", "Card 3 description"]) 
-    
+    data: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
+    icon: str = Field("Arrow", examples=["arrow"], description="The icon that will get added")
+    color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
+    footer: str = Field("Card description", examples=["Card 1 description", "Card 2 description", "Card 3 description"])
+
+class GenericGraph(BaseModel):
+    title: str = Field("Queues", examples=["Queues"])
+    ''' The title of the graph.'''
+    data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
+    '''The data to be displayed in the graph.'''
+    labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent","Transfers", "Delivery"], ["Finance", "Support", "Sales","Transfers", "Delivery"]])
+    '''The labels for the data. Will be the same length as the data list.'''
+    info: str = Field("Graph showing queue capacity", examples=["Graph showing queue capacity"])
+    '''The info of the graph.'''
+    footer_txt: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
+
+class DashboardData(BaseModel):
+    cards: list[GenericCard] 
+    graphs: list[GenericGraph]
+
 class ConnectedUsers(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
     title: str = Field("Connected users", examples=["Connected users"])
