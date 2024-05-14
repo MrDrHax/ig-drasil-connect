@@ -9,6 +9,9 @@ import AAA.userType as userType
 import boto3
 from config import Config
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/dashboard", 
     tags=["dashboard"], 

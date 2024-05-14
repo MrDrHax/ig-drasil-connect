@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Field
 
+import logging
+logger = logging.getLogger(__name__)
+
 class GenericCard(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
     name: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
@@ -111,7 +114,7 @@ class DashboardItem(BaseModel):
     description: str = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UsageGraph(BaseModel):
     data: list[float] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])

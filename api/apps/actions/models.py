@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from typing import List
 
+import logging
+logger = logging.getLogger(__name__)
+
 class StartCallResponse(BaseModel):
     call_id: str
     message: str

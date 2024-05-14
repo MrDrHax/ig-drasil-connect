@@ -1,6 +1,9 @@
 from pydantic import BaseModel, Field
 import datetime
 
+import logging
+logger = logging.getLogger(__name__)
+
 class ListItem(BaseModel):
     callID: int = Field(0, description="The id of the item. Use this to get the summary", examples=[1, 2, 3])
     name: str = Field("No name", description="The name of the connected person. Only applies if authenticated", example="John")
