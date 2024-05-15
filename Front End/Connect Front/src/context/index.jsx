@@ -244,8 +244,8 @@ export function MaterialTailwindControllerProvider({ children }) {
     transparentNavbar: true,
     fixedNavbar: false,
     openConfigurator: false,
-    theme: "light",
-    font: "Normal",
+    theme: localStorage.getItem("theme") || "light",
+    font: localStorage.getItem("font") || "Roboto",
   };
 
   //el dispatch es el que se encarga de cambiar el estado, es un tipo de disparador de eventos

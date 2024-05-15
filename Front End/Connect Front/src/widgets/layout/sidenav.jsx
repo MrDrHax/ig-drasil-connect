@@ -18,12 +18,17 @@ export function Sidenav({ brandImg, brandName, routes }) {
     transparent: "bg-transparent",
   };
 
+  let ccp_link = "https://igdrasilcallcenter.my.connect.aws/ccp-v2"
+
   return (
     <aside
       className={`${sidenavTypes[sidenavType]} ${
         openSidenav ? "translate-x-0" : "-translate-x-80"
       } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
     >
+        <iframe src={ccp_link} allow="microphone; camera; autoplay; clipboard-write; identity-credentials-get"
+        className="w-full h-full" title="Contact Control Panel"/>
+
       {/* <div
         className={`relative`}
       >
@@ -92,9 +97,6 @@ export function Sidenav({ brandImg, brandName, routes }) {
         ))}
       </div> */}
 
-      <div className="relative text-center text-gray-600">
-        <p>TODO: add connect Iframe</p>
-      </div>
     </aside>
   );
 }
