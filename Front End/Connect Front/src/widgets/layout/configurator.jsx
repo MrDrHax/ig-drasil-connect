@@ -109,7 +109,7 @@ export function Configurator() {
             Font type
           </Typography>
           <Typography variant="small" className={`${getTypography()}  ${getTextColor('gray')}`}>
-            Choose between a dislexyc accesible font and normal font.
+            Choose between a dyslexic accesible font and a roboto font.
           </Typography>
 
           {/* Font selector */}
@@ -127,7 +127,7 @@ export function Configurator() {
               // variant={font === "Normal" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "Normal")}
             >
-              Normal
+              Roboto
             </Button>
           </div>
 
