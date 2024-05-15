@@ -18,6 +18,8 @@ import {
   setFixedNavbar,
   navColors,
   getTheme,
+  getFont,
+  getTypography,
   getBorderColor,
 } from "@/context";
 
@@ -114,14 +116,14 @@ export function Configurator() {
 
           <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
             <Button
-              className={`${getTextColor('contrast')} ${font === "OpenDyslexic" ? getBgColor(navColor) : getBgColor("background")}`}
+              className={`${getTextColor('contrast')} ${getTypography()} ${getFont() === "OpenDyslexic" ? getBgColor(navColor) : getBgColor("background")}`}
               // variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "OpenDyslexic")}
             >
               OpenDyslexic
             </Button>
             <Button
-              className={`${getTextColor('contrast')} ${font === "Normal" ? getBgColor(navColor) : getBgColor("background")}`}
+              className={`${getTextColor('contrast')} ${getTypography()} ${getFont() === "Normal" ? getBgColor(navColor) : getBgColor("background")}`}
               // variant={font === "Normal" ? "gradient" : "outlined"}
               onClick={() => setFont(dispatch, "Normal")}
             >
@@ -132,25 +134,25 @@ export function Configurator() {
 
         </div>
         <div className="mb-12">
-          <Typography variant="h6" className={`font-normal ${getTextColor('dark')}`}>
+          <Typography variant="h6" className={`${getTypography()} ${getTextColor('dark')}`}>
             Color pallete
           </Typography>
-          <Typography variant="small" className={`font-normal ${getTextColor('gray')}`}>
+          <Typography variant="small" className={`${getTypography()} ${getTextColor('gray')}`}>
             Choose between dark and light modes.
           </Typography>
 
 
           {/* Theme selector */}
 
-          <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
+          <div className={`mt-3 flex items-center gap-2 ${getTextColor('gray')}`}>
             <Button
-              className= {`${getTextColor('contrast')} ${getTheme() === "dark" ? getBgColor(navColor) : getBgColor("background")}`}
+              className= {`${getTextColor('contrast')} ${getTypography()} ${getTheme() === "dark" ? getBgColor(navColor) : getBgColor("background")}`}
               onClick={() => setTheme(dispatch, "dark")}
             >
               Dark
             </Button>
             <Button
-              className= {`${getTextColor('contrast')} ${getTheme() === "light" ? getBgColor(navColor) : getBgColor("background")}`}
+              className= {`${getTextColor('contrast')} ${getTypography()} ${getTheme() === "light" ? getBgColor(navColor) : getBgColor("background")}`}
               onClick={() => setTheme(dispatch, "light")}
             >
               Light
@@ -162,7 +164,7 @@ export function Configurator() {
         <div className="mb-12">
           <hr />
           <div className="flex items-center justify-between py-5">
-            <Typography variant="h6" className={`font-normal ${getTextColor('gray')}`}>
+            <Typography variant="h6" className={`${getTypography()} ${getTextColor('gray')}`}>
               Navbar Fixed
             </Typography>
             <Switch

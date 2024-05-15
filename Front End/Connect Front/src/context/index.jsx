@@ -11,11 +11,31 @@ export const navColors = {
   red: "from-red-400 to-red-600",
   pink: "from-pink-400 to-pink-600",
 };
+//checa si hay un font sino lo crea y lo guarda 
+let font = localStorage.getItem("font");
+if (font === null) {
+  localStorage.setItem("font", "Normal");
+  font = "Normal";
+}
 
 let theme = localStorage.getItem("theme");
 if (theme === null) {
   localStorage.setItem("theme", "light");
   theme = "light";
+}
+
+export function getFont() {
+  return font;
+}
+
+export function getTypography() {
+  if(font === "OpenDyslexic") {
+    //luego poner e font real de dyslexic
+    return "font-OpenDyslexic";
+  } 
+  else {
+    return "font-normal";
+  }
 }
 
 export function getTheme() {
@@ -180,6 +200,7 @@ export function getTextColor(color) {
   }
 }
 
+
 export function reducer(state, action) {
   switch (action.type) {
     case "OPEN_SIDENAV": {
@@ -190,6 +211,7 @@ export function reducer(state, action) {
       return { ...state, theme: action.value };
     }
     case "FONT": {
+      font = action.value;
       return { ...state, font: action.value };
     }
     case "SIDENAV_TYPE": {
@@ -225,6 +247,8 @@ export function MaterialTailwindControllerProvider({ children }) {
     theme: "light",
     font: "Normal",
   };
+
+  //el dispatch es el que se encarga de cambiar el estado, es un tipo de disparador de eventos
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);
   const value = React.useMemo(
@@ -264,8 +288,13 @@ export const setTheme = (dispatch, value) =>
   localStorage.setItem("theme", value);
   dispatch({ type: "THEME", value });
 }
+//guarda el font en el local storage y no solo en el dispatch
 export const setFont = (dispatch, value) =>
-  dispatch({ type: "FONT", value });
+  {
+   localStorage.setItem("font", value);
+   dispatch({ type: "FONT", value });
+  }
+  
 export const setNavColor = (dispatch, value) =>
   dispatch({ type: "NAV_COLOR", value });
 export const setTransparentNavbar = (dispatch, value) =>
