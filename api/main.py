@@ -44,7 +44,7 @@ try:
     fastapi_cdn_host.patch_docs(app, docs_cdn_host='https://gcore.jsdelivr.net/npm')
 
     # Add middleware for token refresh
-    app.add_middleware(TokenRefreshMiddleware)
+    # app.add_middleware(TokenRefreshMiddleware)
 
     # Add CORS middleware
     app.add_middleware(
