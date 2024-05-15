@@ -70,10 +70,10 @@ export function Configurator() {
     >
       <div className="flex items-start justify-between px-6 pt-8 pb-6">
         <div>
-          <Typography variant="h5" className={`font-normal ${getTextColor('bgray')}`}>
+          <Typography variant="h5" className={`${getTypography()}  ${getTextColor('bgray')}`}>
             Dashboard Configurator
           </Typography>
-          <Typography className={`font-normal ${getTextColor('gray')}`}>
+          <Typography className={`${getTypography()}  ${getTextColor('gray')}`}>
             See our dashboard options.
           </Typography>
         </div>
@@ -87,7 +87,7 @@ export function Configurator() {
       </div>
       <div className="py-4 px-6">
         <div className="mb-12">
-          <Typography variant="h6" className={`font-normal ${getTextColor('bgray')}`}>
+          <Typography variant="h6" className={`${getTypography()}  ${getTextColor('bgray')}`}>
             Nav colors
           </Typography>
           <div className="mt-3 flex items-center gap-2">
@@ -105,16 +105,16 @@ export function Configurator() {
           </div>
         </div>
         <div className="mb-12">
-          <Typography variant="h6" className={`font-normal ${getTextColor('dark')}`}>
+          <Typography variant="h6" className={`${getTypography()}  ${getTextColor('dark')}`}>
             Font type
           </Typography>
-          <Typography variant="small" className={`font-normal ${getTextColor('gray')}`}>
+          <Typography variant="small" className={`${getTypography()}  ${getTextColor('gray')}`}>
             Choose between a dislexyc accesible font and normal font.
           </Typography>
 
           {/* Font selector */}
 
-          <div className={`mt-3 flex items-center gap-2 font-normal ${getTextColor('gray')}`}>
+          <div className={`mt-3 flex items-center gap-2 ${getTypography()}  ${getTextColor('gray')}`}>
             <Button
               className={`${getTextColor('contrast')} ${getTypography()} ${getFont() === "OpenDyslexic" ? getBgColor(navColor) : getBgColor("background")}`}
               // variant={font === "OpenDyslexic" ? "gradient" : "outlined"}
