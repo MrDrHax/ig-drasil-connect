@@ -13,13 +13,23 @@ else:
 # if you want to add a config variable, add it here!!!
 class Config:
     PORT = os.getenv('PORT', 8080)
+    '''The port the server will run on.'''
     HOST = os.getenv('HOST', 'localhost')
+    '''The host the server will run on.'''
     DEBUG = os.getenv('DEBUG', False)
+    '''is the server running in debug mode?'''
     AUTH_DOMAIN = os.getenv('AUTH_DOMAIN', '>_<')
+    '''The domain of keycloak, used for authentication. Includes a finalizing "/"'''
     BASE64AUTH = os.getenv('BASE64AUTH', '>_<')
+    '''The base64 encoded client_id:client_secret for keycloak.'''
     MY_DOMAIN = os.getenv('MY_DOMAIN', 'http://localhost:8080/')
+    '''The domain of the server.'''
     KEYCLOAK_ID = os.getenv('KEYCLOAK_ID', '>_<')
+    '''The client_id for keycloak.'''
+    KEYCLOAK_SECRET = os.getenv('KEYCLOAK_SECRET', '>_<')
+    '''The client_secret for keycloak.'''
     INSTANCE_ID = os.getenv('INSTANCE_ID', '>_<')
+    '''AWS Connect instance ID.'''
 
 
 def logConfig():
