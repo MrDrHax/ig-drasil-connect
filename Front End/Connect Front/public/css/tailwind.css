@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face{
+    font-family: "Opendyslexic3";
+    src: url("../Fonts/OpenDyslexic3-Regular.ttf");
+}

@@ -31,7 +31,7 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController, getTypography } from "@/context";
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
@@ -53,7 +53,7 @@ export function Home() {
               className: "w-6 h-6 text-white",
             })}
             footer={
-              <Typography className={`font-normal ${getTextColor('dark')}`}>
+              <Typography className={`${getTypography()}  ${getTextColor('dark')}`}>
                 <strong className={footer.color}>{footer.value}</strong>
                 &nbsp;{footer.label}
               </Typography>
@@ -69,7 +69,7 @@ export function Home() {
             footer={
               <Typography
                 variant="small"
-                className={`flex items-center font-normal ${getTextColor('dark')}`}
+                className={`flex items-center ${getTypography()}  ${getTextColor('dark')}`}
               >
                 <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
                 &nbsp;{props.footer}
@@ -81,7 +81,7 @@ export function Home() {
 
       {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getTypography()} ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
             shadow={false}
@@ -89,12 +89,12 @@ export function Home() {
             className="m-0 flex items-center justify-between p-6"
           >
             <div>
-              <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor('dark')}`}>
+              <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTypography()} ${getTextColor('dark')}`}>
                 Alerts
               </Typography>
               <Typography
                 variant="small"
-                className="flex items-center gap-1 font-normal text-blue-gray-600"
+                className={`flex items-center gap-1 ${getTypography()}  text-blue-gray-600` }
               >
                 <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
                 <strong>10 alerts </strong>in this 30 minutes
@@ -106,7 +106,7 @@ export function Home() {
                   <EllipsisVerticalIcon
                     strokeWidth={3}
                     fill="currenColor"
-                    className="h-6 w-6"
+                    className="h-4 w-6"
                   />
                 </IconButton>
               </MenuHandler>
@@ -135,7 +135,7 @@ export function Home() {
             </Typography>
             <Typography
               variant="small"
-              className="flex items-center gap-1 font-normal text-blue-gray-600"
+              className="flex items-center gap-1 ${getTypography()}  text-blue-gray-600"
             >
               Next, a list of recommendations for you:
             </Typography>
