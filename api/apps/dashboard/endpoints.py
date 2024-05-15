@@ -1,7 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from . import models, crud
 from typing import List
 from config import Config
+from typing import Annotated
+from AAA.requireToken import requireToken
+import AAA.userType as userType
 
 import boto3
 from config import Config
@@ -23,52 +26,98 @@ router = APIRouter(
     }
 )
 
-@router.get("/cards", tags=["cards"] , response_model=List[models.TopCards])
-async def get_cards() -> models.TopCards:
+@router.get("/cards", tags=["cards"])
+async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.DashboardData:
     '''
     Returns the cards that will be displayed on the dashboard.
     '''
     cards = [
-        models.TopCards(id=1, name="Card 1", price=10.0, description="Card 1 description"),
-        models.TopCards(id=2, name="Card 2", price=20.0, description="Card 2 description"),
-        models.TopCards(id=3, name="Card 3", price=30.0, description="Card 3 description")
+        get_connected_users(),
+        get_capacity(),
+        get_average_call_time(),
+        get_connected_agents()
     ]
-    return cards
 
-@router.get("/connected-users" , tags=["users"], response_model=List[models.ConnectedUsers])
-async def get_connected_users() -> List[models.ConnectedUsers]:
+    graphs = [
+        get_unfinished_calls_graph(),
+        get_average_call_rating_graph(),
+        get_queues_graph()
+
+    ]
+
+    toReturn = models.DashboardData(cards=cards, graphs=graphs)
+
+    return toReturn
+
+@router.get("/connected-users" , tags=["cards"])
+async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the amount of connected users.
     '''
-    return models.ConnectedUsers(id=1, title="Connected users", user_amount=10, footer_data=10, footer_txt="That's today's average.")
-        
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    return models.GenericCard(id=1, name="Connected users", data="80", icon="Arrow", color="red", footer="+32 than today's average.")
     
 @router.get("/capacity", tags=["cards"])
-async def get_capacity() -> models.Capacity:
+async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the capacity
     '''
-    return models.Capacity(title="Capacity name", percentaje=10.0, description="Capacity description")
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    return models.GenericCard(id=2, name="Capacity name", data="10%", icon="Book", color="yellow", footer="+3 more expected in the next hour.")
 
 @router.get("/average_call_time", tags=["cards"])
-async def get_average_call_time() -> models.AverageCallTime:
+async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the average call time.
     '''
-    return models.AverageCallTime(title="Average call time", average=10.0, above_average=20.0, footer_txt="+23s more than expected")
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    return models.GenericCard(id=3, name="Average call time", data="10%", icon="Clock", color="blue", footer="+23s more than expected.")
 
 @router.get("/connected_agents", tags=["cards"])
-async def get_connected_agents() -> models.ConnectedAgents:
+async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the amount of connected agents.
     '''
-    return models.ConnectedAgents(id=1, title="Connected agents", agent_amount=10, footer_data=10, footer_txt="That's today's average.")
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    return models.GenericCard(id=1, name="Connected agents", data="10", icon="Person", color="black", footer="4 online, 6 offline.")
 
 @router.get("/graph/unfinished_calls", tags=["graph"])
-async def get_unfinished_calls_graph() -> models.UnfinishedCallsGraph:
+async def get_unfinished_calls_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
     
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-    return models.UnfinishedCallsGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent"])
+    return models.GenericGraph(title="Unfinished Calls" ,data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], info="Graph showing unfinished calls", footer_txt="Updated 2 min ago")
+
+@router.get("/graph/average_call_rating", tags=["graph"])
+async def get_average_call_rating_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
+    
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    return models.GenericGraph(title="Average Call Rating", data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], info="Graph showing average call rating", footer_txt="Updated 2 min ago")
+
+@router.get("/graph/queues", tags=["graph"])
+async def get_queues_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
+    '''
+    Returns a graph of what queues is being used and capacity of each queue.
+    
+    100 means the queue is full, 0 means the queue is empty.
+    Anything over a 100 is considered an overflow. (waiting users)
+    
+    '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    return models.GenericGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent","Transfers", "Delivery"], info="Graph showing queue capacity", footer_txt="Updated 2 min ago")
 
 @router.get("/queue_supervisors", tags=["data"])
 async def get_queue_supervisors() -> List[models.QueueSupervisor]:
@@ -87,9 +136,9 @@ async def get_agent_visualisation() -> List[models.AgentVisualisation]:
     Returns the agent visualisation.
     '''
     return [
-        models.AgentVisualisation(connected_users=10, usage_level=10.0, agent_name="Agent 1", queue="Queue 1", status="online", help=True),
-        models.AgentVisualisation(connected_users=20, usage_level=20.0, agent_name="Agent 2", queue="Queue 2", status="offline", help=False),
-        models.AgentVisualisation(connected_users=30, usage_level=30.0, agent_name="Agent 3", queue="Queue 3", status="online", help=True)
+        models.AgentVisualisation(agent_name="John Doe", routing_profile="Routing profile 1", status="Available"),
+        models.AgentVisualisation(agent_name="Jane Doe", routing_profile="Routing profile 2", status="Busy"),
+        models.AgentVisualisation(agent_name="John Smith", routing_profile="Routing profile 3", status="Away")
     ]    
 
 @router.get("/graph/usage", tags=["graph"])
@@ -299,17 +348,20 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
         print("Error:")
         return models.AgentProfileData(name=id, queue='Unknown', rating=0, email='Unknown', mobile='Unknown')
 
+list_recommenders_cache = []
 
-# @router.get("/list-recommenders", response_model=List[dict])
-# async def list_recommenders():
-#     client = boto3.client('connect')
-#     paginator = client.get_paginator('list_recommenders')
-#     response_iterator = paginator.paginate(
-#         datasetGroupArn = Config.DATASET_GROUP_ARN,
-#         PaginationConfig = {
-#             'MaxItems': 50,
-#             'PageSize': 50
-#         })
-#     return response_iterator
+@router.get("/list-recommenders", response_model=List[dict])
+async def list_recommenders():
+    try:
+        client = boto3.client('connect')
+        response = client.list_queues(
+            InstanceId='string',
+            MaxResults=10
+        )
+        
+        return response
+    except Exception as e: 
+        print(e.with_traceback)
+        print(e)
         
 
