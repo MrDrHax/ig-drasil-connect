@@ -25,7 +25,7 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor,getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor,getTextColor, useMaterialTailwindController,getTypography } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
 
 
@@ -50,7 +50,7 @@ export function Agent() {
               className: "w-6 h-6 text-white",
             })}
             footer={
-              <Typography className="font-normal text-blue-gray-600">
+              <Typography className={`${getTypography()} ${getTextColor('dark')}`}>
                 <strong className={footer.color}>{footer.value}</strong>
                 &nbsp;{footer.label}
               </Typography>
@@ -69,7 +69,7 @@ export function Agent() {
         name={name}
         descripcion={descripcion}
         footer={
-          <Typography className={`font-normal ${getTextColor('dark')}`}>
+          <Typography className={`${getTypography()} ${getTextColor('dark')}`}>
             <strong className={footer.color}>{footer.value}</strong>
             &nbsp;{footer.label}
           </Typography>
@@ -84,7 +84,7 @@ export function Agent() {
         {...rest}
         recomendation={recomendation}
         footer={
-          <Typography className={`font-normal ${getTextColor('dark')}`}>
+          <Typography className={`${getTypography()} ${getTextColor('dark')}`}>
             <strong className={footer.color}>{footer.value}</strong>
             &nbsp;{footer.label}
           </Typography>

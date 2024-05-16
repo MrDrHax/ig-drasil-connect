@@ -9,7 +9,7 @@ import {
   import { 
     getBgColor, // estos 2 jalan los colores necesarios del contexto
     getTextColor, 
-    useMaterialTailwindController, } from "@/context";
+    useMaterialTailwindController, getTypography, getTypographybold } from "@/context";
 
   {/* esta carta es para la informacion de los usuarios*/}
   export function CustomerCard({ name,description, footer }) {
@@ -20,18 +20,18 @@ import {
     return (
       <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
         <CardBody className="p-4 text-right">
-          <Typography variant="h4" className={`font-bold text-justify ${getTextColor("dark")}`}>
+          <Typography variant="h4" className={` text-justify ${getTypographybold()} ${getTextColor("dark")}`}>
             Customer data
           </Typography>
-          <Typography variant="paragraph" className={`text-justify ${getTextColor("dark")}`}>
-           <span className="font-bold text-blue-gray">Name of Customer: </span> {name}
+          <Typography variant="paragraph" className={`text-justify ${getTypography()} ${getTextColor("gray")}`}>
+           <span className={` ${getTypographybold()} ${getTextColor("dark")}`}>Name of Customer: </span>{name}
           </Typography>
-          <Typography variant="paragraph" className={`text-justify  ${getTextColor("dark")}`}>
-           <span className="font-bold text-blue-gray">Condition: </span> {description}
+          <Typography variant="paragraph" className={`text-justify ${getTypography()} ${getTextColor("gray")}`}>
+           <span className={`text-justify ${getTypographybold()} ${getTextColor("dark")}`}>Condition: </span> {description}
           </Typography>
         </CardBody>
         {footer && (
-          <CardFooter className={`border-t border-blue-gray-50 p-4 ${getTextColor("dark")}`}>
+          <CardFooter className={`border-t border-blue-gray-50 p-4 ${getTypography()} ${getTextColor("dark")}`}>
             {footer}
           </CardFooter>
         )}

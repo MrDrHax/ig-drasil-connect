@@ -7,6 +7,7 @@ module.exports = withMT({
     fontFamily: {
       Normal: ['Roboto', 'sans-serif'],
       OpenDyslexic: ['OpenDyslexic3', 'sans-serif'],
+      OpenDyslexicBold: ['Opendyslexic3-Bold', 'sans-serif'],
     },
     extend: {
       colors:
