@@ -5,6 +5,7 @@ from config import Config
 from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
+from cache.cache_object import cachedData
 
 import boto3
 from config import Config
@@ -235,8 +236,8 @@ async def list_users_data():
     return response['UserSummaryList']
 
 
-@router.get("/get-current-metric-data", response_model=List[dict])
-async def check_agent_availability():
+@router.get("/get-current-metric-data")
+async def check_agent_availability() -> list[list[tuple]]:
     """
     Description:
         Real-time information of the call.
@@ -253,26 +254,30 @@ async def check_agent_availability():
     """    
 
 
-    client = boto3.client('connect')
+    # client = boto3.client('connect')
 
-    # Get info for the first routing profile
-    response = client.get_current_metric_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'RoutingProfiles': [
-                '69e4c000-1473-42aa-9596-2e99fbd890e7',
+    # # Get info for the first routing profile
+    # response = client.get_current_metric_data(
+    #     InstanceId=Config.INSTANCE_ID,
+    #     Filters={
+    #         'RoutingProfiles': [
+    #             '69e4c000-1473-42aa-9596-2e99fbd890e7',
                 
-            ]
-        },
-        CurrentMetrics=[
-        {
-            'Name': 'AGENTS_ONLINE',
-            'Unit': 'COUNT'
-        },
-        ]
-    )
+    #         ]
+    #     },
+    #     CurrentMetrics=[
+    #     {
+    #         'Name': 'AGENTS_ONLINE',
+    #         'Unit': 'COUNT'
+    #     },
+    #     ]
+    # )
 
-    return response['MetricResults']
+    # return response['MetricResults']
+
+    data = cachedData.get("check_agent_availability_data")
+
+    return data
 
 @router.get("/agent-status", response_model=List[dict])
 async def check_agent_availability():
@@ -308,11 +313,7 @@ async def check_agent_availability():
         InstanceId = Config.INSTANCE_ID,
         AgentStatusTypes = [
             'AVAILABLE','OFFLINE','BUSY','ON BREAK','NEEDS ASSISTANCE',
-        ],
-        PaginationConfig = {
-            'MaxItems': 50,
-            'PageSize': 50
-        })
+        ])
     
     return response_iterator
 
@@ -324,29 +325,30 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
     To get the full list, go to /lists/agents
     '''
     try:
-        client = boto3.client('connect')
-        response = client.describe_user(
-            InstanceId=Config.INSTANCE_ID,
-            UserId=id
-        )
+        # client = boto3.client('connect')
+        # response = client.describe_user(
+        #     InstanceId=Config.INSTANCE_ID,
+        #     UserId=id
+        # )
 
 
-        FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
-        Agent_email = response["User"]["Username"]
+        # FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
+        # Agent_email = response["User"]["Username"]
 
-        try:
-            Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
-        except:
-            Agent_mobile = "Unknown"
+        # try:
+        #     Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
+        # except:
+        #     Agent_mobile = "Unknown"
 
-        print(FullName, Agent_email, Agent_mobile)
+        FullName, Agent_email, Agent_mobile = cachedData.get("agent_profile_data", id=id)
 
+        logger.info(f"{FullName}, {Agent_email}, {Agent_mobile}")
 
         return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile)
 
     except Exception as e:
-        print("Error:")
-        return models.AgentProfileData(name=id, queue='Unknown', rating=0, email='Unknown', mobile='Unknown')
+        logger.error(f"Error in get_agent_profile: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 list_recommenders_cache = []
 
