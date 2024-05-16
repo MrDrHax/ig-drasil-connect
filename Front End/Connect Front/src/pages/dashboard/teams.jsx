@@ -9,6 +9,7 @@ import {
     Tooltip,
     Progress,
     Alert,
+    Button,
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
@@ -19,9 +20,12 @@ import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeft
 import { parsePaginationString } from "@/configs/api-tools";
 import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
-import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
 
 import { useAlert } from "@/context/alerts";
+
+// Sidenav changes
+import { Sidenav } from "@/widgets/layout";
 
 function getColorOfStatus(status) {
     switch (status) {
@@ -66,6 +70,17 @@ export function Teams() {
     }
 
     const { showAlertWithMessage } = useAlert();
+
+    /**
+     * A function to barge into a call with a specified agent ID.
+     *
+     * @param {type} agentId - The ID of the agent to barge in on.
+     * @return {type} No return value.
+     */
+    function bargeIn(agentId) {
+        console.log("Barging in to call with agent " + agentId);
+        // TODO
+    }
 
     function updateData(page = 1) {
         let query = searchQuery ? "name=" + searchQuery : null;
@@ -138,7 +153,7 @@ export function Teams() {
                     value="10"
                     icon={<UsersIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`font-normal ${getTextColor('black')}`}>
+                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">10</strong>
                             &nbsp; connected
                         </Typography>
@@ -154,7 +169,7 @@ export function Teams() {
                     value="30%"
                     icon={<CogIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`font-normal ${getTextColor('black')}`}>
+                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">3/5</strong>
                             &nbsp; agents on call
                         </Typography>
@@ -162,9 +177,9 @@ export function Teams() {
                 />
             </div>
             <div className="mt-12 mb-8 flex flex-col gap-12">
-                <Card className={`${getBgColor("background-cards")}`}>
+                <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
                     <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
-                        <Typography variant="h6" color="white" className="flex-none">
+                        <Typography variant="h6" color="white" className={`flex-none ${getTypography()}`}>
                             Agents
                         </Typography>
 
@@ -192,7 +207,7 @@ export function Teams() {
                                         >
                                             <Typography
                                                 variant="small"
-                                                className={`text-[11px] font-bold uppercase ${getTextColor('dark')}`}
+                                                className={`text-[11px] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
                                             >
                                                 {el}
                                             </Typography>
@@ -216,7 +231,7 @@ export function Teams() {
                                                 <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                     <Typography
                                                         variant="small"
-                                                        className={`text-[1em] font-semibold ${getTextColor('dark')}`}
+                                                        className={`text-[1em] ${getTypographybold()} ${getTextColor('dark')}`}
                                                     >
                                                         List is empty
                                                     </Typography>
@@ -238,7 +253,7 @@ export function Teams() {
                                                                     <div>
                                                                         <Typography
                                                                             variant="small"
-                                                                            className={`font-semibold ${getTextColor('dark')}`}
+                                                                            className={`${getTypographybold()} ${getTextColor('dark')}`}
                                                                         >
                                                                             {name}
                                                                         </Typography>
@@ -246,7 +261,7 @@ export function Teams() {
                                                                 </div>
                                                             </td>
                                                             <td className={className}>
-                                                                <Typography className={`text-xs font-semibold ${getTextColor('dark')}`}>
+                                                                <Typography className={`text-xs ${getTypographybold()} ${getTextColor('dark')}`}>
                                                                     {queue}
                                                                 </Typography>
                                                             </td>
@@ -255,12 +270,13 @@ export function Teams() {
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
-                                                                    className="py-0.5 px-2 text-[11px] font-medium w-fit"
+                                                                    className={`py-0.5 px-2 text-[11px] font-medium w-fit ${getTypographybold()}`}
                                                                 />
                                                             </td>
                                                             <td className={className}>
                                                                 {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
+                                                            {/* View Agent Profile */}
                                                             <td className={className}>
                                                                 <Typography
                                                                     as="a"
@@ -270,6 +286,15 @@ export function Teams() {
                                                                     View
                                                                 </Typography>
                                                             </td>
+                                                            {/* Barge-In If needed*/}
+                                                            { requireHelp ?
+                                                            <td className={className}>
+                                                                <Button onClick={() => bargeIn(agentID)}
+                                                                variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
+                                                                    Monitor Call
+                                                                </Button>
+                                                            </td> : null
+                                                            }
                                                         </tr>
                                                     );
                                                 }

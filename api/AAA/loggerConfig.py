@@ -5,7 +5,7 @@ import colorlog
 
 def appendToLogger(filePath = ''):
     # Define the log format
-    formatter = '%(asctime)s - [%(levelname)s][%(name)s:%(thread)d] %(message)s'
+    formatter = '%(asctime)s - [%(levelname)s][%(name)s-%(lineno)d:%(thread)d] %(message)s'
     color_formatter = colorlog.ColoredFormatter(
         "%(log_color)s" + formatter,
         log_colors={
