@@ -71,10 +71,10 @@ export function Configurator() {
       <div className="flex items-start justify-between px-6 pt-8 pb-6">
         <div>
           <Typography variant="h5" className={`${getTypography()}  ${getTextColor('bgray')}`}>
-            Dashboard Configurator
+            Dashboard Accesibility Settings
           </Typography>
           <Typography className={`${getTypography()}  ${getTextColor('gray')}`}>
-            See our dashboard options.
+            Customize the dashboard appearance
           </Typography>
         </div>
         <IconButton
@@ -88,7 +88,7 @@ export function Configurator() {
       <div className="py-4 px-6">
         <div className="mb-12">
           <Typography variant="h6" className={`${getTypography()}  ${getTextColor('bgray')}`}>
-            Nav colors
+            Highlight colors
           </Typography>
           <div className="mt-3 flex items-center gap-2">
             {Object.keys(navColors).map((color) => (
@@ -109,7 +109,7 @@ export function Configurator() {
             Font type
           </Typography>
           <Typography variant="small" className={`${getTypography()}  ${getTextColor('gray')}`}>
-            Choose between a dyslexic accesible font and a roboto font.
+            Choose between a dyslexic accesible font and the roboto font.
           </Typography>
 
           {/* Font selector */}
@@ -135,7 +135,7 @@ export function Configurator() {
         </div>
         <div className="mb-12">
           <Typography variant="h6" className={`${getTypography()} ${getTextColor('dark')}`}>
-            Color pallete
+            Theme
           </Typography>
           <Typography variant="small" className={`${getTypography()} ${getTextColor('gray')}`}>
             Choose between dark and light modes.
@@ -168,6 +168,7 @@ export function Configurator() {
               Navbar Fixed
             </Typography>
             <Switch
+              color= {navColor}
               id="navbar-fixed"
               value={fixedNavbar}
               onChange={() => setFixedNavbar(dispatch, !fixedNavbar)}

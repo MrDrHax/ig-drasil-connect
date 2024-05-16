@@ -9,26 +9,77 @@ import {
   Progress,
 
 } from "@material-tailwind/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { agentQueue, projectsTableData } from "@/data";
+import { QueueList, agentQueue } from "@/data";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
+import React, { useEffect, useState } from 'react';
+import { useAlert } from "@/context/alerts";
+
+// Pagination imports
+import { parsePaginationString } from "@/configs/api-tools";
+import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+
+
 export function Queues() {
-  const controller = useMaterialTailwindController();
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { navColor } = controller;
+
+  const [dataToDisplay, setData] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // pagination vars
+  const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
+  const [pagination_totalPages, pagination_setTotalPages] = useState(0);
+  const [pagination_itemsPerPage, pagination_setItemsPerPage] = useState(0);
+  const [pagination_totalItems, pagination_setTotalItems] = useState(0);
+
+  const { showAlertWithMessage } = useAlert();
+
+  function updateData(page = 1) {
+    let query = searchQuery ? "name=" + searchQuery : null;
+    let skip = (page - 1) * 10;
+
+    setIsLoaded(false);
+
+    QueueList(skip, 10, query, "name", "asc").then((data) => {
+        const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        pagination_setCurrentPage(currentPage);
+        pagination_setItemsPerPage(itemsPerPage);
+        pagination_setTotalItems(totalItems);
+
+        pagination_setTotalPages(totalPages);
+
+        setData(data.data);
+        setIsLoaded(true);
+    }).catch((error) => {
+        setIsLoaded(true);
+
+        showAlertWithMessage("red", "" + error, 10000);
+
+        console.error(error);
+    });
+}
+
+useEffect(() => {
+    updateData();
+}, []);
 
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card className={`w-full ${getBgColor("background-cards")}`}>
         <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getTypography()} ${getBgColor("search-bar")}`}>
           <Typography variant="h6" className={`${getTextColor("white3")} ${getTypographybold()}`}>
-            Agent Queue
+            Agent Queues
           </Typography>
         </CardHeader>
         <CardBody className={`overflow-x-scroll px-0 pt-0 pb-2 ${getBgColor("background-cards")}`}>
           <table className={`w-full min-w-[640px] table-auto ${getTypography()} `}>
             <thead>
               <tr>
-                {["Name", "Ongoing Calls", "Avg Response Time", "Usage", "Status"].map((el) => (
+                {["Name", "Ongoing Calls", "Average Wait Time", "Usage", "Status"].map((el) => (
                   <th
                     key={el}
                     className="border-b border-blue-gray-50 py-3 px-5 text-left"
@@ -44,15 +95,17 @@ export function Queues() {
               </tr>
             </thead>
             <tbody>
-              {agentQueue.map(
-                ({ name, ongoingCalls, avg, online, usage }, key) => {
-                  const className = `py-3 px-5 ${key === agentQueue.length - 1
+              { dataToDisplay.map(
+                //agentQueue.map(
+                ({ name, usage, averageWaitTime, maxContacts }, key) => {
+                  const className = `py-3 px-5 ${key === dataToDisplay.length - 1
                       ? ""
                       : "border-b border-blue-gray-50"
                     }`;
 
                   return (
                     <tr key={name}>
+                      {/* Name */}
                       <td className={className}>
                         <div className="flex items-center  gap-4">
 
@@ -68,20 +121,24 @@ export function Queues() {
                           </div>
                         </div>
                       </td>
+
+                      {/* Ongoing Calls */}
                       <td className={className}>
                         <Typography className={`text-xs ${getTypography()} ${getTextColor('black')}`}>
-                          {ongoingCalls}
+                          {usage}
                         </Typography>
                         {/*<Typography className="text-xs font-normal text-blue-gray-500">
                             {ongoingCalls[1]}
                            </Typography>*/}
                       </td>
+
+                      {/* Average Wait Time */}
                       <td className={className}>
                         <Typography
-                          className={`text-xs ${getTypography()} ${avg <= 1 ? "text-green-600" : avg <= 2.30 ? "text-orange-600" : "text-red-600"
+                          className={`text-xs ${getTypography()} ${averageWaitTime <= 1 ? "text-green-600" : averageWaitTime <= 2.30 ? "text-orange-600" : "text-red-600"
                             }`}
                         >
-                          {avg}
+                          {averageWaitTime}
                         </Typography>
 
                         {/*<Typography className="text-xs font-normal text-blue-gray-500">
@@ -89,19 +146,19 @@ export function Queues() {
                            </Typography>*/}
                       </td>
 
-
+                      {/* Usage */}
                       <td className={className}>
                         <div className="w-10/12">
                           <Typography
                             variant="small"
                             className={`mb-1 block text-xs font-medium ${getTextColor('black')}`}
                           >
-                            {usage}%
+                            {usage / maxContacts * 100}%
                           </Typography>
                           <Progress
-                            value={usage}
+                            value={usage / maxContacts * 100}
                             variant="gradient"
-                            color={usage <= 50 ? "green" : usage > 50 && usage <= 80 ? "orange" : "red"}
+                            color={usage / maxContacts * 100 <= 50 ? "green" : usage / maxContacts * 100 > 50 && usage / maxContacts * 100 <= 80 ? "orange" : "red"}
                             className="h-1"
                           />
                         </div>
@@ -109,8 +166,8 @@ export function Queues() {
                       <td className={className}>
                         <Chip
                           variant="gradient"
-                          color={usage <= 80 ? "green" : usage > 80 && usage <= 100 ? "orange" : "red"}
-                          value={usage <= 80 ? "Free" : usage > 80 && usage <= 100 ? "Stressed" : "Exceeded"}
+                          color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"}
+                          value={usage / maxContacts * 100 <= 80 ? "Free" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "Stressed" : "Exceeded"}
                           className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
                         />
                       </td>
@@ -121,120 +178,79 @@ export function Queues() {
               )}
             </tbody>
           </table>
+          {/* Pagination */}
+          <div>
+            <div className={`flex items-center justify-between border-t border-gray-200 ${getBgColor("background-cards")} px-4 py-3 sm:px-6`}>
+                <div className="flex flex-1 justify-between sm:hidden">
+                    <a
+                        href="#"
+                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        Previous
+                    </a>
+                    <a
+                        href="#"
+                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        Next
+                    </a>
+                </div>
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                        <p className={`text-sm ${getTextColor("gray")}`}>
+                            Showing <span className="font-medium">{(pagination_currentPage - 1) * pagination_itemsPerPage + 1}</span> to <span className="font-medium">{pagination_currentPage * pagination_itemsPerPage}</span> of{' '}
+                            <span className="font-medium">{pagination_totalItems}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                            <a
+                                href="#"
+                                onClick={() => { !(pagination_currentPage - 1 === 0) ? updateData(pagination_currentPage - 1) : null }}
+                                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                            >
+                                <span className="sr-only">Previous</span>
+                                <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+                            </a>
+
+                            {([...Array(pagination_totalPages)].map((e, i) => {
+                                return (i + 1 == pagination_currentPage) ? (
+                                    <a
+                                        key={i}
+                                        href="#"
+                                        onClick={() => updateData(i + 1)}
+                                        aria-current="page"
+                                        className={`relative z-10 inline-flex items-center ${getBgColor(navColor)} px-4 py-2 text-sm font-semibold ${getTextColor("contrast")} focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                ) : (
+                                    <a
+                                        key={i}
+                                        href="#"
+                                        onClick={() => updateData(i + 1)}
+                                        aria-current="page"
+                                        className={`relative z-10 inline-flex items-center px-4 py-2 text-sm font-semibold ${getTextColor("dark")} focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                )
+                            }))}
+                            <a
+                                href="#"
+                                onClick={() => { !(pagination_currentPage === pagination_totalPages) ? updateData(pagination_currentPage + 1) : null }}
+                                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                            >
+                                <span className="sr-only">Next</span>
+                                <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+          </div>
         </CardBody>
       </Card>
-
-      {/* Projects Table 
-        <Card>
-          <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-            <Typography variant="h6" color="white">
-              Projects Table
-            </Typography>
-          </CardHeader>
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-            <table className="w-full min-w-[640px] table-auto">
-              <thead>
-                <tr>
-                  {["companies", "members", "budget", "completion", ""].map(
-                    (el) => (
-                      <th
-                        key={el}
-                        className="border-b border-blue-gray-50 py-3 px-5 text-left"
-                      >
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-bold uppercase text-blue-gray-400"
-                        >
-                          {el}
-                        </Typography>
-                      </th>
-                    )
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {projectsTableData.map(
-                  ({ img, name, members, budget, completion }, key) => {
-                    const className = `py-3 px-5 ${
-                      key === projectsTableData.length - 1
-                        ? ""
-                        : "border-b border-blue-gray-50"
-                    }`;
-  
-                    return (
-                      <tr key={name}>
-                        <td className={className}>
-                          <div className="flex items-center gap-4">
-                            <Avatar src={img} alt={name} size="sm" />
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold"
-                            >
-                              {name}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={className}>
-                          {members.map(({ img, name }, key) => (
-                            <Tooltip key={name} content={name}>
-                              <Avatar
-                                src={img}
-                                alt={name}
-                                size="xs"
-                                variant="circular"
-                                className={`cursor-pointer border-2 border-white ${
-                                  key === 0 ? "" : "-ml-2.5"
-                                }`}
-                              />
-                            </Tooltip>
-                          ))}
-                        </td>
-                        <td className={className}>
-                          <Typography
-                            variant="small"
-                            className="text-xs font-medium text-blue-gray-600"
-                          >
-                            {budget}
-                          </Typography>
-                        </td>
-                        <td className={className}>
-                          <div className="w-10/12">
-                            <Typography
-                              variant="small"
-                              className="mb-1 block text-xs font-medium text-blue-gray-600"
-                            >
-                              {completion}%
-                            </Typography>
-                            <Progress
-                              value={completion}
-                              variant="gradient"
-                              color={completion === 100 ? "green" : "gray"}
-                              className="h-1"
-                            />
-                          </div>
-                        </td>
-                        <td className={className}>
-                          <Typography
-                            as="a"
-                            href="#"
-                            className="text-xs font-semibold text-blue-gray-600"
-                          >
-                            <EllipsisVerticalIcon
-                              strokeWidth={2}
-                              className="h-5 w-5 text-inherit"
-                            />
-                          </Typography>
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
-          </CardBody>
-        </Card>
-        */}
     </div>
   );
 }
