@@ -31,7 +31,7 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor, getTextColor, useMaterialTailwindController, getTypography } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
@@ -130,12 +130,12 @@ export function Home() {
             color="transparent"
             className="m-0 p-6"
           >
-            <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor('dark')}`}>
+             <Typography variant="h6" color="blue-gray" className={`${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
               Recommendations
             </Typography>
             <Typography
               variant="small"
-              className="flex items-center gap-1 ${getTypography()}  text-blue-gray-600"
+              className={`flex items-center gap-1 font-normal ${getTypography()} ${getTextColor("white3")}`}
             >
               Next, a list of recommendations for you:
             </Typography>

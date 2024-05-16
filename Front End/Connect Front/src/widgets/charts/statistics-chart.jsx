@@ -22,9 +22,9 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
   const theme = controller;
 
   return (
-    <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+    <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} ${getTypography()} `}>
       <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
-        <Chart {...chart} className={`${getBgColor("background-cards")}`}/>
+        <Chart {...chart} className={`${getBgColor("background-cards")} ${getTextColor("dark")}`}/>
       </CardHeader>
       <CardBody className="px-6 pt-0">
         <Typography variant="h6" color="blue-gray" className={`${getTypography()} ${getTextColor("dark")}`}>

@@ -28,7 +28,8 @@ import {
   setOpenSidenav,
   getBgColor,
   getTextColor,
-  getTheme
+  getTheme,
+  getTypography
 } from "@/context";
 import { getApiLoginPage, getNameFromToken } from "@/configs";
 
@@ -89,29 +90,29 @@ export function DashboardNavbar() {
             {page}
           </Typography> */}
 
-          <Typography variant="h6" color={getTheme() === "light"? 'black' : 'white'}>
+          <Typography variant="h6" className={'${getTypography()}'} color={getTheme() === "light"? 'black' : 'white'}>
             <div className="flex text-center">
               <Link
                 to="/dashboard/home"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'home' ? getBgColor(navColor) : ''}`}
               >
                 Home
               </Link>
               <Link
                 to="/dashboard/team"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'team' ? getBgColor(navColor) : ''}`}
               >
                 Agents
               </Link>
               <Link
                 to="/dashboard/queues"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'queues' ? getBgColor(navColor) : ''}`}
               >
                 Queues
               </Link>
               <Link
                 to="/dashboard/agent"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
+                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'agent' ? getBgColor(navColor) : ''}`}
               >
                 Home agent
               </Link>
@@ -136,9 +137,9 @@ export function DashboardNavbar() {
             <Button
               variant="text"
               color="blue-gray"
-              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTextColor("contrast")}`}
+              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
             >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
+              <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
               {getNameFromToken()}
             </Button>
             <IconButton

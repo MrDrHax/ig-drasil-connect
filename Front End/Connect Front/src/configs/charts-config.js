@@ -1,3 +1,11 @@
+let color = "#777777";
+if(localStorage.getItem('theme') === 'dark'){
+  color = "#ffffff";
+}
+else{
+  color = "#777777";
+}
+
 export const chartsConfig = {
   chart: {
     toolbar: {
