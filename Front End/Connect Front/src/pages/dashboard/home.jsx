@@ -53,10 +53,12 @@ export function Home() {
     });
   }
 
-  //Call the function just once
+  //Call the function to recieve data just once
+  /*
   useEffect(() => {
     updateData();
   }, []);
+  */
 
   return (
     <div className="mt-4">
