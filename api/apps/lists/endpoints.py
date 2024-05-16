@@ -1,6 +1,18 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
 from . import crud, models
+from AAA.requireToken import requireToken
+import AAA.userType as userType
+
+from tools.lazySquirrel import LazySquirrel
+from tools.querryParams import QueryParams
+
+import boto3
+from config import Config
+from cache.cache_object import cachedData
+
+import logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/lists", 
@@ -16,12 +28,6 @@ router = APIRouter(
     }
 )
 
-class QueryParams:
-    def __init__(self, q: str | None = None, skip: int = 0, limit: int = 100, sortBy: tuple[str, str] | None = None):
-        self.q = q
-        self.skip = skip
-        self.limit = limit
-        self.sortBy = sortBy 
 
 @router.get("/queues", tags=["queues"])
 async def get_queues(qpams: Annotated[QueryParams, Depends()]) -> models.QueueDataList:
@@ -31,11 +37,12 @@ async def get_queues(qpams: Annotated[QueryParams, Depends()]) -> models.QueueDa
     To see details, go to summary/queues/{queueID}
     '''
 
-    return models.QueueDataList(pagination="1-4/4",
-        data=[models.QueueDataListItem(queueID="a", name="Support", maxContacts=10, usage=5, enabled=True), 
-            models.QueueDataListItem(queueID="b", name="Sales", maxContacts=10, usage=5, enabled=True), 
-            models.QueueDataListItem(queueID="c", name="Final sale", maxContacts=10, usage=5, enabled=True), 
-            models.QueueDataListItem(queueID="d", name="Advanced support", maxContacts=10, usage=5, enabled=True)])
+    data = await cachedData.get("get_queues_data")
+
+    pagination, data = qpams.apply(data)
+
+    return models.QueueDataList(pagination=pagination,
+                                data=data)
 
 @router.get("/reconnected", tags=["reconnected", "calls"])
 async def get_reconnected_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:
@@ -79,19 +86,25 @@ async def get_angry_calls(qpams: Annotated[QueryParams, Depends()]) -> models.Li
                                  models.ListItem(callID=3, name="John", agent="Ron (support)", started="2021-07-26T14:00:00", ended="2021-07-26T14:30:00", rating=2.5)],
                            pagination="1-3/3")
 
+
 @router.get("/agents", tags=["agents"])
-async def get_agents(qpams: Annotated[QueryParams, Depends()]) -> models.AgentsDataList:
+async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[str, Depends(requireToken)]) -> models.AgentsDataList:
     '''
     Returns a list of all available agents (even on break).
 
     To see details, go to summary/agents/{agentID}
+
+    statuses: "connected", "disconnected", "on-call", "busy", "on-break"
     '''
 
-    return models.AgentsDataList(pagination="1-4/4",
-        data=[models.AgentsDataListItem(agentID="a", name="Ron", status="Available", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="b", name="Jane", status="Available", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="c", name="John", status="Available", calls=5, rating=4.5), 
-            models.AgentsDataListItem(agentID="d", name="Ron", status="Available", calls=5, rating=4.5)])
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    data = await cachedData.get("routing_profiles_data")
+
+    pagination, data = qpams.apply(data)
+
+    return models.AgentsDataList(pagination=pagination, data=data)
 
 @router.get("/rerouted", tags=["calls"])
 async def get_rerouted_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:

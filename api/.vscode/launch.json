@@ -5,12 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: from app",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main"
+        },
+        {
             "name": "Python Debugger: FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
             "args": [
                 "main:app",
+                "--host",
+                "localhost",
+                "--port",
+                "8080",
                 "--reload"
             ],
             "jinja": true,
