@@ -20,6 +20,7 @@ import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeft
 import { parsePaginationString } from "@/configs/api-tools";
 import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
+import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
 
 import { useAlert } from "@/context/alerts";
@@ -29,15 +30,15 @@ import { Sidenav } from "@/widgets/layout";
 
 function getColorOfStatus(status) {
     switch (status) {
-        case "connected":
+        case "Available":
             return "green";
-        case "disconnected":
-            return "gray";
-        case "on-call":
+        case "Training":
             return "blue";
-        case "busy":
+        case "On break":
+            return "yellow";
+        case "Busy":
             return "orange";
-        case "on-break":
+        case "Needs Assistance":
             return "red";
         default:
             return "gray";
@@ -47,7 +48,7 @@ function getColorOfStatus(status) {
 
 export function Teams() {
     const [controller, dispatch] = useMaterialTailwindController();
-    const { navColor, fixedNavbar, openSidenav, theme } = controller;
+    const { navColor} = controller;
 
     const [dataToDisplay, setData] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -278,13 +279,9 @@ export function Teams() {
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
-                                                                <Typography
-                                                                    as="a"
-                                                                    href={"/dashboard/profile?profile=" + agentID}
-                                                                    className={`text-xs font-semibold ${getTextColor('dark')}`}
-                                                                >
+                                                                <Link to = {"/dashboard/profile?profile=" + agentID} className={`text-xs font-semibold ${getTextColor('dark')}`}>
                                                                     View
-                                                                </Typography>
+                                                                </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
                                                             { requireHelp ?

@@ -25,11 +25,14 @@ import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
 import { StatisticsChart } from "@/widgets/charts";
 import { platformSettingsData, conversationsData, projectsData, statisticsChartsData } from "@/data";
 
-
 import { getBgColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 import { AgentDetails } from "@/data/agents-data";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
+
+import {getRolesFromToken} from '@/configs/api-tools';
+
+import {lexRecommendationData} from "@/data";
 
 /**
  * Renders the user profile page with tabs for app and chat views.
@@ -78,7 +81,10 @@ export function Profile() {
                   {dataToDisplay.name}
                 </Typography>
                 <Typography variant="small" className={`${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
-                  Agent
+                {/* Role List */}
+                  { getRolesFromToken().includes('manager') && getRolesFromToken().includes('agent') ? 'Agent / Supervisor' : 
+                  !getRolesFromToken().includes('manager') ? 'Agent' :
+                  !getRolesFromToken().includes('agent') ? 'Supervisor' : ''}
                 </Typography>
                 <div className="flex items-center gap-2 font-bold text-blue-gray-500">
               <Rating value={5} readonly/>
@@ -111,19 +117,24 @@ export function Profile() {
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
             <ProfileInfoCard
-              title="About agent"
-              description="Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
+              title="Agent AI/n Recommendations"
+              description= {"Al/n, your virtual assistant recommends: " + lexRecommendationData()[0].recomendation}
+              // "Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
               details={{
                 "name": dataToDisplay.name,
                 mobile: dataToDisplay.mobile,
                 email: dataToDisplay.email,
+
+                /* Change Social Media Icons to proficiencies */
+                "social media": (
+                  <div className="flex items-center gap-4">
+                    <i className="fa-brands fa-facebook text-blue-700" />
+                    <i className="fa-brands fa-twitter text-blue-400" />
+                    <i className="fa-brands fa-instagram text-purple-500" />
+                  </div>
+                ),
                 
               }}
-              action={
-                <Tooltip content="Edit Profile">
-                  <PencilIcon className={`h-4 w-4 cursor-pointer ${getTextColor("dark")}`} />
-                </Tooltip>
-              }
             />
             <div>
               <Typography variant="small" className={`${getTypographybold()} ${getTextColor("dark")} pb-5`}>
@@ -134,12 +145,6 @@ export function Profile() {
                     <MessageCard
                       key={props.name}
                       {...props}
-                      
-                      //action={
-                       //<Button variant="text" size="sm">
-                          //reply
-                        //</Button>
-                      //}
                     />
                   ))}
                 </ul>

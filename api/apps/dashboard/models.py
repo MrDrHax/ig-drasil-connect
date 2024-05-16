@@ -3,13 +3,18 @@ from pydantic import BaseModel, Field
 import logging
 logger = logging.getLogger(__name__)
 
+class CardFooter(BaseModel):
+    color: str = Field("text-green-500", examples=["text-green-500", "text-gray-500", "text-red-500"])
+    value: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
+    label: str = Field("minutes ago", examples=["minutes ago", "hours ago", "days ago"])
+
 class GenericCard(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
-    name: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
-    data: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
+    title: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
+    value: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
     icon: str = Field("Arrow", examples=["arrow"], description="The icon that will get added")
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
-    footer: str = Field("Card description", examples=["Card 1 description", "Card 2 description", "Card 3 description"])
+    footer: CardFooter
 
 class GenericGraph(BaseModel):
     title: str = Field("Queues", examples=["Queues"])
