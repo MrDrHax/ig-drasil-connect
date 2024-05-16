@@ -13,6 +13,8 @@ from config import Config
 import logging
 logger = logging.getLogger(__name__)
 
+Icons = ["UserGroupIcon", "UserCicleIcon", "ClockIcon", "ClockIcon", "StarIcon"]
+
 router = APIRouter(
     prefix="/dashboard", 
     tags=["dashboard"], 
@@ -57,7 +59,7 @@ async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> m
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    return models.GenericCard(id=1, name="Connected users", data="80", icon="Arrow", color="red", footer="+32 than today's average.")
+    return models.GenericCard(id=1, name="Connected users", data="80", icon=Icons, color="red", footer="+32 than today's average.")
     
 @router.get("/capacity", tags=["cards"])
 async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -67,7 +69,7 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    return models.GenericCard(id=2, name="Capacity name", data="10%", icon="Book", color="yellow", footer="+3 more expected in the next hour.")
+    return models.GenericCard(id=2, name="Capacity name", data="10%", icon=Icons, color="yellow", footer="+3 more expected in the next hour.")
 
 @router.get("/average_call_time", tags=["cards"])
 async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -77,7 +79,7 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) ->
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    return models.GenericCard(id=3, name="Average call time", data="10%", icon="Clock", color="blue", footer="+23s more than expected.")
+    return models.GenericCard(id=3, name="Average call time", data="10%", icon=Icons, color="blue", footer="+23s more than expected.")
 
 @router.get("/connected_agents", tags=["cards"])
 async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -87,7 +89,7 @@ async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> 
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    return models.GenericCard(id=1, name="Connected agents", data="10", icon="Person", color="black", footer="4 online, 6 offline.")
+    return models.GenericCard(id=1, name="Connected agents", data="10", icon=Icons, color="black", footer="4 online, 6 offline.")
 
 @router.get("/graph/unfinished_calls", tags=["graph"])
 async def get_unfinished_calls_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
@@ -252,7 +254,29 @@ async def check_agent_availability() -> list[list[tuple]]:
         Metrics about an on-going call.
     """    
 
-    data = await cachedData.get("check_agent_availability_data")
+
+    # client = boto3.client('connect')
+
+    # # Get info for the first routing profile
+    # response = client.get_current_metric_data(
+    #     InstanceId=Config.INSTANCE_ID,
+    #     Filters={
+    #         'RoutingProfiles': [
+    #             '69e4c000-1473-42aa-9596-2e99fbd890e7',
+                
+    #         ]
+    #     },
+    #     CurrentMetrics=[
+    #     {
+    #         'Name': 'AGENTS_ONLINE',
+    #         'Unit': 'COUNT'
+    #     },
+    #     ]
+    # )
+
+    # return response['MetricResults']
+
+    data = cachedData.get("check_agent_availability_data")
 
     return data
 
@@ -302,7 +326,22 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
     To get the full list, go to /lists/agents
     '''
     try:
-        FullName, Agent_email, Agent_mobile = await cachedData.get("agent_profile_data", id=id)
+        # client = boto3.client('connect')
+        # response = client.describe_user(
+        #     InstanceId=Config.INSTANCE_ID,
+        #     UserId=id
+        # )
+
+
+        # FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
+        # Agent_email = response["User"]["Username"]
+
+        # try:
+        #     Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
+        # except:
+        #     Agent_mobile = "Unknown"
+
+        FullName, Agent_email, Agent_mobile = cachedData.get("agent_profile_data", id=id)
 
         logger.info(f"{FullName}, {Agent_email}, {Agent_mobile}")
 
