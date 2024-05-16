@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from . import models
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 from config import Config
 from cache.cache_object import cachedData
 
@@ -78,3 +79,90 @@ async def routing_profiles_data() -> tuple:
     return parsed
 
 cachedData.add("routing_profiles_data", routing_profiles_data, 20)
+
+async def get_queue_description(queueID: str):
+    client = boto3.client('connect')
+    response = client.describe_queue(
+        InstanceId=Config.INSTANCE_ID,
+        QueueId=queueID
+    )
+    return response['Queue']
+
+cachedData.add("get_queue_description", get_queue_description, 60*24) # 24 hours
+
+async def get_queues_data():
+    client = boto3.client('connect')
+    response = client.list_queues(
+        InstanceId=Config.INSTANCE_ID,
+        QueueTypes=[
+            'STANDARD',
+        ]
+    ) # get active queues
+
+    builtData = []
+
+    # get additional queue info
+    for q in response['QueueSummaryList']:
+        try:
+            # metrics
+            metric_data = client.get_current_metric_data(
+                InstanceId=Config.INSTANCE_ID,
+                Filters={
+                    'Queues': [q['Id']],
+                    'Channels': ['VOICE', 'CHAT']
+                },
+                CurrentMetrics=[
+                    {
+                        'Name': 'CONTACTS_IN_QUEUE',
+                        'Unit': 'COUNT'
+                    },
+                    {
+                        'Name': 'OLDEST_CONTACT_AGE',
+                        'Unit': 'SECONDS'
+                    }
+                ],
+                Groupings=[
+                    'QUEUE'
+                ],
+                MaxResults=1
+            )
+
+            # Assuming successful retrieval, extract the metrics values
+            contacts_in_queue = 0
+            contact_age_average = 0  # Initialize the variable for the oldest contact age
+            if metric_data['MetricResults']:
+                for collection in metric_data['MetricResults'][0]['Collections']:
+                    if collection['Metric']['Name'] == 'CONTACTS_IN_QUEUE':
+                        contacts_in_queue = collection['Value']
+                    elif collection['Metric']['Name'] == 'OLDEST_CONTACT_AGE':
+                        contact_age_average += collection['Value']
+
+            average_wait_time = contact_age_average / contacts_in_queue if contacts_in_queue > 0 else 0
+
+            # queue info/description
+            queue_data = await cachedData.get('get_queue_description', queueID=q['Id'])
+
+            MaxContacts = int(queue_data.get('MaxContacts', 10) * 0.8) # 80% of the max contacts
+            status = queue_data.get('Status', 'DISABLED')
+
+        except (BotoCoreError, ClientError) as error:
+            print(f"Error fetching current metric data: {error}")
+            contacts_in_queue = 0  # Default/fallback value in case of error
+            contact_age_average = 0  # Default/fallback value in case of error
+            MaxContacts = 0
+            status = 'DISABLED'
+            average_wait_time = 0
+
+        builtData.append(models.QueueDataListItem(
+            queueID=q['Id'],
+            name=q['Name'],
+            maxContacts=MaxContacts,
+            usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
+            enabled=status == "ENABLED",
+            waiting=contacts_in_queue, 
+            averageWaitTime=average_wait_time  
+        ))
+
+    return builtData
+
+cachedData.add("get_queues_data", get_queues_data, 20)
