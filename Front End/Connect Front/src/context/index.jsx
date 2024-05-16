@@ -11,7 +11,8 @@ export const navColors = {
   red: "from-red-400 to-red-600",
   pink: "from-pink-400 to-pink-600",
 };
-//checa si hay un font sino lo crea y lo guarda 
+
+//Reads from Local Storage
 let font = localStorage.getItem("font");
 if (font === null) {
   localStorage.setItem("font", "Normal");
@@ -24,13 +25,18 @@ if (theme === null) {
   theme = "light";
 }
 
+
+/**
+ * Retrieves the font value stored in local storage.
+ *
+ * @return {string} The font value from local storage.
+ */
 export function getFont() {
   return font;
 }
 
 export function getTypography() {
   if(font === "OpenDyslexic") {
-    //luego poner e font real de dyslexic
     return "font-OpenDyslexic";
   } 
   else {
@@ -93,7 +99,6 @@ export function getBgColor(color) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { theme } =
     controller;
-  
 
   if (theme === "light") {
     switch (color) {
@@ -239,13 +244,13 @@ export function reducer(state, action) {
 export function MaterialTailwindControllerProvider({ children }) {
   const initialState = {
     openSidenav: false,
-    navColor: "dark",
+    navColor: "green",
     sidenavType: "white",
     transparentNavbar: true,
     fixedNavbar: false,
     openConfigurator: false,
-    theme: "light",
-    font: "Normal",
+    theme: localStorage.getItem("theme") || "light",
+    font: localStorage.getItem("font") || "Roboto",
   };
 
   //el dispatch es el que se encarga de cambiar el estado, es un tipo de disparador de eventos
