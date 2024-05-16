@@ -9,6 +9,7 @@ import {
     Tooltip,
     Progress,
     Alert,
+    Button,
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
@@ -22,6 +23,9 @@ import React, { useEffect, useState } from 'react';
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController } from "@/context";
 
 import { useAlert } from "@/context/alerts";
+
+// Sidenav changes
+import { Sidenav } from "@/widgets/layout";
 
 function getColorOfStatus(status) {
     switch (status) {
@@ -66,6 +70,17 @@ export function Teams() {
     }
 
     const { showAlertWithMessage } = useAlert();
+
+    /**
+     * A function to barge into a call with a specified agent ID.
+     *
+     * @param {type} agentId - The ID of the agent to barge in on.
+     * @return {type} No return value.
+     */
+    function bargeIn(agentId) {
+        console.log("Barging in to call with agent " + agentId);
+        // TODO
+    }
 
     function updateData(page = 1) {
         let query = searchQuery ? "name=" + searchQuery : null;
@@ -261,6 +276,7 @@ export function Teams() {
                                                             <td className={className}>
                                                                 {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
+                                                            {/* View Agent Profile */}
                                                             <td className={className}>
                                                                 <Typography
                                                                     as="a"
@@ -270,6 +286,15 @@ export function Teams() {
                                                                     View
                                                                 </Typography>
                                                             </td>
+                                                            {/* Barge-In If needed*/}
+                                                            { requireHelp ?
+                                                            <td className={className}>
+                                                                <Button onClick={() => bargeIn(agentID)}
+                                                                variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
+                                                                    Monitor Call
+                                                                </Button>
+                                                            </td> : null
+                                                            }
                                                         </tr>
                                                     );
                                                 }
