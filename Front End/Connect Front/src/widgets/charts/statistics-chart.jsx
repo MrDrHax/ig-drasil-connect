@@ -11,6 +11,7 @@ import {
   getBgColor,
   getTextColor,
   useMaterialTailwindController, 
+  getTypography,
 } from "@/context";
 
 import { chartsConfig } from "@/configs";
@@ -21,20 +22,20 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
   const theme = controller;
 
   return (
-    <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+    <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} ${getTypography()} `}>
       <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
-        <Chart {...chart} className={`${getBgColor("background-cards")}`}/>
+        <Chart {...chart} className={`${getBgColor("background-cards")} ${getTextColor("dark")}`}/>
       </CardHeader>
       <CardBody className="px-6 pt-0">
-        <Typography variant="h6" color="blue-gray" className={`${getTextColor("dark")}`}>
+        <Typography variant="h6" color="blue-gray" className={`${getTypography()} ${getTextColor("dark")}`}>
           {title}
         </Typography>
-        <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
+        <Typography variant="small" className={`${getTypography()} ${getTextColor("dark")}`}>
           {description}
         </Typography>
       </CardBody>
       {footer && (
-        <CardFooter className="border-t border-blue-gray-50 px-6 py-5">
+        <CardFooter className={`${getTypography()}  border-t border-blue-gray-50 px-6 py-5`}>
           {footer}
         </CardFooter>
       )}

@@ -39,7 +39,7 @@ export function getNameFromToken() {
     let data = access_token.split('.')[1];
     data = JSON.parse(atob(data));
 
-    console.log(typeof(data.preferred_username));
+    //console.log(typeof(data.preferred_username));
 
     return data.preferred_username;
 }

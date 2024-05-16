@@ -38,9 +38,9 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
                 access_token = request.cookies['access_token']
                 refresh_token = request.cookies['refresh_token']
                 # If the access token has expired, refresh it
-                if isTokenExpired(access_token):
-                    access_token = refreshAccessToken(refresh_token)
-                    request.cookies['access_token'] = access_token
+                # if isTokenExpired(access_token):
+                #     access_token = refreshAccessToken(refresh_token)
+                #     request.cookies['access_token'] = access_token
                 response = await call_next(request)
             else:
                 logger.warning(f"No access token found in the request: {request.url.path}")

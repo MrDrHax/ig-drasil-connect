@@ -9,7 +9,7 @@ import {
 import {
   messageData
 } from "@/data";
-import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController,getTypographybold } from "@/context";
 import {TwitterChatboxTextarea ,ChatMsupervisor } from "@/widgets/chat";
 
 
@@ -26,7 +26,7 @@ export function ChatBoxSupervisor() {
             className="m-0 flex items-center justify-between p-6"
             >
                 <div>
-                    <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor("dark")}`}>
+                    <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTypographybold()} ${getTextColor("dark")}`}>
                     Chat
                     </Typography>
                 </div>

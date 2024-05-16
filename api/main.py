@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import fastapi_cdn_host
 from starlette.middleware.cors import CORSMiddleware
@@ -6,6 +7,10 @@ from AAA.requireToken import TokenRefreshMiddleware
 from AAA.loggerConfig import appendToLogger
 import logging
 import config
+
+from cache import cache_object
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 
 appendToLogger()
 logger = logging.getLogger(__name__)
@@ -33,18 +38,36 @@ except ImportError:
     from .apps.actions.endpoints import router as actions_router
     from .apps.extras.endpoints import router as extras_router
 
+scheduler = AsyncIOScheduler()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await cache_object.startup(app, scheduler)
+
+    scheduler.start()
+
+    yield
+
+    await cache_object.shutdown(app, scheduler)
+
+    scheduler.shutdown()
 
 logger.info("Starting the FastAPI app")
 
 try:
-
-    app = FastAPI(debug=Config.DEBUG, title="Ig-drasil connect API", description="API for Ig-drasil connect dashboard", version="0.1.0", redoc_url="/docs", docs_url="/swagger")
+    app = FastAPI(
+        debug=Config.DEBUG, 
+        title="Ig-drasil connect API", 
+        description="API for Ig-drasil connect dashboard", 
+        version="0.1.0", 
+        redoc_url="/docs", docs_url="/swagger",
+        lifespan=lifespan)
 
     # change docs cdn host
     fastapi_cdn_host.patch_docs(app, docs_cdn_host='https://gcore.jsdelivr.net/npm')
 
     # Add middleware for token refresh
-    app.add_middleware(TokenRefreshMiddleware)
+    # app.add_middleware(TokenRefreshMiddleware)
 
     # Add CORS middleware
     app.add_middleware(
