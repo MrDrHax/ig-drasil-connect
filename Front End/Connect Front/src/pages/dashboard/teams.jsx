@@ -30,15 +30,15 @@ import { Sidenav } from "@/widgets/layout";
 
 function getColorOfStatus(status) {
     switch (status) {
-        case "connected":
+        case "Available":
             return "green";
-        case "disconnected":
-            return "gray";
-        case "on-call":
+        case "Training":
             return "blue";
-        case "busy":
+        case "On break":
+            return "yellow";
+        case "Busy":
             return "orange";
-        case "on-break":
+        case "Needs Assistance":
             return "red";
         default:
             return "gray";
@@ -48,7 +48,7 @@ function getColorOfStatus(status) {
 
 export function Teams() {
     const [controller, dispatch] = useMaterialTailwindController();
-    const { navColor, fixedNavbar, openSidenav, theme } = controller;
+    const { navColor} = controller;
 
     const [dataToDisplay, setData] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
