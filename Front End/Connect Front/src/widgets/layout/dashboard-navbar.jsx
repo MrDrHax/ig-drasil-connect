@@ -27,10 +27,14 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
   getBgColor,
-  getTextColor
+  getTextColor,
+  getTheme,
+  getTypography
 } from "@/context";
 import { getApiLoginPage, getNameFromToken } from "@/configs";
 
+
+import {getRolesFromToken} from '@/configs/api-tools';
 
 function handleTabClick(tab) {
   history.push(`/${tab}`);
@@ -44,6 +48,8 @@ export function DashboardNavbar() {
 
   const [loginUrl, setLoginUrl] = useState('');
 
+  let roles = getRolesFromToken();
+
   useEffect(() => {
     getApiLoginPage()
       .then(data => setLoginUrl(data))
@@ -52,7 +58,7 @@ export function DashboardNavbar() {
 
   return (
     <Navbar
-      color={fixedNavbar ? "white" : "transparent"}
+      color= {"transparent"}
       className={`rounded-xl transition-all ${fixedNavbar
         ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
         : "px-0 py-1"
@@ -88,34 +94,47 @@ export function DashboardNavbar() {
             {page}
           </Typography> */}
 
-          <Typography variant="h6" color={theme === "light"? 'black' : 'white'}>
+          <Typography variant="h6" className={'${getTypography()}'} color={getTheme() === "light"? 'black' : 'white'}>
+          {/* Main navbar with tabs for different pages */}
             <div className="flex text-center">
-              <Link
-                to="/dashboard/home"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
-              >
-                Home
-              </Link>
-              <Link
-                to="/dashboard/team"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
-              >
-                Agents
-              </Link>
-              <Link
-                to="/dashboard/queues"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
-              >
-                Queues
-              </Link>
-              <Link
-                to="/dashboard/agent"
-                className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
-              >
-                Home agent
-              </Link>
+
+              {/* Supervisor Tabs */}
+              { roles.includes('manager') && (
+                <>
+                <Link
+                  to="/dashboard/home"
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/dashboard/team"
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
+                >
+                  Agents
+                </Link>
+                <Link
+                  to="/dashboard/queues"
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
+                >
+                  Queues
+                </Link>
+                </>
+              )}
+
+              {/* Agent Tabs */}
+              { roles.includes('agent') && (
+                <Link
+                  to="/dashboard/agent"
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
+                >
+                  Dashboard
+                </Link>
+              )}
             </div>
           </Typography>
+
+
         </div>
         <div className="flex items-center">
           {/*
@@ -135,9 +154,9 @@ export function DashboardNavbar() {
             <Button
               variant="text"
               color="blue-gray"
-              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTextColor("dark")}`}
+              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
             >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
+              <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
               {getNameFromToken()}
             </Button>
             <IconButton
@@ -145,13 +164,13 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="grid xl:hidden"
             >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
+              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
             </IconButton>
           </Link>
           <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
-                <BellIcon className={`h-10 w-5 ${getTextColor("dark")}`} />
+                <BellIcon className={`h-10 w-5 ${getTextColor("contrast")}`} />
               </IconButton>
             </MenuHandler>
             <MenuList className="w-max border-0">
@@ -231,7 +250,7 @@ export function DashboardNavbar() {
             color="blue-gray"
             onClick={() => setOpenConfigurator(dispatch, true)}
           >
-            <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("dark")}`} />
+            <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
           </IconButton>
         </div>
       </div>

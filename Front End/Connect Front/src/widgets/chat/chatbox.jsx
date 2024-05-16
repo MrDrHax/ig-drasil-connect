@@ -9,8 +9,8 @@ import {
 import {
   messageData
 } from "@/data";
-import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
-import {TwitterChatboxTextarea ,ChatMessage, ChatMsupervisor } from "@/widgets/chat";
+import { getBgColor, getTextColor, useMaterialTailwindController,getTypographybold } from "@/context";
+import {TwitterChatboxTextarea ,ChatMessage} from "@/widgets/chat";
 
 /**
  * Renders a chat box component.
@@ -30,7 +30,7 @@ export function ChatBox() {
             className="m-0 flex items-center justify-between p-6"
             >
                 <div>
-                    <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor("dark")}`}>
+                    <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTypographybold()} ${getTextColor("dark")}`}>
                     Chat
                     </Typography>
                 </div>

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Typography,
   Card,
@@ -31,7 +30,10 @@ import {
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
-import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
+
+import React, { useState, useEffect } from 'react';
+import { SupervisorHomeData } from "@/data/supervisor-home-data";
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
@@ -41,10 +43,28 @@ export function Home() {
   const controller = useMaterialTailwindController();
   const theme = controller;
 
+  const [cards, setCards] = useState([]);
+  const [graphs, setGraphs] = useState([]);
+
+  function updateData() {
+
+    SupervisorHomeData().then((data) => {
+      setCards(data.cards);
+      setGraphs(data.graphs);
+      //console.log(data);
+    });
+  }
+
+  //Call the function to recieve data just once
+  useEffect(() => {
+    updateData();
+  }, []);
+
   return (
-    <div className="mt-12">
+    <div className="mt-4">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
+        { cards.map(({ icon, title, footer, ...rest }) => (
+          //statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
             {...rest}
@@ -53,7 +73,7 @@ export function Home() {
               className: "w-6 h-6 text-white",
             })}
             footer={
-              <Typography className={`font-normal ${getTextColor('dark')}`}>
+              <Typography className={`${getTypography()}  ${getTextColor('dark')}`}>
                 <strong className={footer.color}>{footer.value}</strong>
                 &nbsp;{footer.label}
               </Typography>
@@ -62,14 +82,15 @@ export function Home() {
         ))}
       </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        {statisticsChartsData.map((props) => (
+        { //dataToDisplay.graphs.map((props) => (
+          statisticsChartsData.map((props) => (
           <StatisticsChart
             key={props.title}
             {...props}
             footer={
               <Typography
                 variant="small"
-                className={`flex items-center font-normal ${getTextColor('dark')}`}
+                className={`flex items-center ${getTypography()}  ${getTextColor('dark')}`}
               >
                 <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
                 &nbsp;{props.footer}
@@ -81,7 +102,7 @@ export function Home() {
 
       {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+        <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getTypography()} ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
             shadow={false}
@@ -89,12 +110,12 @@ export function Home() {
             className="m-0 flex items-center justify-between p-6"
           >
             <div>
-              <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor('dark')}`}>
+              <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTypography()} ${getTextColor('dark')}`}>
                 Alerts
               </Typography>
               <Typography
                 variant="small"
-                className="flex items-center gap-1 font-normal text-blue-gray-600"
+                className={`flex items-center gap-1 ${getTypography()}  text-blue-gray-600` }
               >
                 <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
                 <strong>10 alerts </strong>in this 30 minutes
@@ -106,7 +127,7 @@ export function Home() {
                   <EllipsisVerticalIcon
                     strokeWidth={3}
                     fill="currenColor"
-                    className="h-6 w-6"
+                    className="h-4 w-6"
                   />
                 </IconButton>
               </MenuHandler>
@@ -130,12 +151,12 @@ export function Home() {
             color="transparent"
             className="m-0 p-6"
           >
-            <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTextColor('dark')}`}>
+             <Typography variant="h6" color="blue-gray" className={`${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
               Recommendations
             </Typography>
             <Typography
               variant="small"
-              className="flex items-center gap-1 font-normal text-blue-gray-600"
+              className={`flex items-center gap-1 font-normal ${getTypography()} ${getTextColor("white3")}`}
             >
               Next, a list of recommendations for you:
             </Typography>

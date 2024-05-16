@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from . import models, crud
 from config import Config
 from starlette.responses import RedirectResponse
@@ -6,6 +6,9 @@ from AAA.requireToken import oauthScheme
 
 #Imports for Authentication in IAM Identity Center
 import requests
+
+import logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/extras", 
@@ -108,7 +111,39 @@ async def get_IAM_refresh(refresh: str, deviceID: str) -> models.Token:
     Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
     '''
 
-    return models.Token(id_token="example_token", access_token="example_access_token", refresh="example_refresh", deviceID="example_deviceID")
+    # URL for the token endpoint
+    token_endpoint = f"{Config.AUTH_DOMAIN}protocol/openid-connect/token"
+
+    # Parameters for the request
+    parameters = {
+        'client_id': Config.KEYCLOAK_ID, 
+        'refresh_token': refresh,
+        'grant_type': 'refresh_token',
+        'client_secret': Config.KEYCLOAK_SECRET,  # Only if your client is confidential
+    }
+
+    # Headers for the request
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    # Making the POST request to the token endpoint
+    response = requests.post(token_endpoint, data=parameters, headers=headers, verify=False)
+
+    if response.status_code == 200:
+        # Parse the JSON response
+        new_tokens = response.json()
+        new_token = new_tokens.get('id_token')
+        new_access_token = new_tokens.get('access_token')
+        new_refresh_token = new_tokens.get('refresh_token', refresh)  # Use the old refresh token if a new one isn't provided
+        
+        # Return the new tokens
+        return models.Token(id_token=new_token, access_token=new_access_token, refresh=new_refresh_token, deviceID=deviceID)
+    else:
+        # Handle error
+        logger.error(f"Failed to refresh token: {response.text}")
+        raise HTTPException(response.status_code, "Failed to refresh token")
+
 
 @router.get("/AI/summary/{callID}", tags=["AI"])
 async def get_AI_summary(callID: int) -> str:

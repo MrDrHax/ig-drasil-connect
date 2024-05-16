@@ -5,8 +5,12 @@ import {
   CardBody,
   Typography,
 } from "@material-tailwind/react";
+import { getBgColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
+
 
 export function ProfileInfoCard({ title, description, details, action }) {
+  const controller = useMaterialTailwindController();
+
   return (
     <Card color="transparent" shadow={false}>
       <CardHeader
@@ -15,7 +19,7 @@ export function ProfileInfoCard({ title, description, details, action }) {
         floated={false}
         className="mx-0 mt-0 mb-4 flex items-center justify-between gap-4"
       >
-        <Typography variant="h6" color="blue-gray">
+        <Typography variant="h6" className={`${getTypography()} ${getTextColor("white3")} `}>
           {title}
         </Typography>
         {action}
@@ -24,7 +28,7 @@ export function ProfileInfoCard({ title, description, details, action }) {
         {description && (
           <Typography
             variant="small"
-            className="font-normal text-blue-gray-500"
+            className={`${getTypography()} ${getTextColor("white3")} text-[0.8rem] `}
           >
             {description}
           </Typography>
@@ -39,14 +43,14 @@ export function ProfileInfoCard({ title, description, details, action }) {
                 <Typography
                   variant="small"
                   color="blue-gray"
-                  className="font-semibold capitalize"
+                  className={`${getTypographybold()} ${getTextColor("white3")} text-[0.8rem] `}
                 >
                   {el}:
                 </Typography>
                 {typeof details[el] === "string" ? (
                   <Typography
                     variant="small"
-                    className="font-normal text-blue-gray-500"
+                    className={`${getTypography()} ${getTextColor("white3")} text-[0.6rem] `}
                   >
                     {details[el]}
                   </Typography>
