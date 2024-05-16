@@ -32,6 +32,11 @@ export function validateToken() {
     return false;
 }
 
+/**
+ * A function that extracts the preferred username from a JWT token stored in session storage.
+ *
+ * @return {string} The preferred username extracted from the JWT token.
+ */
 export function getNameFromToken() {
     let access_token = sessionStorage.getItem('access_token');
 
@@ -42,6 +47,21 @@ export function getNameFromToken() {
     //console.log(typeof(data.preferred_username));
 
     return data.preferred_username;
+}
+
+/**
+ * A function that retrieves the roles from a JWT token stored in session storage.
+ *
+ * @return {array} The roles extracted from the JWT token.
+ */
+export function getRolesFromToken() {
+    let access_token = sessionStorage.getItem('access_token');
+
+    // return jwt data
+    let data = access_token.split('.')[1];
+    data = JSON.parse(atob(data));
+
+    return data.realm_access.roles;
 }
 
 export const parsePaginationString = (paginationString) => {
