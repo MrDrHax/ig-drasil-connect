@@ -253,29 +253,7 @@ async def check_agent_availability() -> list[list[tuple]]:
         Metrics about an on-going call.
     """    
 
-
-    # client = boto3.client('connect')
-
-    # # Get info for the first routing profile
-    # response = client.get_current_metric_data(
-    #     InstanceId=Config.INSTANCE_ID,
-    #     Filters={
-    #         'RoutingProfiles': [
-    #             '69e4c000-1473-42aa-9596-2e99fbd890e7',
-                
-    #         ]
-    #     },
-    #     CurrentMetrics=[
-    #     {
-    #         'Name': 'AGENTS_ONLINE',
-    #         'Unit': 'COUNT'
-    #     },
-    #     ]
-    # )
-
-    # return response['MetricResults']
-
-    data = cachedData.get("check_agent_availability_data")
+    data = await cachedData.get("check_agent_availability_data")
 
     return data
 
@@ -325,22 +303,7 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
     To get the full list, go to /lists/agents
     '''
     try:
-        # client = boto3.client('connect')
-        # response = client.describe_user(
-        #     InstanceId=Config.INSTANCE_ID,
-        #     UserId=id
-        # )
-
-
-        # FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
-        # Agent_email = response["User"]["Username"]
-
-        # try:
-        #     Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
-        # except:
-        #     Agent_mobile = "Unknown"
-
-        FullName, Agent_email, Agent_mobile = cachedData.get("agent_profile_data", id=id)
+        FullName, Agent_email, Agent_mobile = await cachedData.get("agent_profile_data", id=id)
 
         logger.info(f"{FullName}, {Agent_email}, {Agent_mobile}")
 

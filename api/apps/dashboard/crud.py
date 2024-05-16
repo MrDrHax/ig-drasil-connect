@@ -7,7 +7,7 @@ from cache.cache_object import cachedData
 import logging
 logger = logging.getLogger(__name__)
 
-def agent_profile_data(id) -> tuple:
+async def agent_profile_data(id) -> tuple:
     client = boto3.client('connect')
     response = client.describe_user(
         InstanceId=Config.INSTANCE_ID,
@@ -24,9 +24,9 @@ def agent_profile_data(id) -> tuple:
 
     return FullName, Agent_email, Agent_mobile
 
-cachedData.add("agent_profile_data", agent_profile_data)
+cachedData.add("agent_profile_data", agent_profile_data, 60*24) # 24 hours
 
-def check_agent_availability_data():
+async def check_agent_availability_data():
     client = boto3.client('connect')
 
     # Get info for the first routing profile
