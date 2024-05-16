@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Typography,
   Card,
@@ -33,6 +32,9 @@ import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
+import React, { useState, useEffect } from 'react';
+import { SupervisorHomeData } from "@/data/supervisor-home-data";
+
 export function Home() {
   const [open, setOpen] = React.useState(1);
  
@@ -40,6 +42,21 @@ export function Home() {
 
   const controller = useMaterialTailwindController();
   const theme = controller;
+
+  const [dataToDisplay, setData] = useState([]);
+
+  function updateData() {
+
+    SupervisorHomeData().then((data) => {
+      setData(data);
+      console.log(data);
+    });
+  }
+
+  //Call the function just once
+  useEffect(() => {
+    updateData();
+  }, []);
 
   return (
     <div className="mt-4">
@@ -62,7 +79,8 @@ export function Home() {
         ))}
       </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        {statisticsChartsData.map((props) => (
+        { //dataToDisplay.graphs.map((props) => (
+          statisticsChartsData.map((props) => (
           <StatisticsChart
             key={props.title}
             {...props}
