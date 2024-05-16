@@ -11,7 +11,7 @@ import {
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { agentQueue, projectsTableData } from "@/data";
-import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 export function Queues() {
   const controller = useMaterialTailwindController();
@@ -19,13 +19,13 @@ export function Queues() {
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card className={`w-full ${getBgColor("background-cards")}`}>
-        <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getBgColor("search-bar")}`}>
-          <Typography variant="h6" color="white">
+        <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getTypography()} ${getBgColor("search-bar")}`}>
+          <Typography variant="h6" className={`${getTextColor("white3")} ${getTypographybold()}`}>
             Agent Queue
           </Typography>
         </CardHeader>
         <CardBody className={`overflow-x-scroll px-0 pt-0 pb-2 ${getBgColor("background-cards")}`}>
-          <table className="w-full min-w-[640px] table-auto">
+          <table className={`w-full min-w-[640px] table-auto ${getTypography()} `}>
             <thead>
               <tr>
                 {["Name", "Ongoing Calls", "Avg Response Time", "Usage", "Status"].map((el) => (
@@ -35,7 +35,7 @@ export function Queues() {
                   >
                     <Typography
                       variant="small"
-                      className={`text-[11px] font-bold uppercase ${getTextColor('black')}`}
+                      className={`text-[11px] ${getTypographybold()} uppercase ${getTextColor('black')}`}
                     >
                       {el}
                     </Typography>
@@ -54,13 +54,13 @@ export function Queues() {
                   return (
                     <tr key={name}>
                       <td className={className}>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center  gap-4">
 
                           <div>
                             <Typography
                               variant="small"
                               color="blue-gray"
-                              className={`font-semibold ${getTextColor('black')}`}
+                              className={`${getTypography()} ${getTextColor('black')}`}
                             >
                               {name}
                             </Typography>
@@ -69,7 +69,7 @@ export function Queues() {
                         </div>
                       </td>
                       <td className={className}>
-                        <Typography className={`text-xs font-semibold ${getTextColor('black')}`}>
+                        <Typography className={`text-xs ${getTypography()} ${getTextColor('black')}`}>
                           {ongoingCalls}
                         </Typography>
                         {/*<Typography className="text-xs font-normal text-blue-gray-500">
@@ -78,7 +78,7 @@ export function Queues() {
                       </td>
                       <td className={className}>
                         <Typography
-                          className={`text-xs font-semibold ${avg <= 1 ? "text-green-600" : avg <= 2.30 ? "text-orange-600" : "text-red-600"
+                          className={`text-xs ${getTypography()} ${avg <= 1 ? "text-green-600" : avg <= 2.30 ? "text-orange-600" : "text-red-600"
                             }`}
                         >
                           {avg}
@@ -111,7 +111,7 @@ export function Queues() {
                           variant="gradient"
                           color={usage <= 80 ? "green" : usage > 80 && usage <= 100 ? "orange" : "red"}
                           value={usage <= 80 ? "Free" : usage > 80 && usage <= 100 ? "Stressed" : "Exceeded"}
-                          className="py-0.5 px-2 text-[11px] font-medium w-fit"
+                          className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
                         />
                       </td>
 

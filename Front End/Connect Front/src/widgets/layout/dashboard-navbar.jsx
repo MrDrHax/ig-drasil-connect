@@ -137,9 +137,9 @@ export function DashboardNavbar() {
             <Button
               variant="text"
               color="blue-gray"
-              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTextColor("contrast")}`}
+              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
             >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
+              <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
               {getNameFromToken()}
             </Button>
             <IconButton

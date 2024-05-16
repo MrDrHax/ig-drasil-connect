@@ -10,7 +10,7 @@ import {
   messageData
 } from "@/data";
 import { getBgColor, getTextColor, useMaterialTailwindController,getTypographybold } from "@/context";
-import {TwitterChatboxTextarea ,ChatMessage, ChatMsupervisor } from "@/widgets/chat";
+import {TwitterChatboxTextarea ,ChatMessage} from "@/widgets/chat";
 
 /**
  * Renders a chat box component.

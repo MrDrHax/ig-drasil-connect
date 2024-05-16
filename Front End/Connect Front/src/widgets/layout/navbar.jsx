@@ -30,7 +30,7 @@ export function Navbar({ brandName, routes, action }) {
           color="blue-gray"
           className="capitalize"
         >
-          <Link to={path} className="flex items-center gap-1 p-1 font-normal">
+          <Link to={path} className="flex items-center gap-1 p-1 font-normal ">
             {icon &&
               React.createElement(icon, {
                 className: "w-[18px] h-[18px] opacity-50 mr-1",

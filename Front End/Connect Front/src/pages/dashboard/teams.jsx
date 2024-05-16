@@ -253,7 +253,7 @@ export function Teams() {
                                                                     <div>
                                                                         <Typography
                                                                             variant="small"
-                                                                            className={`font-semibold ${getTextColor('dark')}`}
+                                                                            className={`${getTypographybold()} ${getTextColor('dark')}`}
                                                                         >
                                                                             {name}
                                                                         </Typography>
@@ -261,7 +261,7 @@ export function Teams() {
                                                                 </div>
                                                             </td>
                                                             <td className={className}>
-                                                                <Typography className={`text-xs font-semibold ${getTextColor('dark')}`}>
+                                                                <Typography className={`text-xs ${getTypographybold()} ${getTextColor('dark')}`}>
                                                                     {queue}
                                                                 </Typography>
                                                             </td>
@@ -270,7 +270,7 @@ export function Teams() {
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
-                                                                    className="py-0.5 px-2 text-[11px] font-medium w-fit"
+                                                                    className={`py-0.5 px-2 text-[11px] font-medium w-fit ${getTypographybold()}`}
                                                                 />
                                                             </td>
                                                             <td className={className}>

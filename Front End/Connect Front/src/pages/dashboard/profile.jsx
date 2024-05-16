@@ -26,7 +26,7 @@ import { StatisticsChart } from "@/widgets/charts";
 import { platformSettingsData, conversationsData, projectsData, statisticsChartsData } from "@/data";
 
 
-import { getBgColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 import { AgentDetails } from "@/data/agents-data";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
@@ -74,15 +74,15 @@ export function Profile() {
                 className="rounded-lg shadow-lg shadow-blue-gray-500/40"
               />
               <div>
-                <Typography variant="h5" color="blue-gray" className="mb-1">
+                <Typography variant="h5" color="blue-gray" className={`${getTypography()} ${getTextColor("white3")} mb-1`}>
                   {dataToDisplay.name}
                 </Typography>
-                <Typography variant="small" className="font-normal text-blue-gray-600">
+                <Typography variant="small" className={`${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
                   Agent
                 </Typography>
                 <div className="flex items-center gap-2 font-bold text-blue-gray-500">
               <Rating value={5} readonly/>
-              <Typography color="blue-gray" className="font-medium text-blue-gray-500">
+              <Typography color="blue-gray" className={`${getTypography()} ${getTextColor("white3")} text-[10px]`}>
                 Based on 12 customer Reviews.
               </Typography>
               </div>
@@ -91,15 +91,15 @@ export function Profile() {
             </div>
             {/* Tab Navigation */}
             <div className="w-96">
-              <Tabs value='app'>
+              <Tabs value='app' >
                 <TabsHeader>
                   <Tab value="app" onClick={() => setView('app')}>
                     <InformationCircleIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    Information
+                    <span className={`${getTypography()} text-black`}>Information</span>
                   </Tab>
                   <Tab value="chat" onClick={() => setView('chat')}>
                     <ChatBubbleLeftEllipsisIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
-                    Message
+                    <span className={`${getTypography()} text-black`}>Message</span>
                   </Tab>
                 </TabsHeader>
               </Tabs>
@@ -117,13 +117,7 @@ export function Profile() {
                 "name": dataToDisplay.name,
                 mobile: dataToDisplay.mobile,
                 email: dataToDisplay.email,
-                proficiencies: (
-                  <div className="flex items-center gap-4">
-                    <i className="fa-brands fa-facebook text-blue-700" />
-                    <i className="fa-brands fa-twitter text-blue-400" />
-                    <i className="fa-brands fa-instagram text-purple-500" />
-                  </div>
-                ),
+                
               }}
               action={
                 <Tooltip content="Edit Profile">
@@ -132,19 +126,20 @@ export function Profile() {
               }
             />
             <div>
-              <Typography variant="small" className={`font-normal ${getTextColor("dark")}`}>
+              <Typography variant="small" className={`${getTypographybold()} ${getTextColor("dark")} pb-5`}>
                   Last customer calls
                 </Typography>
-                <ul className="flex flex-col gap-6">
+                <ul className={`flex flex-col gap-6`}>
                   {conversationsData.map((props) => (
                     <MessageCard
                       key={props.name}
                       {...props}
-                      action={
-                        <Button variant="text" size="sm">
-                          reply
-                        </Button>
-                      }
+                      
+                      //action={
+                       //<Button variant="text" size="sm">
+                          //reply
+                        //</Button>
+                      //}
                     />
                   ))}
                 </ul>

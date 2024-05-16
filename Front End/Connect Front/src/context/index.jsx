@@ -198,6 +198,8 @@ export function getTextColor(color) {
         return "text-gray-900";
       case "white2":
         return "text-white";
+      case "white3":
+        return "text-white";
       case "contrast":
         return "text-white";
       case "gray":

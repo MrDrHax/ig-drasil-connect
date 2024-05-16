@@ -89,10 +89,10 @@ export function ChatMsupervisor ({ message, rol,hour}){
     {/* Change the color of the card based on the role of the message sender. */}
       <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isSupervisor ? getBgColor('green') : getBgColor('gray')}`}>
         <CardBody>
-          <Typography color="black" className={`text-base ${getTypography()} ${isAgent ? getTextColor("black") : getTextColor("white2")}`}>
+          <Typography color="black" className={`text-base ${getTypography()} ${isSupervisor ?  getTextColor("white2"):getTextColor("black")} `}>
             {message} 
           </Typography>
-          <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isAgent ? getTextColor("black") : getTextColor("white2")}`} >
+          <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isSupervisor ?  getTextColor("white2"): getTextColor("black")}`} >
             {isSupervisor ? "You": "agent"} {hour} 
           </Typography>
         </CardBody>
