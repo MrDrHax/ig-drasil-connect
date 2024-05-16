@@ -7,17 +7,10 @@ import {
   Menu,
   MenuHandler,
   MenuList,
-  MenuItem,
-  Avatar,
-  Tooltip,
-  Progress,
-  Accordion,
-  AccordionBody,
-  AccordionHeader,
+  MenuItem
 } from "@material-tailwind/react";
 import {
   EllipsisVerticalIcon,
-  ArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
@@ -28,7 +21,7 @@ import {
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
-import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
@@ -45,6 +38,22 @@ export function Home() {
 
   const [cards, setCards] = useState([]);
   const [graphs, setGraphs] = useState([]);
+
+
+  function getIcon(icon) {
+    switch (icon) {
+      case "Arrow":
+        return ArrowUpIcon;
+      case "Book":
+        return BookOpenIcon;
+      case "Clock":
+        return ClockIcon;
+      case "Person":
+        return UserGroupIcon;
+      default:
+        return CheckCircleIcon;
+    }
+  }
 
   function updateData() {
 
@@ -69,7 +78,7 @@ export function Home() {
             key={title}
             {...rest}
             title={title}
-            icon={React.createElement(icon, {
+            icon={React.createElement(getIcon(icon), {
               className: "w-6 h-6 text-white",
             })}
             footer={
