@@ -4,8 +4,11 @@ from . import crud, models
 from AAA.requireToken import requireToken
 import AAA.userType as userType
 
+from tools.lazySquirrel import LazySquirrel
+
 import boto3
 from config import Config
+from cache.cache_object import cachedData
 
 import logging
 logger = logging.getLogger(__name__)
@@ -91,32 +94,6 @@ async def get_angry_calls(qpams: Annotated[QueryParams, Depends()]) -> models.Li
                                  models.ListItem(callID=3, name="John", agent="Ron (support)", started="2021-07-26T14:00:00", ended="2021-07-26T14:30:00", rating=2.5)],
                            pagination="1-3/3")
 
-async def get_agent_name(Id: str) -> str:
-    '''
-    Returns the name of a given agent, from their Id
-
-    Id: The identifier of the agent account
-
-    Returns: The name of the agent
-    '''
-    client = boto3.client('connect')
-    response = client.describe_user(
-        InstanceId=Config.INSTANCE_ID,
-        UserId=Id
-    )
-    return f"{response['User']['IdentityInfo']['FirstName']} {response['User']['IdentityInfo']['LastName']}"
-
-def get_routing_profile_name(Id: str, routing_profile_list: list) -> str:
-    '''
-    Returns the name of a given routing profile, from their Id
-
-    Id: The identifier of the routing profile
-
-    Returns: The name of the routing profile
-    '''
-    for profile in routing_profile_list:
-        if profile['Id'] == Id:
-            return profile['Name']
 
 @router.get("/agents", tags=["agents"])
 async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[str, Depends(requireToken)]) -> models.AgentsDataList:
@@ -131,54 +108,22 @@ async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-    client = boto3.client('connect')
+    data = await cachedData.get("routing_profiles_data")
 
-    # Get a list of all routing profiles
-    response = client.list_routing_profiles(
-        InstanceId=Config.INSTANCE_ID
-    )
+    processing = LazySquirrel(data)
 
-    routingProfiles = response['RoutingProfileSummaryList']
-
-    # Get a list of the Arn for each routing profile
-    routingProfilesArns = [profile['Arn'] for profile in routingProfiles]
-
-
-    # Get info for all the routing profiles
-    response = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'RoutingProfiles': routingProfilesArns
-        }
-    )
-
-    try :
-        list = response['UserDataList']
-        parsed = [models.AgentsDataListItem(
-                                  agentID=str(userData['User']['Id']), 
-                                  name= await get_agent_name(userData['User']['Id']),
-                                  queue= get_routing_profile_name(userData['RoutingProfile']['Id'], routingProfiles),
-                                  status= userData['Status']['StatusName'], 
-                                  requireHelp=userData['Status']['StatusName'] == "Needs Assistance", calls=5, rating=4.5) 
-                                  for userData in list]
-        
-        return models.AgentsDataList(pagination="1-1/1", data=parsed)
-        
-
-    except Exception as e:
-        print(e)
+    if qpams.q:
+        filtering = qpams.q.split(',')
+        for f in filtering:
+            key, value = f.split('=')
+            processing.filter_by(key, value)
     
-        if (qpams.skip != 0):
-            return models.AgentsDataList(pagination="5-8/8",
-            data=[models.AgentsDataListItem(agentID="adsfg", name="cheff", status="connected", calls=5, rating=4.5), 
-                models.AgentsDataListItem(agentID="bbcvn", name="dude", status="connected", calls=5, rating=4.5), 
-                models.AgentsDataListItem(agentID="cewrt", name="robert", status="connected", calls=5, rating=4.5), 
-                models.AgentsDataListItem(agentID="dfghj", name="test", status="connected", calls=5, rating=4.5, requireHelp=True)])
-        return models.AgentsDataList(pagination="1-4/8",
-            data=[models.AgentsDataListItem(agentID="adsfg", name="Ron", status="connected", calls=5, rating=4.5), 
-                models.AgentsDataListItem(agentID="bbcvn", name="Jane", status="connected", calls=5, rating=4.5), 
-                models.AgentsDataListItem(agentID="cewrt", name="John", status="connected", calls=5, rating=4.5), 
-                models.AgentsDataListItem(agentID="dfghj", name="Ron", status="connected", calls=5, rating=4.5, requireHelp=True)])
+    if qpams.sortBy:
+        processing.sort_by(qpams.sortBy[0], qpams.sortBy[1] == 'desc')
+    
+    pagination, data = processing.paginate(qpams.skip, qpams.limit)
+
+    return models.AgentsDataList(pagination=pagination, data=data)
 
 @router.get("/rerouted", tags=["calls"])
 async def get_rerouted_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:
