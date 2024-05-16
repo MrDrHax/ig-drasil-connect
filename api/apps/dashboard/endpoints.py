@@ -69,9 +69,9 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    footer_info = models.CardFooter(color="text-green-500", value="+3", label="more expected in the next hour")
+    footer_info = models.CardFooter(color="text-green-500", value="+30%", label="more expected in the next hour")
     
-    return models.GenericCard(id=2, title="Capacity name", value="10%", icon="Book", color="yellow", footer=footer_info)
+    return models.GenericCard(id=2, title="Percent of capacity", value="10%", icon="Book", color="yellow", footer=footer_info)
 
 @router.get("/average_call_time", tags=["cards"])
 async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -83,7 +83,7 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) ->
     
     footer_info = models.CardFooter(color="text-red-500", value="+23s", label="more than expected")
     
-    return models.GenericCard(id=3, title="Average call time", value="10%", icon="Clock", color="blue", footer=footer_info)
+    return models.GenericCard(id=3, title="Average call time", value="3m23s", icon="Clock", color="blue", footer=footer_info)
 
 @router.get("/connected_agents", tags=["cards"])
 async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -103,7 +103,7 @@ async def get_unfinished_calls_graph(token: Annotated[str, Depends(requireToken)
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-    return models.GenericGraph(title="Unfinished Calls" ,data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], info="Graph showing unfinished calls", footer_txt="Updated 2 min ago")
+    return models.GenericGraph(title="Unfinished Calls" ,data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], description="Graph showing unfinished calls", footer="Updated 2 min ago")
 
 @router.get("/graph/average_call_rating", tags=["graph"])
 async def get_average_call_rating_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
@@ -111,7 +111,7 @@ async def get_average_call_rating_graph(token: Annotated[str, Depends(requireTok
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    return models.GenericGraph(title="Average Call Rating", data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], info="Graph showing average call rating", footer_txt="Updated 2 min ago")
+    return models.GenericGraph(title="Average Call Rating", data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], description="Graph showing average call rating", footer="Updated 2 min ago")
 
 @router.get("/graph/queues", tags=["graph"])
 async def get_queues_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
@@ -125,7 +125,7 @@ async def get_queues_graph(token: Annotated[str, Depends(requireToken)]) -> mode
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-    return models.GenericGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent","Transfers", "Delivery"], info="Graph showing queue capacity", footer_txt="Updated 2 min ago")
+    return models.GenericGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent","Transfers", "Delivery"], description="Graph showing queue capacity", footer="Updated 2 min ago")
 
 @router.get("/queue_supervisors", tags=["data"])
 async def get_queue_supervisors() -> List[models.QueueSupervisor]:
