@@ -6,10 +6,19 @@ import {
   CardHeader,
   CardBody,
 } from "@material-tailwind/react";
+import{   useMaterialTailwindController,
+  setOpenConfigurator,
+  setOpenSidenav,
+  getBgColor,
+  getTextColor,
+  getTheme,
+  getTypography
+} from "@/context";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { MessageCard } from "@/widgets/cards";
 
 export function Notifications() {
+  const [controller, dispatch] = useMaterialTailwindController();
   const [showAlerts, setShowAlerts] = React.useState({
     blue: true,
     green: true,
@@ -29,7 +38,7 @@ export function Notifications() {
     my-5: margin vertical 5
 */}
   return (
-    <div className="mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7 ">
+    <div className={'mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7'}>
           {alerts.map((color) => (
             <Alert
               key={color}
