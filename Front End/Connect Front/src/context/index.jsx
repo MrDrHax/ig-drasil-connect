@@ -6,7 +6,7 @@ MaterialTailwind.displayName = "MaterialTailwindContext";
 
 export const navColors = {
   dark: "from-black to-black border-gray-200",
-  green: "from-green-400 to-green-600",
+  green: "from-green2-500 to-green2-700",
   orange: "from-orange-400 to-orange-600",
   red: "from-red-400 to-red-600",
   pink: "from-pink-400 to-pink-600",
@@ -41,6 +41,15 @@ export function getTypography() {
   } 
   else {
     return "font-normal";
+  }
+}
+
+export function getTypographybold() {
+  if(font === "OpenDyslexic") {
+    return "font-OpenDyslexicBold";
+  }
+  else {
+    return "font-bold";
   }
 }
 
@@ -105,7 +114,7 @@ export function getBgColor(color) {
       case "dark":
         return "bg-gray-500";
       case "green":
-        return "bg-green-500";
+        return "bg-green2-700";
       case "orange":
         return "bg-orange-500";
       case "red":
@@ -128,7 +137,7 @@ export function getBgColor(color) {
       case "dark":
         return "bg-gray-800";
       case "green":
-        return "bg-green-500";
+        return "bg-green2-700";
       case "orange":
         return "bg-orange-500";
       case "red":
@@ -157,13 +166,15 @@ export function getTextColor(color) {
   if (theme === "light") {
     switch (color) {
       case "dark":
-        return "text-black-900";
+        return "text-black";
       case "white":
+        return "text-white";
+      case "white2":
         return "text-white";
       case "contrast":
         return "text-black";
       case "gray":
-        return "text-gray-600";
+        return "text-gray-500";
       case "bgray":
         return "text-gray-800";
       case "green":
@@ -185,6 +196,10 @@ export function getTextColor(color) {
         return "text-white";
       case "white":
         return "text-gray-900";
+      case "white2":
+        return "text-white";
+      case "white3":
+        return "text-white";
       case "contrast":
         return "text-white";
       case "gray":
