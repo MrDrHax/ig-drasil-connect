@@ -50,7 +50,7 @@ export function Agent() {
               className: "w-6 h-6 text-white",
             })}
             footer={
-              <Typography className={`${getTypography()} ${getTextColor('dark')}`}>
+              <Typography className={` ${getTypography()} ${getTextColor('dark')}`}>
                 <strong className={footer.color}>{footer.value}</strong>
                 &nbsp;{footer.label}
               </Typography>
