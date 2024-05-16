@@ -32,6 +32,8 @@ class QueueDataListItem(BaseModel):
     maxContacts: int = Field(10, description="The max amount of contacts a queue can have before considered full.", example=10)
     usage: float = Field(0, description="The current usage of the queue. 100 means full, 0 means empty.", example=5)
     enabled: bool = Field(True, description="If the queue is enabled or not.", example=True)
+    waiting: int = Field(0, description="The amount of clients waiting in the queue.", example=5)
+    averageWaitTime: float = Field(0, description="The average wait time for the clients in the queue.", example=5)
 
     def __getitem__(self, item):
         return getattr(self, item)

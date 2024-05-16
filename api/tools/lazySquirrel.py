@@ -46,7 +46,7 @@ class LazySquirrel:
         for operation in self.operations:
             result = operation(result)
         paginated_result = result[skip:skip + limit]
-        return pagination_string(paginated_result, skip, skip + limit), paginated_result
+        return pagination_string(result, skip, skip + limit), paginated_result
     
 if __name__ == "__main__":
     testdata = [

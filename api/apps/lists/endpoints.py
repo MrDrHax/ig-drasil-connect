@@ -5,6 +5,7 @@ from AAA.requireToken import requireToken
 import AAA.userType as userType
 
 from tools.lazySquirrel import LazySquirrel
+from tools.querryParams import QueryParams
 
 import boto3
 from config import Config
@@ -27,16 +28,6 @@ router = APIRouter(
     }
 )
 
-class QueryParams:
-    def __init__(self, q: str | None = None, skip: int = 0, limit: int = 100, sortByDat: str | None = None, sortBy: str = 'asc'):
-        self.q = q
-        self.skip = skip
-        self.limit = limit
-        if not sortByDat or not sortBy:
-            self.sortBy = None
-        else:
-            self.sortBy = (sortByDat, sortBy)
-
 
 @router.get("/queues", tags=["queues"])
 async def get_queues(qpams: Annotated[QueryParams, Depends()]) -> models.QueueDataList:
@@ -46,11 +37,12 @@ async def get_queues(qpams: Annotated[QueryParams, Depends()]) -> models.QueueDa
     To see details, go to summary/queues/{queueID}
     '''
 
-    return models.QueueDataList(pagination="1-4/4",
-        data=[models.QueueDataListItem(queueID="a", name="Support", maxContacts=10, usage=5, enabled=True), 
-            models.QueueDataListItem(queueID="b", name="Sales", maxContacts=10, usage=5, enabled=True), 
-            models.QueueDataListItem(queueID="c", name="Final sale", maxContacts=10, usage=5, enabled=True), 
-            models.QueueDataListItem(queueID="d", name="Advanced support", maxContacts=10, usage=5, enabled=True)])
+    data = await cachedData.get("get_queues_data")
+
+    pagination, data = qpams.apply(data)
+
+    return models.QueueDataList(pagination=pagination,
+                                data=data)
 
 @router.get("/reconnected", tags=["reconnected", "calls"])
 async def get_reconnected_calls(qpams: Annotated[QueryParams, Depends()]) -> models.ListData:
@@ -110,18 +102,7 @@ async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[
 
     data = await cachedData.get("routing_profiles_data")
 
-    processing = LazySquirrel(data)
-
-    if qpams.q:
-        filtering = qpams.q.split(',')
-        for f in filtering:
-            key, value = f.split('=')
-            processing.filter_by(key, value)
-    
-    if qpams.sortBy:
-        processing.sort_by(qpams.sortBy[0], qpams.sortBy[1] == 'desc')
-    
-    pagination, data = processing.paginate(qpams.skip, qpams.limit)
+    pagination, data = qpams.apply(data)
 
     return models.AgentsDataList(pagination=pagination, data=data)
 
