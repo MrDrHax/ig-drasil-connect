@@ -20,6 +20,7 @@ import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeft
 import { parsePaginationString } from "@/configs/api-tools";
 import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
+import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
 
 import { useAlert } from "@/context/alerts";
@@ -278,13 +279,9 @@ export function Teams() {
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
-                                                                <Typography
-                                                                    as="a"
-                                                                    href={"/dashboard/profile?profile=" + agentID}
-                                                                    className={`text-xs font-semibold ${getTextColor('dark')}`}
-                                                                >
+                                                                <Link to = {"/dashboard/profile?profile=" + agentID} className={`text-xs font-semibold ${getTextColor('dark')}`}>
                                                                     View
-                                                                </Typography>
+                                                                </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
                                                             { requireHelp ?
