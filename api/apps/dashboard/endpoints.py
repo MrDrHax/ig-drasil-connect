@@ -33,17 +33,16 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     Returns the cards that will be displayed on the dashboard.
     '''
     cards = [
-        get_connected_users(),
-        get_capacity(),
-        get_average_call_time(),
-        get_connected_agents()
+        await get_connected_users(token),
+        await get_capacity(token),
+        await get_average_call_time(token),
+        await get_connected_agents(token)
     ]
 
     graphs = [
-        get_unfinished_calls_graph(),
-        get_average_call_rating_graph(),
-        get_queues_graph()
-
+        await get_unfinished_calls_graph(token),
+        await get_average_call_rating_graph(token),
+        await get_queues_graph(token)
     ]
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
