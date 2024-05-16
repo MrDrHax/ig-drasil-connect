@@ -43,27 +43,28 @@ export function Home() {
   const controller = useMaterialTailwindController();
   const theme = controller;
 
-  const [dataToDisplay, setData] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [graphs, setGraphs] = useState([]);
 
   function updateData() {
 
     SupervisorHomeData().then((data) => {
-      setData(data);
-      console.log(data);
+      setCards(data.cards);
+      setGraphs(data.graphs);
+      //console.log(data);
     });
   }
 
   //Call the function to recieve data just once
-  /*
   useEffect(() => {
     updateData();
   }, []);
-  */
 
   return (
     <div className="mt-4">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
+        { cards.map(({ icon, title, footer, ...rest }) => (
+          //statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
             {...rest}
