@@ -21,6 +21,8 @@ try:
     from apps.summary.endpoints import router as summary_router
     from apps.actions.endpoints import router as actions_router
     from apps.extras.endpoints import router as extras_router
+    from DocumentDB.Endpoints.Info_database import router as database_router
+
 except ImportError:
     logger.critical("Error importing the required modules, please fun app in module mode.")
     # Load environment variables
@@ -32,7 +34,7 @@ except ImportError:
     from .apps.summary.endpoints import router as summary_router
     from .apps.actions.endpoints import router as actions_router
     from .apps.extras.endpoints import router as extras_router
-
+    from DocumentDB.Endpoints.Info_database import router as database_router
 
 logger.info("Starting the FastAPI app")
 
@@ -61,6 +63,7 @@ try:
     app.include_router(summary_router)
     app.include_router(actions_router)
     app.include_router(extras_router)
+    app.include_router(database_router)
 
     @app.get("/")
     def read_root():
