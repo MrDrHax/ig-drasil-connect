@@ -4,6 +4,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure
 
+#uri = "mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasildb.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilDB"
 uri = "mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest"
 # # Create a new client and connect to the server
 # client = MongoClient(uri, server_api=ServerApi('1'))
@@ -30,8 +31,8 @@ class DataBase:
             raise Exception("This class is a singleton!")
         try:
             #TODO Pasar el uri a .env, por lo que hay que crear una nueva
-            self.client = MongoClient(uri) 
-            self.db = self.client["database_name"]  # OJO: cambiarlo por el nombre de la base de datos (creo David la tiene)
+            self.client = MongoClient(uri,tls=True, tlsAllowInvalidCertificates=True) 
+            self.db = self.client["IGDrasilTest"]  # OJO: cambiarlo por el nombre de la base de datos (creo David la tiene)
         except ConnectionFailure as e:
             print(f"Error connecting to MongoDB: {e}")
             DataBase._instance = None
@@ -49,6 +50,7 @@ class DataBase:
         try:
             # Verificar que la conexión es exitosa obteniendo la lista de colecciones
             collections = self.db.list_collection_names()
+            print(collections)
             print("Connection successful! Collections:", collections)
             return True
         except Exception as e:
