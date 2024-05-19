@@ -1,27 +1,12 @@
 
 from pymongo import MongoClient
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure
 
-#uri = "mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasildb.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilDB"
 uri = "mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest"
-# # Create a new client and connect to the server
-# client = MongoClient(uri, server_api=ServerApi('1'))
-# # Send a ping to confirm a successful connection
-# try:
-#     print(client.admin.command('ping'))
-#     print("Pinged your deployment. You successfully connected to MongoDB!")
-# except Exception as e:
-#     print(e)
-
-
 
 """
 Singleton pattern 
 """
-
-
 
 class DataBase:
     _instance = None
