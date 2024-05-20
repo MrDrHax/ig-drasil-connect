@@ -3,9 +3,16 @@ from . import models, crud
 from config import Config
 from starlette.responses import RedirectResponse
 from AAA.requireToken import oauthScheme
+from AAA.requireToken import requireToken
+import AAA.userType as userType
+from typing import Annotated
 
 #Imports for Authentication in IAM Identity Center
 import requests
+
+#Imports for AWS
+import boto3
+from config import Config
 
 import logging
 logger = logging.getLogger(__name__)
@@ -38,6 +45,106 @@ async def get_agentID() -> str:
     Works only for logged in users.
     '''
     return "1"
+
+async def get_SecurityProfileID(securityProfileName: str) -> str:
+    '''
+    Returns the Security Profile ID.
+    
+    @param securityProfileName: Name of the security profile.
+    '''
+    client = boto3.client('connect')
+    response = client.list_security_profiles(
+        InstanceId=Config.INSTANCE_ID
+    )
+
+    for securityProfile in response['SecurityProfileSummaryList']:
+        if securityProfileName == securityProfile['Name']:
+             return securityProfile['Id']
+
+    return None
+
+@router.post("/Register", tags=["auth"])
+async def post_Register(token: Annotated[str, Depends(requireToken)], email: str, firstName: str, lastName: str, securityProfileName: str) -> str:
+    '''
+    Registers a new user.
+    Works only for supervisors registering new users.
+
+    @param email: Email of the user.
+    @param firstName: First name of the user.
+    @param lastName: Last name of the user.
+    @param securityProfileName: Name of the security profile. Options: "Agent / CallCenterManager / Admin" 
+    '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    #Create the user in IAM Identity Center
+    sso_client = boto3.client('identitystore')
+
+    try :
+        response = sso_client.create_user(
+            IdentityStoreId=Config.IDENTITY_STORE_ID,
+            UserName=email,
+            DisplayName=firstName + " " + lastName,
+            Name = {
+                'GivenName': firstName,
+                'FamilyName': lastName
+            }
+        )
+    except Exception as e:
+        logger.error("Tried to create user in IAM Identity Center, but an error occurred: " + str(e))
+
+    #Get the Security Profile ID
+    securityProfileId = await get_SecurityProfileID(securityProfileName)
+
+    #Create the user in Amazon Connect
+    client = boto3.client('connect')
+    try:
+        client.create_user(
+            Username=email,
+            InstanceId=Config.INSTANCE_ID,
+            SecurityProfileIds = [
+                securityProfileId
+            ],
+            #Default to the default routing profile
+            RoutingProfileId = '69e4c000-1473-42aa-9596-2e99fbd890e7',
+            IdentityInfo = {
+                'FirstName': firstName,
+                'LastName': lastName,
+                'SecondaryEmail': email
+            },
+            PhoneConfig = {
+                'PhoneType': 'SOFT_PHONE',
+                'AutoAccept': False
+            }
+        )
+    except Exception as e:
+        logger.error("Tried to create user in Amazon Connect, but an error occurred: " + str(e))
+
+    #Create the user in Keycloak
+    try:
+        url = Config.KEYCLOAK_URI + "/admin/realms/IgDrasilConnect/users"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'username': email,
+            'enabled': True,
+            'credentials': [
+                {
+                    'type': 'password',
+                    'value': '123',
+                    'temporary': True
+                }
+            ],
+            'email': email,
+            'firstName': firstName,
+            'lastName': lastName
+        }
+        response = requests.post(url, headers=headers, json=data, verify=False)
+    except Exception as e:
+        logger.error("Tried to create user in Keycloak, but an error occurred: " + str(e))
+    
+    return str(response)
 
 @router.get("/IAM", tags=["auth"])
 async def get_IAM(deviceID: str) -> str:
