@@ -20,6 +20,8 @@ class Config:
     MY_DOMAIN = os.getenv('MY_DOMAIN', 'http://localhost:8080/')
     KEYCLOAK_ID = os.getenv('KEYCLOAK_ID', '>_<')
     INSTANCE_ID = os.getenv('INSTANCE_ID', '>_<')
+    #TODO: Revisar que la variable de entorno se cargo correctamente
+    URI_MONGODB = os.getenv('URI_MONGODB','UwU')
 
 
 def logConfig():
