@@ -90,9 +90,12 @@ export function Teams() {
     }
 
     function updateData(page = 1) {
+        // search by name
         let search = searchQuery ? `name=${searchQuery}` : '';
+
+        // search by status
         if (searchQuery_status) {
-            search += search ? `&status=${searchQuery_status}` : `status=${searchQuery_status}`;
+            search += search ? `,status=${searchQuery_status}` : `status=${searchQuery_status}`;
         }
         let skip = (page - 1) * 10;
 
