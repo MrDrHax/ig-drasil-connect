@@ -101,6 +101,7 @@ export async function storeToken(data) {
     sessionStorage.setItem('token', token);
     sessionStorage.setItem('access_token', access_token);
     sessionStorage.setItem('refresh', refresh);
+    //sessionStorage.setItem('userID', data.deviceID);
 }
 
 export async function getApiToken(code) {

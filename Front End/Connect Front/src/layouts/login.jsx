@@ -10,6 +10,7 @@ export function Login() {
     let query = useQuery();
     let code = query.get("code");
 
+    // Saving the tokens in local storage
     getApiToken(code)
         .then(data => {
             storeToken(data)

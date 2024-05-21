@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 from config import Config
 
-uri = 'mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest'
+#uri = 'mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest'
 
 """
 Singleton pattern 
@@ -16,7 +16,7 @@ class DataBase:
             raise Exception("This class is a singleton!")
         try:
             #TODO Pasar el uri a .env, por lo que hay que crear una nueva
-            self.client = MongoClient(uri,tls=True, tlsAllowInvalidCertificates=True) 
+            self.client = MongoClient(Config.URI_MONGODB, tls=True, tlsAllowInvalidCertificates=True) 
             self.db = self.client["IGDrasilTest"]  # OJO: cambiarlo por el nombre de la base de datos (creo David la tiene)
         except ConnectionFailure as e:
             print(f"Error connecting to MongoDB: {e}")

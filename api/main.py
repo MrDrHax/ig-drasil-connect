@@ -28,6 +28,10 @@ try:
     from apps.extras.endpoints import router as extras_router
     from MongoAtlas.DB_endpoints import router as database_router
 
+except Exception as e:
+    logger.error("Error loading environment variables: " + str(e))
+    sys.exit(1)
+
 scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
