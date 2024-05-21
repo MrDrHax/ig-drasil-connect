@@ -63,12 +63,20 @@ async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id:
     
 #    return db['chats'].find_one({"agent_id": agent_id})
 
-    chat = db['chats'].find_one({"agent_id": agent_id})
+    try:
+        chat = db['chats'].find_one({"agent_id": agent_id})
 
-    for index, message in enumerate(chat['messages']):
-        chat['messages'][index]['content'] = b64decode(message['content']).decode('utf-8').split(Config.BASE64AUTH)[0]
+        for index, message in enumerate(chat['messages']):
+            # Decode the base64-encoded string
+            chat['messages'][index]['content'] = b64decode(message['content']).decode('utf-8').split(Config.BASE64AUTH)[0]
+            # Convert the timestamp to local timezone
+            chat['messages'][index]['timestamp'] = message['timestamp'].replace(tzinfo=timezone.utc).astimezone(tz=None)
 
-    return chat['messages']
+        return chat['messages']
+
+    except Exception as e:
+        logger.error(e)
+        return []
 
 @router.get('/get_chat', tags=["DB"])
 async def get_chat(token: Annotated[str, Depends(requireToken)]) -> List[models.ChatMessage]:

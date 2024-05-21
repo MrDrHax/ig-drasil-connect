@@ -21,7 +21,7 @@ import {
   PencilIcon,
 } from "@heroicons/react/24/solid";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
-import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
+import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
 import { platformSettingsData, conversationsData, projectsData, statisticsChartsData } from "@/data";
 
@@ -53,6 +53,7 @@ export function Profile() {
   function updateData() {
 
     AgentDetails(searchParams.get("profile")).then((data) => {
+      data.id = searchParams.get("profile");
       setData(data);
     });
   }
@@ -164,7 +165,7 @@ export function Profile() {
           {
             view === 'chat' && (
             <div className="gird-cols-1 mb-12 grid gap-12 px-4" style={{ visibility: view === 'chat' ? 'visible' : 'hidden' }}>
-              <ChatBoxSupervisor/>
+              <ChatBox agent_id={dataToDisplay.id} is_supervisor={true}/>
             </div>
           )}
         </CardBody>

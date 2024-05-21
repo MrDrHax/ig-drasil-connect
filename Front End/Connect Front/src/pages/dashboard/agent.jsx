@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   Typography,
   Card,
@@ -21,7 +21,8 @@ import {
   statisticsCardsDataAgent as statisticsCardsData,
   customerDataAgent,
   lexRecommendationData,
-  messageData
+  messageData,
+  AgentId
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
@@ -34,9 +35,24 @@ export function Agent() {
   const controller = useMaterialTailwindController();
   const theme = controller;
 
-  const [open, setOpen] = React.useState(1);
+  const [open, setOpen] = useState(1);
  
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
+
+
+  function updateData() {
+
+    if (sessionStorage.getItem("userID") == null) {
+        AgentId().then((data) => {
+          sessionStorage.setItem("userID", data);
+      });
+    }
+  }
+
+  //Call the function just once
+  useEffect(() => {
+    updateData();
+  }, []);
 
   return (
     <div className="mt-8">
@@ -184,7 +200,7 @@ export function Agent() {
 
     
   {/* Aqui es para el chat del agente*/}
-  <ChatBox/>
+  <ChatBox agent_id={sessionStorage.getItem("userID")} is_supervisor={false}/>
 
   </div>
   );

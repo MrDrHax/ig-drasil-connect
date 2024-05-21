@@ -39,12 +39,24 @@ async def route_call(callID: int, agentID: int) -> str:
     return "success"
 
 @router.get("/agentID", tags=["agents"])
-async def get_agentID() -> str:
+async def get_agentID(username: str) -> str:
     '''
     Returns the agentID of the user.
-    Works only for logged in users.
+
+    @param username: Username of the user.
     '''
-    return "1"
+
+    client = boto3.client('connect')
+    response = client.list_users(
+        InstanceId=Config.INSTANCE_ID
+    )
+
+    for user in response['UserSummaryList']:
+        #logger.info(user['Username'])
+        if user['Username'].lower() == username.lower():
+            return user['Id']
+
+    return "None"
 
 async def get_SecurityProfileID(securityProfileName: str) -> str:
     '''
@@ -182,7 +194,6 @@ async def get_IAM_callback(code:str, redirect_uri:str) -> models.Token:
     Make sure to add the token to the user's session, and authenticate the user on next calls. Token type is bearer.
     '''
     #Endpoints
-    authorization_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/auth"
     token_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/token"
     userInfo_endpoint = Config.AUTH_DOMAIN + "protocol/openid-connect/userinfo"
 
@@ -198,17 +209,10 @@ async def get_IAM_callback(code:str, redirect_uri:str) -> models.Token:
     id_token = str(r.json().get("id_token", "NO ID TOKEN"))
     access_token = str(r.json().get("access_token", "NO ACCESS TOKEN"))
     refresh_token = str(r.json().get("refresh_token", "NO REFRESH TOKEN"))
+    
+    #deviceID = get_agentID()
 
-    #Create the request for the user info
-    r2 = requests.request('GET', url = userInfo_endpoint, headers= {'Authorization' : 'Bearer ' + access_token}, verify=False)
-
-    #Get deviceID
-    try:
-        deviceID = str(r2.json().get("preferred_username", "NO DEVICE ID"))
-    except:
-        deviceID = "NO DEVICE ID"
-
-    return models.Token(id_token= id_token, access_token= access_token, refresh= refresh_token, deviceID= deviceID)
+    return models.Token(id_token= id_token, access_token= access_token, refresh= refresh_token, deviceID= "deviceID")
 
 @router.get("/IAM/refresh", tags=["auth"])
 async def get_IAM_refresh(refresh: str, deviceID: str) -> models.Token:
