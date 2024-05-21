@@ -1,7 +1,7 @@
 import { Textarea, Button, IconButton, Typography, CardHeader, CardBody, CardFooter } from "@material-tailwind/react";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
-import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController } from "@/context";
+import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
  
 export function TwitterChatboxTextarea() {
 
@@ -14,7 +14,7 @@ export function TwitterChatboxTextarea() {
         rows={1}
         resize={true}
         placeholder="Your Message"
-        className={`min-h-full !border-0 focus:border-transparent ${getTextColor("dark")}`}
+        className={`min-h-full !border-0 focus:border-transparent ${getTextColor("dark")} `}
         containerProps={{
           className: "grid h-full",
         }}
@@ -64,10 +64,10 @@ export function ChatMessage ({ message, rol,hour}){
         {/* Change the color of the card based on the role of the message sender. */}
         <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '300px' }}>
           <CardBody>
-          <Typography color="black" className={`text-base ${getTextColor('dark')}`}>
+          <Typography color="black" className={`text-base ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")}`}>
               {message} 
             </Typography>
-            <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTextColor('dark')}`} >
+            <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")} `} >
                 {isAgent ? "You": "Supervisor"} {hour}
               </Typography>
           </CardBody>
@@ -89,10 +89,10 @@ export function ChatMsupervisor ({ message, rol,hour}){
     {/* Change the color of the card based on the role of the message sender. */}
       <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isSupervisor ? getBgColor('green') : getBgColor('gray')}`}>
         <CardBody>
-          <Typography color="black" className={`text-base ${getTextColor('dark')}`}>
+          <Typography color="black" className={`text-base ${getTypography()} ${isSupervisor ?  getTextColor("white2"):getTextColor("black")} `}>
             {message} 
           </Typography>
-          <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTextColor('dark')}`} >
+          <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isSupervisor ?  getTextColor("white2"): getTextColor("black")}`} >
             {isSupervisor ? "You": "agent"} {hour} 
           </Typography>
         </CardBody>
