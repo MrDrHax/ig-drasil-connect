@@ -20,13 +20,13 @@ import {
     return (
       <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
         <CardBody className="p-4 text-right">
-          <Typography variant="h4" className={` text-justify ${getTypographybold()} ${getTextColor("dark")}`}>
+          <Typography /*variant="h4"*/ className={`text-justify text-[1.5rem] ${getTypographybold()} ${getTextColor("dark")}`}>
             Customer data
           </Typography>
-          <Typography variant="paragraph" className={`text-justify ${getTypography()} ${getTextColor("gray")}`}>
+          <Typography variant="paragraph" className={`text-[1rem] text-justify ${getTypography()} ${getTextColor("gray")}`}>
            <span className={` ${getTypographybold()} ${getTextColor("dark")}`}>Name of Customer: </span>{name}
           </Typography>
-          <Typography variant="paragraph" className={`text-justify ${getTypography()} ${getTextColor("gray")}`}>
+          <Typography variant="paragraph" className={`text-[1rem] text-justify ${getTypography()} ${getTextColor("gray")}`}>
            <span className={`text-justify ${getTypographybold()} ${getTextColor("dark")}`}>Condition: </span> {description}
           </Typography>
         </CardBody>
@@ -79,10 +79,10 @@ import {
     return (
       <Card className={`border shadow-sm ${getBgColor("background-cards")}`}>
         <CardBody className="p-4 text-right">
-          <Typography variant="h4" className={`${getTypographybold()} text-justify  ${getTextColor("dark")}`} >
+          <Typography /*variant="h4"*/ className={`text-[1.5rem] ${getTypographybold()} text-justify  ${getTextColor("dark")}`} >
             Al/n, your virtual assistant:
           </Typography>
-          <Typography variant="paragraph" className={`p-1 text-justify ${getTypography()} ${getTextColor("dark")}`}>
+          <Typography variant="paragraph" className={`text-[1rem] p-1 text-justify ${getTypography()} ${getTextColor("dark")}`}>
           <span className={`${getTypographybold()}`}>Recommends: </span> {recomendation} 😊
           </Typography>
         </CardBody>

@@ -16,12 +16,12 @@ export function MessageCard({ img, name, message, action }) {
         />
         <div>
           <Typography
-            variant="small"
-            className={`${getTypographybold()} ${getTextColor("white3")} text-[0.8rem]`}
+            //variant="small"
+            className={`text-sm ${getTypographybold()} ${getTextColor("white3")} text-[0.8rem]`}
           >
             {name}
           </Typography>
-          <Typography className={`${getTypography()} ${getTextColor("white3")} text-[0.6rem]`}>
+          <Typography className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[0.6rem]`}>
             {message}
           </Typography>
         </div>
