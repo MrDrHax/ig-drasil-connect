@@ -71,7 +71,7 @@ useEffect(() => {
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card className={`w-full ${getBgColor("background-cards")}`}>
         <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getTypography()} ${getBgColor("search-bar")}`}>
-          <Typography variant="h6" className={`${getTextColor("white3")} ${getTypographybold()}`}>
+          <Typography variant="h6" className={`text-[1.45rem] ${getTextColor("white3")} ${getTypographybold()}`}>
             Agent Queues
           </Typography>
         </CardHeader>
@@ -86,7 +86,7 @@ useEffect(() => {
                   >
                     <Typography
                       variant="small"
-                      className={`text-[11px] ${getTypographybold()} uppercase ${getTextColor('black')}`}
+                      className={`text-[0.68rem] ${getTypographybold()} uppercase ${getTextColor('black')}`}
                     >
                       {el}
                     </Typography>
@@ -113,7 +113,7 @@ useEffect(() => {
                             <Typography
                               variant="small"
                               color="blue-gray"
-                              className={`${getTypography()} ${getTextColor('black')}`}
+                              className={`text-[0.8rem] ${getTypography()} ${getTextColor('black')}`}
                             >
                               {name}
                             </Typography>
@@ -124,7 +124,7 @@ useEffect(() => {
 
                       {/* Ongoing Calls */}
                       <td className={className}>
-                        <Typography className={`text-xs ${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[0.7rem] ${getTypography()} ${getTextColor('black')}`}>
                           {usage}
                         </Typography>
                         {/*<Typography className="text-xs font-normal text-blue-gray-500">
@@ -135,7 +135,7 @@ useEffect(() => {
                       {/* Average Wait Time */}
                       <td className={className}>
                         <Typography
-                          className={`text-xs ${getTypography()} ${averageWaitTime <= 1 ? "text-green-600" : averageWaitTime <= 2.30 ? "text-orange-600" : "text-red-600"
+                          className={`text-[0.7rem] ${getTypography()} ${averageWaitTime <= 1 ? "text-green-600" : averageWaitTime <= 2.30 ? "text-orange-600" : "text-red-600"
                             }`}
                         >
                           {averageWaitTime}
@@ -151,7 +151,7 @@ useEffect(() => {
                         <div className="w-10/12">
                           <Typography
                             variant="small"
-                            className={`mb-1 block text-xs font-medium ${getTextColor('black')}`}
+                            className={`mb-1 block text-[0.7rem] font-medium ${getTextColor('black')}`}
                           >
                             {usage / maxContacts * 100}%
                           </Typography>
@@ -197,7 +197,7 @@ useEffect(() => {
                 </div>
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                     <div>
-                        <p className={`text-sm ${getTextColor("gray")}`}>
+                        <p className={`text-[0.8rem] ${getTextColor("gray")}`}>
                             Showing <span className="font-medium">{(pagination_currentPage - 1) * pagination_itemsPerPage + 1}</span> to <span className="font-medium">{pagination_currentPage * pagination_itemsPerPage}</span> of{' '}
                             <span className="font-medium">{pagination_totalItems}</span> results
                         </p>

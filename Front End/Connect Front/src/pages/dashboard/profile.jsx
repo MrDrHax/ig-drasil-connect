@@ -77,10 +77,10 @@ export function Profile() {
                 className="rounded-lg shadow-lg shadow-blue-gray-500/40"
               />
               <div>
-                <Typography variant="h5" color="blue-gray" className={`${getTypography()} ${getTextColor("white3")} mb-1`}>
+                <Typography variant="h5" color="blue-gray" className={`text-[1.2] ${getTypography()} ${getTextColor("white3")} mb-1`}>
                   {dataToDisplay.name}
                 </Typography>
-                <Typography variant="small" className={`${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
+                <Typography variant="small" className={`text-[0.8rem] ${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
                 {/* Role List */}
                   { getRolesFromToken().includes('manager') && getRolesFromToken().includes('agent') ? 'Agent / Supervisor' : 
                   !getRolesFromToken().includes('manager') ? 'Agent' :
@@ -88,7 +88,7 @@ export function Profile() {
                 </Typography>
                 <div className="flex items-center gap-2 font-bold text-blue-gray-500">
               <Rating value={5} readonly/>
-              <Typography color="blue-gray" className={`${getTypography()} ${getTextColor("white3")} text-[10px]`}>
+              <Typography color="blue-gray" className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[10px]`}>
                 Based on 12 customer Reviews.
               </Typography>
               </div>
@@ -137,7 +137,7 @@ export function Profile() {
               }}
             />
             <div>
-              <Typography variant="small" className={`${getTypographybold()} ${getTextColor("dark")} pb-5`}>
+              <Typography variant="small" className={`text-[0.8rem] ${getTypographybold()} ${getTextColor("dark")} pb-5`}>
                   Last customer calls
                 </Typography>
                 <ul className={`flex flex-col gap-6`}>
@@ -152,7 +152,7 @@ export function Profile() {
 
             {/* Add Average Rating Over Months Chart */}
               <div>
-                <Typography variant="h6" color="blue-gray" className={`font-normal ${getTextColor("dark")}`}>
+                <Typography /*variant="h6"*/ color="blue-gray" className={`font-normal text-[1.3rem] ${getTextColor("dark")}`}>
                   Average rating over months
                 </Typography>
                 <StatisticsChart chart={statisticsChartsData[3].chart} /> {/* Pass the chart object */}
