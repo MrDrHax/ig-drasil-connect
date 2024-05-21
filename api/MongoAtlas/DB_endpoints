@@ -1,3 +1,0 @@
-import DB_connection
-
-DB_connection = DataBase.get_database()

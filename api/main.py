@@ -7,6 +7,9 @@ from AAA.loggerConfig import appendToLogger
 import logging
 import config
 
+sys.path.append('/api/AAA')
+print(sys.path)
+
 appendToLogger()
 logger = logging.getLogger(__name__)
 
@@ -21,20 +24,11 @@ try:
     from apps.summary.endpoints import router as summary_router
     from apps.actions.endpoints import router as actions_router
     from apps.extras.endpoints import router as extras_router
-    from DocumentDB.Endpoints.Info_database import router as database_router
+    from MongoAtlas.DB_endpoints import router as database_router
 
-except ImportError:
-    logger.critical("Error importing the required modules, please fun app in module mode.")
-    # Load environment variables
-    from .config import Config
-
-    # Import routers
-    from .apps.dashboard.endpoints import router as dashboard_router
-    from .apps.lists.endpoints import router as lists_router
-    from .apps.summary.endpoints import router as summary_router
-    from .apps.actions.endpoints import router as actions_router
-    from .apps.extras.endpoints import router as extras_router
-    from DocumentDB.Endpoints.Info_database import router as database_router
+except ImportError as e:
+    logger.critical("Error importing the required modules, please fun app in module mode. Error:" + e.msg)
+    sys.exit(1)
 
 logger.info("Starting the FastAPI app")
 
