@@ -1,0 +1,51 @@
+{
+    "data": null,
+    "distances": [
+        [
+            0.9785718504774991,
+            1.0008405459804592,
+            1.0251244627193474,
+            1.0900972595752334,
+            1.094304659765821
+        ]
+    ],
+    "documents": [
+        [
+            "There is a venue located at CDMX, palacio de bellas artes with ID: vcsdbjkwefuih run by ig-drasil. The venue is a concert about rock. The date is June 19 2024 at 3: 00pm.\n",
+            "There is a venue located at Monterrey, Auditorio Citibanamex with ID: mtyuhcwyurc run by musiknows. The venue is a concert about jazz. The date is June 5 2024 at 7: 30pm.\n",
+            "There is a venue located at Cuernavaca, Jardín Borda with ID: cuerztkpdwm run by arts_council. The venue is an outdoor concert featuring classical music. The date is July 22 2024 at 7: 30pm.\n",
+            "There is a venue located at San Luis Potosí, Teatro de la Paz with ID: sanlwrtqzbx run by theater_society. The venue is a theatrical play based on a famous novel. The date is July 30 2024 at 6: 30pm.\n",
+            "There is a venue located at Mexico City, Foro Sol with ID: mexqpoxckz run by music_events_mx. The venue is a music festival featuring various artists. The date is June 15 2024 at 2: 00pm.\n"
+        ]
+    ],
+    "embeddings": null,
+    "ids": [
+        [
+            "venueInfo.md_0",
+            "venueInfo.md_1",
+            "venueInfo.md_17",
+            "venueInfo.md_15",
+            "venueInfo.md_5"
+        ]
+    ],
+    "metadatas": [
+        [
+            {
+                "source": "venueInfo.md"
+            },
+            {
+                "source": "venueInfo.md"
+            },
+            {
+                "source": "venueInfo.md"
+            },
+            {
+                "source": "venueInfo.md"
+            },
+            {
+                "source": "venueInfo.md"
+            }
+        ]
+    ],
+    "uris": null
+}

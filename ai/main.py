@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
 from starlette.middleware.cors import CORSMiddleware
 import sys
 import logging
@@ -11,7 +11,14 @@ from AAA.loggerConfig import appendToLogger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from GPT.SessionManager import GPTManager
+from GPT import DocumentedResponse
 from Parser.Metrics import parseMetrics
+
+from pydantic import BaseModel
+
+class Request_BodyWithPrompt(BaseModel):
+    prompt: str
+    data: dict
 
 appendToLogger()
 logger = logging.getLogger(__name__)
@@ -92,6 +99,12 @@ try:
             response = model.prompt(f'recommendations-{agent_id}', parsed_data)
 
         return response
+    
+    @app.post("/response/{call_id}")
+    async def get_client_response(call_id: str, question: Request_BodyWithPrompt) -> str:
+        toReturn = DocumentedResponse.get_response(question.prompt, call_id, model)
+
+        return toReturn
 
     logger.info("FastAPI app started without errors")
 except Exception as e:

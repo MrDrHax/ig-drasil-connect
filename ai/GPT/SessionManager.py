@@ -4,6 +4,7 @@ from datetime import datetime
 model = GPT4All("orca-mini-3b-gguf2-q4_0.gguf", device='gpu') # device='amd', device='intel'
 
 class Session:
+    '''A session of GPT-4-All. It manages the history of the conversation and the generator. DO NOT USE THIS CLASS DIRECTLY. Use GPTManager instead.'''
     last_active: datetime
 
     def __init__(self, sys_prompt, prompt_template):
@@ -14,6 +15,7 @@ class Session:
         self.last_active = datetime.now()
 
     def sessionMan(self):
+        '''A generator function that manages the conversation and history. It yields the responses.'''
         while self.isActive:
             model._history = self.history
             model._current_prompt_template = self.template
@@ -25,11 +27,15 @@ class Session:
             yield response
 
     def prompt(self, prompt):
+        '''Ask something to the model. Returns the response.'''
+
         self.last_active = datetime.now()
         self._prompt = prompt
         return next(self.generator)
     
     def close(self):
+        '''Closes the session and deletes the generator.'''
+
         self.isActive = False
         del self.history
         self.generator.close()
@@ -38,20 +44,61 @@ class Session:
 sessions: dict[str, Session] = {}
 
 class GPTManager:
+    '''Manages the GPT sessions. All prompts should be done through this class.'''
     def __init__(self):
         pass
 
-    def create_session(self, sessionID, sys_prompt, prompt_template):
+    def create_session(self, sessionID: str, sys_prompt: str, prompt_template: str) -> None:
+        '''
+        Creates a new session. The sessionID must be unique or it will overwrite the previous session.
+        
+        :param sessionID: The unique identifier of the session. Must be unique. 
+        :type sessionID: str
+        :param sys_prompt: The system prompt for the session. It is the first step in the conversation and will give it context.
+        :type sys_prompt: str
+        :param prompt_template: The template for the prompts in the session. Will get used in every prompt and will add the prompt where {0} is present.
+        :type prompt_template: str
+        '''
+        if sessionID in sessions:
+            self.delete_session(sessionID)
+
         sessions[sessionID] = Session(sys_prompt, prompt_template)
 
-    def delete_session(self, sessionID):
+    def delete_session(self, sessionID: str) -> None:
+        """
+        Deletes a session. If a DB is implemented, the session remains in the database.
+        
+        :param sessionID: The unique identifier of the session to be deleted.
+        :type sessionID: str
+        """
+
+        # TODO add a backup to a database
+
         sessions[sessionID].close()
         del sessions[sessionID]
 
-    def get_session(self, sessionID):
+    def get_session(self, sessionID: str) -> Session:
+        """
+        Returns the session object. Use this to manage the session directly.
+        
+        :param sessionID: The unique identifier of the session to be retrieved.
+        :type sessionID: str
+        :return: The session object.
+        """
+
         return sessions[sessionID]
     
-    def prompt(self, sessionID, prompt):
+    def prompt(self, sessionID: str, prompt: str) -> str:
+        """
+        Prompts the model with a session. Returns the response. Use this to call any prompts
+        
+        :param sessionID: The unique identifier of the session to be prompted.
+        :type sessionID: str
+        :param prompt: The prompt to be sent to the model.
+        :type prompt: str
+        :return: The response from the model.
+        """
+
         if sessionID not in sessions:
             raise ValueError(f"Session {sessionID} does not exist")
 
@@ -63,6 +110,7 @@ class GPTManager:
             session.close()
     
 
+# tests
 if __name__ == "__main__":
     manager = GPTManager()
 
@@ -75,7 +123,8 @@ if __name__ == "__main__":
                            Durations are given in milliseconds.
                            Make sure the Agent NEVER interrupts the customer.
                            Talk time should be as little as possible.
-                           Your trainee's name is unknown, however, refer to it in second person, avoid saying things like 'the agent'. Try to start feedback like: 'You should...' or 'Have you tried ...'""", "### Call record:\n{0}\n\n### What can I (the agent) improve based on the last call record? Please give me feedback on what I can improve!\n")
+                           Your trainee's name is unknown, however, refer to it in second person, avoid saying things like 'the agent'. Try to start feedback like: 'You should...' or 'Have you tried ...'""", 
+                           "### Call record:\n{0}\n\n### What can I (the agent) improve based on the last call record? Please give me feedback on what I can improve!\n")
 
     print(manager.prompt("test", """AGENT: (NEUTRAL)Er.
 CUSTOMER: (NEUTRAL)Hello.
