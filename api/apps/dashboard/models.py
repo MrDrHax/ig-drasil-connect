@@ -16,16 +16,24 @@ class GenericCard(BaseModel):
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
     footer: CardFooter
 
+class ChartData(BaseModel):
+    type: str = Field("line", examples=["line", "bar"])
+    ''' The type of chart.'''
+    height: int = Field(220, examples=[300, 400])
+    ''' The height of the chart. '''
+
 class GenericGraph(BaseModel):
     title: str = Field("Queues", examples=["Queues"])
     ''' The title of the graph.'''
+    description: str = Field("Graph showing queue capacity", examples=["Graph showing queue capacity"])
+    '''The info of the graph.'''
+    footer: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
+    """The footer of the graph of when it was last updated."""
     data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
     '''The data to be displayed in the graph.'''
     labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent","Transfers", "Delivery"], ["Finance", "Support", "Sales","Transfers", "Delivery"]])
     '''The labels for the data. Will be the same length as the data list.'''
-    info: str = Field("Graph showing queue capacity", examples=["Graph showing queue capacity"])
-    '''The info of the graph.'''
-    footer_txt: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
+   
 
 class DashboardData(BaseModel):
     cards: list[GenericCard] 

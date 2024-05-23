@@ -5,6 +5,7 @@ connectEnv/
 
 .dev.env
 .env
+.pem
 venv
 
 !.vscode/launch.json

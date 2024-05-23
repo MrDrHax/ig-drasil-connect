@@ -55,3 +55,12 @@ db.createCollection("supervisor_agent", {
       }
     }
   }); 
+
+  db.createCollection("Resume-Transcrip",{
+    validator: {
+      $jsonSchema: {
+        bsonType: "object",
+        title: "Transcrip "
+      }
+    }
+  });

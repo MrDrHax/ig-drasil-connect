@@ -1,4 +1,4 @@
-import { getApiPath, addTokenToHeader } from "@/configs/api-tools";
+import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-tools";
 
 /**
  * Retrieves a list of agents from the API.
@@ -72,6 +72,23 @@ export async function AgentDetails(id) {
         id: id
     }
     */
+}
+
+export async function AgentId() {
+    let url = getApiPath() + `extras/agentID?username=${getNameFromToken()}`;
+
+    let request = new Request(url);
+
+    addTokenToHeader(request);
+
+    let response = await fetch(request);
+
+    if (!response.ok) {
+        // raise error
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+
+    return await response.json();
 }
 
 export function AgentsSummary() {
