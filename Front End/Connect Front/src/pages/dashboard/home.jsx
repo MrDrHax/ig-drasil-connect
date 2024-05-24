@@ -82,7 +82,7 @@ export function Home() {
               className: "w-6 h-6 text-white",
             })}
             footer={
-              <Typography className={`${getTypography()}  ${getTextColor('dark')}`}>
+              <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
                 <strong className={footer.color}>{footer.value}</strong>
                 &nbsp;{footer.label}
               </Typography>
@@ -98,8 +98,8 @@ export function Home() {
             {...props}
             footer={
               <Typography
-                variant="small"
-                className={`flex items-center ${getTypography()}  ${getTextColor('dark')}`}
+                //variant="small"
+                className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}
               >
                 <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
                 &nbsp;{props.footer}
@@ -119,12 +119,12 @@ export function Home() {
             className="m-0 flex items-center justify-between p-6"
           >
             <div>
-              <Typography variant="h6" color="blue-gray" className={`mb-1 ${getTypography()} ${getTextColor('dark')}`}>
+              <Typography variant="h6" color="blue-gray" className={`mb-1 text-xl ${getTypography()} ${getTextColor('dark')}`}>
                 Alerts
               </Typography>
               <Typography
-                variant="small"
-                className={`flex items-center gap-1 ${getTypography()}  text-blue-gray-600` }
+                //variant="small"
+                className={`flex items-center gap-1 text-base ${getTypography()}  text-blue-gray-600` }
               >
                 <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
                 <strong>10 alerts </strong>in this 30 minutes
@@ -160,12 +160,12 @@ export function Home() {
             color="transparent"
             className="m-0 p-6"
           >
-             <Typography variant="h6" color="blue-gray" className={`${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
+             <Typography variant="h6" color="blue-gray" className={`text-xl ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
               Recommendations
             </Typography>
             <Typography
-              variant="small"
-              className={`flex items-center gap-1 font-normal ${getTypography()} ${getTextColor("white3")}`}
+              //variant="small"
+              className={`flex items-center gap-1 font-normal text-base ${getTypography()} ${getTextColor("white3")}`}
             >
               Next, a list of recommendations for you:
             </Typography>

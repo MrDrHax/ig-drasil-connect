@@ -27,8 +27,8 @@ export function ProfileInfoCard({ title, description, details, action }) {
       <CardBody className="p-0">
         {description && (
           <Typography
-            variant="small"
-            className={`${getTypography()} ${getTextColor("white3")} text-[0.8rem] `}
+            //variant="small"
+            className={`text-sm ${getTypography()} ${getTextColor("white3")} text-[0.8rem] `}
           >
             {description}
           </Typography>
@@ -41,16 +41,16 @@ export function ProfileInfoCard({ title, description, details, action }) {
             {Object.keys(details).map((el, key) => (
               <li key={key} className="flex items-center gap-4">
                 <Typography
-                  variant="small"
+                  //variant="small"
                   color="blue-gray"
-                  className={`${getTypographybold()} ${getTextColor("white3")} text-[0.8rem] `}
+                  className={`text-sm ${getTypographybold()} ${getTextColor("white3")} text-[0.8rem] `}
                 >
                   {el}:
                 </Typography>
                 {typeof details[el] === "string" ? (
                   <Typography
-                    variant="small"
-                    className={`${getTypography()} ${getTextColor("white3")} text-[0.6rem] `}
+                    //variant="small"
+                    className={`text-sm ${getTypography()} ${getTextColor("white3")} text-[0.6rem] `}
                   >
                     {details[el]}
                   </Typography>

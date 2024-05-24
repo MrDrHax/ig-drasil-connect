@@ -29,7 +29,13 @@ class Config:
     KEYCLOAK_SECRET = os.getenv('KEYCLOAK_SECRET', '>_<')
     '''The client_secret for keycloak.'''
     INSTANCE_ID = os.getenv('INSTANCE_ID', '>_<')
+    #TODO: Revisar que la variable de entorno se cargo correctamente
+    URI_MONGODB = os.getenv('URI_MONGODB','UwU')
     '''AWS Connect instance ID.'''
+    IDENTITY_STORE_ID = os.getenv('IDENTITY_STORE_ID', '>_<')
+    '''AWS SSO Instance ID. '''
+    KEYCLOAK_URI = os.getenv('KEYCLOAK_URI', 'https://localhost:8443/')
+    '''The URI for keycloak'''
 
 
 def logConfig():

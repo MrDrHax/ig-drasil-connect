@@ -175,7 +175,7 @@ export function Teams() {
                     value="10"
                     icon={<UsersIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">10</strong>
                             &nbsp; connected
                         </Typography>
@@ -191,7 +191,7 @@ export function Teams() {
                     value="30%"
                     icon={<CogIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">3/5</strong>
                             &nbsp; agents on call
                         </Typography>
@@ -201,7 +201,7 @@ export function Teams() {
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
                     <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
-                        <Typography variant="h6" color="white" className={`flex-none ${getTypography()}`}>
+                        <Typography variant="h6" color="white" className={`text-[1.54rem] flex-none ${getTypography()}`}>
                             Agents
                         </Typography>
 
@@ -249,7 +249,7 @@ export function Teams() {
                                         >
                                             <Typography
                                                 variant="small"
-                                                className={`text-[11px] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
+                                                className={`text-[0.6rem] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
                                             >
                                                 {el}
                                             </Typography>
@@ -273,7 +273,7 @@ export function Teams() {
                                                 <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                     <Typography
                                                         variant="small"
-                                                        className={`text-[1em] ${getTypographybold()} ${getTextColor('dark')}`}
+                                                        className={`text-[0.8em] ${getTypographybold()} ${getTextColor('dark')}`}
                                                     >
                                                         List is empty
                                                     </Typography>
@@ -295,7 +295,7 @@ export function Teams() {
                                                                     <div>
                                                                         <Typography
                                                                             variant="small"
-                                                                            className={`${getTypographybold()} ${getTextColor('dark')}`}
+                                                                            className={`text-[0.7rem]${getTypographybold()} ${getTextColor('dark')}`}
                                                                         >
                                                                             {name}
                                                                         </Typography>
@@ -312,7 +312,7 @@ export function Teams() {
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
-                                                                    className={`py-0.5 px-2 text-[11px] font-medium w-fit ${getTypographybold()}`}
+                                                                    className={`py-0.5 px-2 text-[0.8rem] font-medium w-fit ${getTypographybold()}`}
                                                                 />
                                                             </td>
                                                             <td className={className}>
