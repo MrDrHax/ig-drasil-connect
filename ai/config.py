@@ -13,12 +13,14 @@ else:
 
 # if you want to add a config variable, add it here!!!
 class Config:
-    PORT = os.getenv('PORT', 8080)
+    PORT = os.getenv('PORT', 8081)
     '''The port the server will run on.'''
     HOST = os.getenv('HOST', 'localhost')
     '''The host the server will run on.'''
     DEBUG = os.getenv('DEBUG', False)
     '''is the server running in debug mode?'''
+    DEVICE = os.getenv('DEVICE', 'cpu')
+    '''What device should the model run on? gpu/cpu (can be amd, intel or cuda for specific gpu)'''
 
 def logConfig():
     config = "Configuration:\n"

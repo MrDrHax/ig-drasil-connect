@@ -1,7 +1,9 @@
 from gpt4all import GPT4All
 from datetime import datetime
 
-model = GPT4All("orca-mini-3b-gguf2-q4_0.gguf", device='gpu') # device='amd', device='intel'
+from config import Config
+
+model = GPT4All("orca-mini-3b-gguf2-q4_0.gguf", device=Config.DEVICE) # device='amd', device='intel'
 
 class Session:
     '''A session of GPT-4-All. It manages the history of the conversation and the generator. DO NOT USE THIS CLASS DIRECTLY. Use GPTManager instead.'''
