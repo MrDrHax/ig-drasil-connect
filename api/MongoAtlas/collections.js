@@ -1,30 +1,40 @@
-db.createCollection("agent_notes", {
-    validator: {
-        $jsonSchema: {
-            bsonType: "object",
-            title: "Agent Notes",
-            required: ["_id", "date", "id_agent", "notes", "created_at", "updated_at"],
-            properties: {
-                _id: { bsonType: "objectId" },
-                date: { bsonType: "date" },
-                id_agent: { bsonType: "string" },
-                notes: {
-                    bsonType: "array",
-                    items: {
-                        bsonType: "object",
-                        required: ["message", "timestamp"],
-                        properties: {
-                            message: { bsonType: "string" },
-                            timestamp: { bsonType: "date" }
-                        }
-                    }
-                },
-                created_at: { bsonType: "date" },
-                updated_at: { bsonType: "date" }
-            }
-        }
-    }
+db.createCollection("notes", {
+  validator: {
+      $jsonSchema: {
+          bsonType: "object",
+          title: "notes",
+          required: ["_id", "date", "id_creator", "creator_type", "notes", "created_at", "updated_at"],
+          properties: {
+              _id: { bsonType: "objectId" },
+              date: { bsonType: "date" },
+              id_creator: { bsonType: "string" }, // ID of the agent or supervisor creating the note
+              creator_type: { 
+                  enum: ["agent", "supervisor"], // Type of the creator: agent or supervisor
+                  description: "Type of the creator - either agent or supervisor"
+              },
+              notes: {
+                  bsonType: "array",
+                  items: {
+                      bsonType: "object",
+                      required: ["message", "timestamp", "created_by"],
+                      properties: {
+                          message: { bsonType: "string" },
+                          timestamp: { bsonType: "date" },
+                          created_by: {
+                              bsonType: "string",
+                              enum: ["agent", "supervisor"],
+                              description: "Indicates if the note was created by an agent or a supervisor"
+                          }
+                      }
+                  }
+              },
+              created_at: { bsonType: "date" },
+              updated_at: { bsonType: "date" }
+          }
+      }
+  }
 });
+
 
 
 db.createCollection("supervisor_agent", {
