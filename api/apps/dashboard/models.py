@@ -24,23 +24,19 @@ class SeriesData(BaseModel):
 
 class XAxisData(BaseModel):
     categories: list[str] = Field([], examples=[["sales","delivery"], ["transfers", "agents", "queue"]])
-    ''' The categories to be displayed on the x-axis. '''
+    ''' The categories to be displayed on the x-axis. Has to be of the same length as the lenght of the series. '''
 
-
-class ColorData(BaseModel):
-    color: str = Field("indigo", examples=["indigo", "gray", "green"])
-    ''' The color of the chart. '''
+class GraphOptions(BaseModel):
+    colors: list[str] = Field(["#3b82f6"], examples=[["#3b82f6"], ["#3b82f6", "#f87171"], ["#f87171", "#3b82f6"]])
+    ''' The color of the series in RGB format. Has to be of the same length as the number of series. '''
     xaxis: XAxisData
-
 
 class ChartData(BaseModel):
     type: str = Field("line", examples=["line", "bar"])
     ''' The type of chart.'''
-    height: int = Field(220, examples=[300, 400])
-    ''' The height of the chart. '''
     series: list[SeriesData]
     ''' The series to be displayed in the chart. '''
-    options: ColorData
+    options: GraphOptions
     ''' The options to be displayed in the chart. '''
 
 class GenericGraph(BaseModel):
@@ -50,17 +46,18 @@ class GenericGraph(BaseModel):
     '''The info of the graph.'''
     footer: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
     """The footer of the graph of when it was last updated."""
-    data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
-    '''The data to be displayed in the graph.'''
-    labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent","Transfers", "Delivery"], ["Finance", "Support", "Sales","Transfers", "Delivery"]])
-    '''The labels for the data. Will be the same length as the data list.'''
     chart: ChartData
     '''The chart to be displayed in the graph. '''
    
-
 class DashboardData(BaseModel):
     cards: list[GenericCard] 
     graphs: list[GenericGraph]
+
+'''
+PREVIOUS EXAMPLES DISCONNECTED FROM THE FRONTEND
+
+IGNORE THIS SECTION
+'''
 
 class ConnectedUsers(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
