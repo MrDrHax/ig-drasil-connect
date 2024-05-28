@@ -1,0 +1,115 @@
+diff --git a/api/MongoAtlas/DB_connection.py b/api/MongoAtlas/DB_connection.py
+index 92b60e0..379cccb 100644
+--- a/api/MongoAtlas/DB_connection.py
++++ b/api/MongoAtlas/DB_connection.py
+@@ -1,8 +1,8 @@
+ from pymongo import MongoClient
+ from pymongo.errors import ConnectionFailure
+-from config import Config
++#from config import Config
+ 
+-#uri = 'mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest'
++uri = 'mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest'
+ 
+ """
+ Singleton pattern 
+@@ -16,7 +16,7 @@ class DataBase:
+             raise Exception("This class is a singleton!")
+         try:
+             #TODO Pasar el uri a .env, por lo que hay que crear una nueva
+-            self.client = MongoClient(Config.URI_MONGODB, tls=True, tlsAllowInvalidCertificates=True) 
++            self.client = MongoClient(uri, tls=True, tlsAllowInvalidCertificates=True) 
+             self.db = self.client["IGDrasilTest"]  # OJO: cambiarlo por el nombre de la base de datos (creo David la tiene)
+         except ConnectionFailure as e:
+             print(f"Error connecting to MongoDB: {e}")
+diff --git a/api/MongoAtlas/DB_endpoints.py b/api/MongoAtlas/DB_endpoints.py
+index fd6c20d..2f2d0e2 100644
+--- a/api/MongoAtlas/DB_endpoints.py
++++ b/api/MongoAtlas/DB_endpoints.py
+@@ -1,9 +1,9 @@
+ import boto3
+ from typing import List
+ from fastapi import APIRouter, Depends, HTTPException
+-from config import Config
+-from MongoAtlas.DB_connection import DataBase
+-from . import models
++#from config import Config
++from DB_connection import DataBase
++from models import ChatMessageBody, ChatMessage, CreateNoteRequest
+ 
+ from typing import Annotated
+ from AAA.requireToken import requireToken
+@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
+ db_instance = DataBase.get_instance()
+ db = db_instance.get_database()
+ 
++INSTANCEID = "dGhpc2lz-b2Zh-0YXV-W5le-zYW5leGFtc"
++BASE64AUTH = "dGhpc2lzYW5leGFtcGxlb2ZhYmFzZTY0YXV0aGVudGljYXRpb24="
++
++
+ router = APIRouter(
+     prefix="/MongoAtlas",
+     tags=["actions"],
+@@ -44,7 +48,7 @@ async def get_contact_lens():
+     """
+     client = boto3.client('connect')
+     response = client.list_realtime_contact_analysis(
+-        InstanceId = Config.INSTANCEID,
++        InstanceId = INSTANCEID,
+         ContactId = 'e6f4e310-d413-440f-8b94-1f967dfce418'
+     )
+     col = db['Test1']
+@@ -54,7 +58,7 @@ async def get_contact_lens():
+ #Chat endpoints
+ 
+ @router.get('/get_chat_by_id', tags=["DB"])
+-async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id: str) -> List[models.ChatMessageBody]:
++async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id: str) -> List[ChatMessageBody]:
+     """
+     Returns all chats from a specific agent ID.
+     """
+@@ -68,7 +72,7 @@ async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id:
+ 
+         for index, message in enumerate(chat['messages']):
+             # Decode the base64-encoded string
+-            chat['messages'][index]['content'] = b64decode(message['content']).decode('utf-8').split(Config.BASE64AUTH)[0]
++            chat['messages'][index]['content'] = b64decode(message['content']).decode('utf-8').split(BASE64AUTH)[0]
+             # Convert the timestamp to local timezone
+             chat['messages'][index]['timestamp'] = message['timestamp'].replace(tzinfo=timezone.utc).astimezone(tz=None)
+ 
+@@ -79,7 +83,7 @@ async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id:
+         return []
+ 
+ @router.get('/get_chat', tags=["DB"])
+-async def get_chat(token: Annotated[str, Depends(requireToken)]) -> List[models.ChatMessage]:
++async def get_chat(token: Annotated[str, Depends(requireToken)]) -> List[ChatMessage]:
+     """
+     Returns a list of all chats.
+     """    
+@@ -97,7 +101,7 @@ async def post_chat(token: Annotated[str, Depends(requireToken)], message: str,
+     if not userType.isManager(token) and not userType.isAgent(token):
+         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager or an agent to access this resource.")
+     
+-    salted_message = message + Config.BASE64AUTH + agent_id
++    salted_message = message + BASE64AUTH + agent_id
+     encoded_message = b64encode(salted_message.encode('utf-8'))
+     #logger.info(b64decode(encoded_message).decode('utf-8'))
+     db['chats'].update_one({"agent_id": agent_id}, {"$push": {"messages": {"content": encoded_message, "supervisor_sender": supervisor, "timestamp": datetime.now(tz=timezone.utc)}}}, upsert=True)
+@@ -107,7 +111,7 @@ async def post_chat(token: Annotated[str, Depends(requireToken)], message: str,
+ 
+ # Notes Endpoints
+ @router.post("/new_note", tags=["DB"])
+-async def new_note(request: models.CreateNoteRequest, token: str = Depends(requireToken)):
++async def new_note(request: CreateNoteRequest, token: str = Depends(requireToken)):
+     """
+     Create a new note.
+     """
+@@ -117,7 +121,7 @@ async def new_note(request: models.CreateNoteRequest, token: str = Depends(requi
+     try:
+         notes = []
+         for note in request.notes:
+-            salted_message = note.message + Config.BASE64AUTH + request.id_creator
++            salted_message = note.message + BASE64AUTH + request.id_creator
+             encoded_message = b64encode(salted_message.encode('utf-8'))
+             note_data = {
+                 "message": encoded_message,
