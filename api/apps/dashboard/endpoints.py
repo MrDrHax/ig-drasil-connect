@@ -42,10 +42,13 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
-        await get_unfinished_calls_graph(token),
-        await get_average_call_rating_graph(token),
-        await get_queues_graph(token)
+        await graph_example()
     ]
+    '''    
+    await get_unfinished_calls_graph(token),
+    await get_average_call_rating_graph(token),
+    await get_queues_graph(token)
+    '''
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
 
@@ -129,16 +132,48 @@ async def get_queues_graph(token: Annotated[str, Depends(requireToken)]) -> mode
 
     return models.GenericGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent","Transfers", "Delivery"], description="Graph showing queue capacity", footer="Updated 2 min ago")
 
-# @router.get("/queue_supervisors", tags=["data"])
-# async def get_queue_supervisors() -> List[models.QueueSupervisor]:
-#     '''
-#     Returns the queue supervisors.
-#     '''
-#     return [
-#         models.QueueSupervisor(id=1, name="Supervisor 1", calls=10, status="online", usage=10.0),
-#         models.QueueSupervisor(id=2, name="Supervisor 2", calls=20, status="offline", usage=20.0),
-#         models.QueueSupervisor(id=3, name="Supervisor 3", calls=30, status="online", usage=30.0)
-#     ]
+@router.get("/graph_example", tags=["data"])
+async def graph_example() -> models.GenericGraph:
+    '''
+    Returns an example of a generic graph.
+    '''
+
+    series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
+
+    xaxis_example = models.XAxisData(
+        categories=["Jan", "Feb", "March", "Apr", "May"]
+    )
+
+    example_options = models.GraphOptions(
+        colors=["#3b82f6", "#f87171"],
+        xaxis=xaxis_example
+    )
+
+    example_chart = models.ChartData(
+        type="line",
+        series= series_example,
+        options=example_options
+    )
+
+    example_graph = models.GenericGraph(
+        title="Example Graph",
+        description="Graph showing number of calls per month",
+        footer="Updated 1st of June",
+        chart = example_chart
+    )
+
+    return example_graph
+
+@router.get("/queue_supervisors", tags=["data"])
+async def get_queue_supervisors() -> List[models.QueueSupervisor]:
+    '''
+    Returns the queue supervisors.
+    '''
+    return [
+        models.QueueSupervisor(id=1, name="Supervisor 1", calls=10, status="online", usage=10.0),
+        models.QueueSupervisor(id=2, name="Supervisor 2", calls=20, status="offline", usage=20.0),
+        models.QueueSupervisor(id=3, name="Supervisor 3", calls=30, status="online", usage=30.0)
+    ]
 
 # @router.get("/agent_visualisation", tags=["data"])
 # async def get_agent_visualisation() -> List[models.AgentVisualisation]:

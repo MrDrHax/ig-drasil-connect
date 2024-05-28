@@ -25,7 +25,10 @@ class LazySquirrel:
         if isinstance(value, int):
             self.operations.append(lambda x: [item for item in x if value == item[key]])
         elif isinstance(value, str):
-            self.operations.append(lambda x: [item for item in x if str(value) in str(item[key])])
+            self.operations.append(
+                lambda x: [item for item in x if str(value).lower() in str(item[key]).lower()]
+                )
+            
         elif isinstance(value, list):
             self.operations.append(lambda x: [item for item in x if item[key] in value])
         else:

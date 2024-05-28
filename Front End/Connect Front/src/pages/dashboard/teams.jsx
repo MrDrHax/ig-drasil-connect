@@ -10,6 +10,7 @@ import {
     Progress,
     Alert,
     Button,
+    Checkbox
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
@@ -53,6 +54,8 @@ export function Teams() {
     const [dataToDisplay, setData] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery_status, setSearchQuery_status] = useState('');
+    const [helpFilter, setHelpFilter] = useState(false);
 
     // pagination vars
     const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
@@ -64,10 +67,19 @@ export function Teams() {
     // let dataToDisplay = searchQuery ? filteredAgents : data;
 
     function handleSearch(event) {
-        let query = event.target.value.toLowerCase();
-        setSearchQuery(query);
+        setSearchQuery(event.target.value.toLowerCase());
         // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
         // setFilteredAgents(filtered);
+    }
+
+    function handleSearchStatus(event) {
+        setSearchQuery_status(event.target.value.toLowerCase());
+        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
+        // setFilteredAgents(filtered);
+    }
+
+    function handleHelpFilter(event) {
+        setHelpFilter(event.target.checked);
     }
 
     const { showAlertWithMessage } = useAlert();
@@ -84,12 +96,21 @@ export function Teams() {
     }
 
     function updateData(page = 1) {
-        let query = searchQuery ? "name=" + searchQuery : null;
+        // search by name
+        let search = searchQuery ? `name=${searchQuery}` : '';
+
+        // search by status
+        if (searchQuery_status) {
+            search += search ? `,status=${searchQuery_status}` : `status=${searchQuery_status}`;
+        }
+        if (helpFilter) {
+            search += search ? `,requireHelp=false` : `requireHelp=true`;
+        }
         let skip = (page - 1) * 10;
 
         setIsLoaded(false);
 
-        AgentList(skip, 10, query, "name", "asc").then((data) => {
+        AgentList(skip, 10, search, "name", "asc").then((data) => {
             const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
             const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -112,7 +133,7 @@ export function Teams() {
 
     useEffect(() => {
         updateData();
-    }, [searchQuery]);
+    }, [searchQuery, searchQuery_status, helpFilter]);
 
     // var theThingToDo = {
     //     type: "pie",
@@ -187,12 +208,32 @@ export function Teams() {
                         <div className="flex-grow"></div>
 
                         <div className="mr-auto md:mr-4 md:w-56">
-                            {/* Search bar */}
+                            {/* Search bar by name*/}
                             <Input
                                 color="white"
                                 label="Search by name"
                                 value={searchQuery}
                                 onChange={handleSearch}
+                            />
+                        </div>
+
+                        <div className="mr-auto md:mr-4 md:w-56">
+                            {/* Search bar by status*/}
+                            <Input
+                                color="white"
+                                label="Search by status"
+                                value={searchQuery_status}
+                                onChange={handleSearchStatus}
+                            />
+                        </div>
+                        <div className="mr-auto md:mr-4 md:w-56">
+                            <Checkbox
+                                color="white"
+                                label="Needs Help"
+                                labelProps={{ className: "text-white" }}
+                                checked={helpFilter}
+                                onChange={handleHelpFilter}
+                                
                             />
                         </div>
                     </CardHeader>

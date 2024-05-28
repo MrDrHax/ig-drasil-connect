@@ -16,10 +16,7 @@ import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { RecomendationCard } from "@/widgets/cards";
 import {
-  statisticsCardsData,
   statisticsChartsData,
-  projectsTableData,
-  ordersOverviewData,
 } from "@/data";
 import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
@@ -27,6 +24,7 @@ import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,
 
 import React, { useState, useEffect } from 'react';
 import { SupervisorHomeData } from "@/data/supervisor-home-data";
+import { chartsConfig } from "@/configs";
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
@@ -91,9 +89,10 @@ export function Home() {
         ))}
       </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        { //dataToDisplay.graphs.map((props) => (
-          statisticsChartsData.map((props) => (
+        { graphs.map((props) => (
+          //statisticsChartsData.map((props) => (
           <StatisticsChart
+            {...chartsConfig}
             key={props.title}
             {...props}
             footer={

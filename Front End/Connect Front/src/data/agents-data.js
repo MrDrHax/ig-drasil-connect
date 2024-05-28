@@ -12,18 +12,19 @@ import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-to
  * @throws {Error} If the API request fails.
  */
 export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
-    let url = getApiPath() + `lists/agents?skip=${skip}&limit=${limit}&sortByDat=${sortbydat}&sortBy=${sortby}`;
+    let url = new URL(getApiPath() + 'lists/agents');
 
-    // fill in the query
-    let query = ""
+    console.log("seatch: " + search);
 
-    if (search) {
-        query += search;
-    }
+    let params = {
+        skip: skip,
+        limit: limit,
+        sortByDat: sortbydat,
+        sortBy: sortby,
+        q: search
+    };
 
-    if (query) {
-        url += `&q=${query}`;
-    }
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
     let request = new Request(url);
 
