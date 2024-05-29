@@ -8,6 +8,8 @@ import AAA.userType as userType
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta
 
+import random
+
 import boto3
 from config import Config
 
@@ -66,7 +68,7 @@ async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> m
     
     footer_info = models.CardFooter(color="text-green-500", value="+32", label="than today's average")
 
-    return models.GenericCard(id=1, title="Connected users", value="80", icon=Icons, color="red", footer=footer_info)
+    return models.GenericCard(id=1, title="Connected users", value="80", icon="Book", color="red", footer=footer_info)
     
 @router.get("/capacity", tags=["cards"])
 async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -102,7 +104,7 @@ async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> 
     
     footer_info = models.CardFooter(color="text-green-500", value="4", label="Online")
     
-    return models.GenericCard(id=1, title="Connected agents", value="10", icon=Icons, color="gray", footer=footer_info)
+    return models.GenericCard(id=1, title="Connected agents", value="10", icon="Star", color="gray", footer=footer_info)
 
 @router.get("/graph/unfinished_calls", tags=["graph"])
 async def get_unfinished_calls_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
@@ -694,6 +696,7 @@ async def get_not_connected_users_data():
 @router.get("/average-call-time-duration")
 async def get_average_call_time_duration():
     
+    routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
     
     response = client.get_metric_data_v2(
@@ -707,7 +710,7 @@ async def get_average_call_time_duration():
         Filters = [
             {
             'FilterKey': 'ROUTING_PROFILE',
-            'FilterValues' : ['2ad7ae92-03eb-4517-bc90-c2e10609503d'],  
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
             } 
         ],
         
@@ -731,6 +734,8 @@ async def get_avg_contact_duration()-> models.GenericGraph:
     ''' 
         
     client = boto3.client('connect')
+
+    routing_profile_list = await routing_profiles()
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -743,7 +748,8 @@ async def get_avg_contact_duration()-> models.GenericGraph:
         Filters = [
             {
             'FilterKey': 'ROUTING_PROFILE',
-            'FilterValues' : ['2ad7ae92-03eb-4517-bc90-c2e10609503d'],  
+            # Here we need to pass a list of routing profiles that we get from another endpoint
+            'FilterValues' : [i['Id'] for i in routing_profile_list],
             } 
         ],
         
@@ -756,30 +762,44 @@ async def get_avg_contact_duration()-> models.GenericGraph:
     
     )
 
-    data = response['MetricResults'][0]['Collections']  
-    
-    series_example = [models.SeriesData(name="2ad7ae92-03eb-4517-bc90-c2e10609503d", data=data)]
+    #We need to get the timestamps for the x axis
+    timestamps = []
 
+    #We need to get the data for the y axis points
+    data = []
+
+    for j in range(len(response['MetricResults'])):
+        # Save the timestamps in a list
+        timestamps.append(response['MetricResults'][j]['MetricInterval']['StartTime'].strftime('%Y-%m-%d'))
+        # Save the data in a list when the name is AVG_CONTACT_DURATION
+        data.append(response['MetricResults'][j]['Collections'][0]['Value']) 
+
+    # Create the graph points
+    series_example = [models.SeriesData(name=response['MetricResults'][0]['Collections'][0]['Metric']['Name'], data=data)]
+
+    # Create the x axis labels
     xaxis_example = models.XAxisData(
-        categories=["Day 1", "Day 2"]
+        categories=timestamps
     )
 
+    # Create the graph options
     example_options = models.GraphOptions(
-        colors=["#ff0000"],
         xaxis=xaxis_example
     )
 
+    # Create the graph type
     example_chart = models.ChartData(
         type="line",
         series= series_example,
         options=example_options
     )
 
+    # Create the graph
     example_graph = models.GenericGraph(
         title="Average Contact Duration",
-        description="Graph showing average contact duration per day",
-        footer="Updated " + str(datetime.today()),
+        description="Graph showing average contact duration per day in seconds",
+        footer="Updated " + datetime.today().strftime('%Y-%m-%d'),
         chart = example_chart
     )
-    
+
     return example_graph

@@ -19,7 +19,7 @@ class GenericCard(BaseModel):
 class SeriesData(BaseModel):
     name: str = Field("Series 1", examples=["Series 1", "Series 2", "Series 3"])
     ''' The name of the series on the chart. '''
-    data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
+    data: list[float] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
     ''' The data to be displayed in the series. '''
 
 class XAxisData(BaseModel):
@@ -27,9 +27,8 @@ class XAxisData(BaseModel):
     ''' The categories to be displayed on the x-axis. Has to be of the same length as the lenght of the series. '''
 
 class GraphOptions(BaseModel):
-    colors: list[str] = Field(["#3b82f6"], examples=[["#3b82f6"], ["#3b82f6", "#f87171"], ["#f87171", "#3b82f6"]])
-    ''' The color of the series in RGB format. Has to be of the same length as the number of series. '''
     xaxis: XAxisData
+    ''' The x-axis to be displayed in the chart. '''
 
 class ChartData(BaseModel):
     type: str = Field("line", examples=["line", "bar"])

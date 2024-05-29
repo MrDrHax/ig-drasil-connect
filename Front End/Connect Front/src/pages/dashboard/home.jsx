@@ -15,16 +15,12 @@ import {
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { RecomendationCard } from "@/widgets/cards";
-import {
-  statisticsChartsData,
-} from "@/data";
 import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 import React, { useState, useEffect } from 'react';
 import { SupervisorHomeData } from "@/data/supervisor-home-data";
-import { chartsConfig } from "@/configs";
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
@@ -92,7 +88,6 @@ export function Home() {
         { graphs.map((props) => (
           //statisticsChartsData.map((props) => (
           <StatisticsChart
-            {...chartsConfig}
             key={props.title}
             {...props}
             footer={
