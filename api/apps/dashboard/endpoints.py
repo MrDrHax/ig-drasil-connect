@@ -6,6 +6,7 @@ from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
 from cache.cache_object import cachedData
+from datetime import datetime , timedelta
 
 import boto3
 from config import Config
@@ -42,7 +43,8 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
-        await graph_example()
+        await graph_example(),
+        await get_avg_contact_duration()
     ]
     '''    
     await get_unfinished_calls_graph(token),
@@ -531,7 +533,6 @@ async def describe_user(user_id:str):
 #     )
 #     return response['User']
 
-from datetime import datetime 
 
 @router.get("/metric-data")
 async def metric_data(queue_id:str):
@@ -690,36 +691,95 @@ async def get_not_connected_users_data():
 
     return userList
 
-@router.get("/contacts-abandonded-metric-data")
-async def contacts_abandonded_metric_data(queue_id:str):
-
+@router.get("/average-call-time-duration")
+async def get_average_call_time_duration():
+    
     client = boto3.client('connect')
-    response = client.get_metric_data(
-        InstanceId=Config.INSTANCE_ID,
-        StartTime=datetime(2024, 5, 25),
-        EndTime=datetime(2024, 5, 26),
-        Filters={
-            'Queues': [
-                queue_id
-                ]
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
         },
-        Groupings=[
-            'QUEUE'
-        ],
-        HistoricalMetrics=[
+        Filters = [
             {
-                'Name': 'CONTACTS_ABANDONED',
-            # 'Threshold': {
-            #     'Comparison': 'LT',
-            #     'ThresholdValue': 123.0
-            # },
-                'Statistic': 'SUM',
-                'Unit': 'COUNT'
-            },
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : ['2ad7ae92-03eb-4517-bc90-c2e10609503d'],  
+            } 
+        ],
+        
+        Metrics = [
+            {
+                'Name': 'AVG_CONTACT_DURATION',
+            }
         ]
+        
+    
     )
-
-    print(datetime())
 
     return response['MetricResults']
 
+@router.get("/graph/get-avg-contact-duration")
+async def get_avg_contact_duration()-> models.GenericGraph:
+    
+    '''
+    Returns the average contact duration.
+    
+    ''' 
+        
+    client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : ['2ad7ae92-03eb-4517-bc90-c2e10609503d'],  
+            } 
+        ],
+        
+        Metrics = [
+            {
+                'Name': 'AVG_CONTACT_DURATION',
+            }
+        ]
+        
+    
+    )
+
+    data = response['MetricResults'][0]['Collections']  
+    
+    series_example = [models.SeriesData(name="2ad7ae92-03eb-4517-bc90-c2e10609503d", data=data)]
+
+    xaxis_example = models.XAxisData(
+        categories=["Day 1", "Day 2"]
+    )
+
+    example_options = models.GraphOptions(
+        colors=["#ff0000"],
+        xaxis=xaxis_example
+    )
+
+    example_chart = models.ChartData(
+        type="line",
+        series= series_example,
+        options=example_options
+    )
+
+    example_graph = models.GenericGraph(
+        title="Average Contact Duration",
+        description="Graph showing average contact duration per day",
+        footer="Updated " + str(datetime.today()),
+        chart = example_chart
+    )
+    
+    return example_graph
