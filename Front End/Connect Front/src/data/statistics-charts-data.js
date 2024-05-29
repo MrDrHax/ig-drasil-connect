@@ -25,6 +25,7 @@ const websiteViewsChart = {
       labels: {
         style: {
           fontSize: "12px",
+          colors: "#777777",
         },
       }
     },

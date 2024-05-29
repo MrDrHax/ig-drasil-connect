@@ -3,28 +3,60 @@ from pydantic import BaseModel, Field
 import logging
 logger = logging.getLogger(__name__)
 
+class CardFooter(BaseModel):
+    color: str = Field("text-green-500", examples=["text-green-500", "text-gray-500", "text-red-500"])
+    value: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
+    label: str = Field("minutes ago", examples=["minutes ago", "hours ago", "days ago"])
+
 class GenericCard(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
-    name: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
-    data: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
+    title: str = Field("Card name", examples=["Card 1", "Card 2", "Card 3"])
+    value: str = Field("0.0", examples=['10.0', '20.0', '30.0'])
     icon: str = Field("Arrow", examples=["arrow"], description="The icon that will get added")
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
-    footer: str = Field("Card description", examples=["Card 1 description", "Card 2 description", "Card 3 description"])
+    footer: CardFooter
+
+class SeriesData(BaseModel):
+    name: str = Field("Series 1", examples=["Series 1", "Series 2", "Series 3"])
+    ''' The name of the series on the chart. '''
+    data: list[float] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
+    ''' The data to be displayed in the series. '''
+
+class XAxisData(BaseModel):
+    categories: list[str] = Field([], examples=[["sales","delivery"], ["transfers", "agents", "queue"]])
+    ''' The categories to be displayed on the x-axis. Has to be of the same length as the lenght of the series. '''
+
+class GraphOptions(BaseModel):
+    xaxis: XAxisData
+    ''' The x-axis to be displayed in the chart. '''
+
+class ChartData(BaseModel):
+    type: str = Field("line", examples=["line", "bar"])
+    ''' The type of chart.'''
+    series: list[SeriesData]
+    ''' The series to be displayed in the chart. '''
+    options: GraphOptions
+    ''' The options to be displayed in the chart. '''
 
 class GenericGraph(BaseModel):
     title: str = Field("Queues", examples=["Queues"])
     ''' The title of the graph.'''
-    data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
-    '''The data to be displayed in the graph.'''
-    labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent","Transfers", "Delivery"], ["Finance", "Support", "Sales","Transfers", "Delivery"]])
-    '''The labels for the data. Will be the same length as the data list.'''
-    info: str = Field("Graph showing queue capacity", examples=["Graph showing queue capacity"])
+    description: str = Field("Graph showing queue capacity", examples=["Graph showing queue capacity"])
     '''The info of the graph.'''
-    footer_txt: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
-
+    footer: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
+    """The footer of the graph of when it was last updated."""
+    chart: ChartData
+    '''The chart to be displayed in the graph. '''
+   
 class DashboardData(BaseModel):
     cards: list[GenericCard] 
     graphs: list[GenericGraph]
+
+'''
+PREVIOUS EXAMPLES DISCONNECTED FROM THE FRONTEND
+
+IGNORE THIS SECTION
+'''
 
 class ConnectedUsers(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])

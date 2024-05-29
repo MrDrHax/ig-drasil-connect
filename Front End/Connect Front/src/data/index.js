@@ -9,4 +9,4 @@ export * from "@/data/authors-table-data";
 export * from "@/data/agents-data";
 export * from "@/data/agent-queue";
 export * from "@/data/chat-data";
-
+export {SupervisorHomeData} from "@/data/supervisor-home-data";

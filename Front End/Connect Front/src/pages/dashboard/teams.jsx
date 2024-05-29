@@ -4,12 +4,9 @@ import {
     CardBody,
     Typography,
     Input,
-    Avatar,
     Chip,
-    Tooltip,
-    Progress,
-    Alert,
     Button,
+    Checkbox
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
@@ -18,8 +15,8 @@ import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
-import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
+import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
 
 import { useAlert } from "@/context/alerts";
@@ -29,15 +26,15 @@ import { Sidenav } from "@/widgets/layout";
 
 function getColorOfStatus(status) {
     switch (status) {
-        case "connected":
+        case "Available":
             return "green";
-        case "disconnected":
-            return "gray";
-        case "on-call":
+        case "Training":
             return "blue";
-        case "busy":
+        case "On break":
+            return "yellow";
+        case "Busy":
             return "orange";
-        case "on-break":
+        case "Needs Assistance":
             return "red";
         default:
             return "gray";
@@ -47,11 +44,13 @@ function getColorOfStatus(status) {
 
 export function Teams() {
     const [controller, dispatch] = useMaterialTailwindController();
-    const { navColor, fixedNavbar, openSidenav, theme } = controller;
+    const { navColor} = controller;
 
     const [dataToDisplay, setData] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery_status, setSearchQuery_status] = useState('');
+    const [helpFilter, setHelpFilter] = useState(false);
 
     // pagination vars
     const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
@@ -63,10 +62,19 @@ export function Teams() {
     // let dataToDisplay = searchQuery ? filteredAgents : data;
 
     function handleSearch(event) {
-        let query = event.target.value.toLowerCase();
-        setSearchQuery(query);
+        setSearchQuery(event.target.value.toLowerCase());
         // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
         // setFilteredAgents(filtered);
+    }
+
+    function handleSearchStatus(event) {
+        setSearchQuery_status(event.target.value.toLowerCase());
+        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
+        // setFilteredAgents(filtered);
+    }
+
+    function handleHelpFilter(event) {
+        setHelpFilter(event.target.checked);
     }
 
     const { showAlertWithMessage } = useAlert();
@@ -83,12 +91,21 @@ export function Teams() {
     }
 
     function updateData(page = 1) {
-        let query = searchQuery ? "name=" + searchQuery : null;
+        // search by name
+        let search = searchQuery ? `name=${searchQuery}` : '';
+
+        // search by status
+        if (searchQuery_status) {
+            search += search ? `,status=${searchQuery_status}` : `status=${searchQuery_status}`;
+        }
+        if (helpFilter) {
+            search += search ? `,requireHelp=false` : `requireHelp=true`;
+        }
         let skip = (page - 1) * 10;
 
         setIsLoaded(false);
 
-        AgentList(skip, 10, query, "name", "asc").then((data) => {
+        AgentList(skip, 10, search, "name", "asc").then((data) => {
             const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
             const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -111,7 +128,7 @@ export function Teams() {
 
     useEffect(() => {
         updateData();
-    }, [searchQuery]);
+    }, [searchQuery, searchQuery_status, helpFilter]);
 
     // var theThingToDo = {
     //     type: "pie",
@@ -153,7 +170,7 @@ export function Teams() {
                     value="10"
                     icon={<UsersIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">10</strong>
                             &nbsp; connected
                         </Typography>
@@ -169,7 +186,7 @@ export function Teams() {
                     value="30%"
                     icon={<CogIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">3/5</strong>
                             &nbsp; agents on call
                         </Typography>
@@ -179,19 +196,39 @@ export function Teams() {
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
                     <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
-                        <Typography variant="h6" color="white" className={`flex-none ${getTypography()}`}>
+                        <Typography variant="h6" color="white" className={`text-[1.54rem] flex-none ${getTypography()}`}>
                             Agents
                         </Typography>
 
                         <div className="flex-grow"></div>
 
                         <div className="mr-auto md:mr-4 md:w-56">
-                            {/* Search bar */}
+                            {/* Search bar by name*/}
                             <Input
                                 color="white"
                                 label="Search by name"
                                 value={searchQuery}
                                 onChange={handleSearch}
+                            />
+                        </div>
+
+                        <div className="mr-auto md:mr-4 md:w-56">
+                            {/* Search bar by status*/}
+                            <Input
+                                color="white"
+                                label="Search by status"
+                                value={searchQuery_status}
+                                onChange={handleSearchStatus}
+                            />
+                        </div>
+                        <div className="mr-auto md:mr-4 md:w-56">
+                            <Checkbox
+                                color="white"
+                                label="Needs Help"
+                                labelProps={{ className: "text-white" }}
+                                checked={helpFilter}
+                                onChange={handleHelpFilter}
+                                
                             />
                         </div>
                     </CardHeader>
@@ -207,7 +244,7 @@ export function Teams() {
                                         >
                                             <Typography
                                                 variant="small"
-                                                className={`text-[11px] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
+                                                className={`text-[0.6rem] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
                                             >
                                                 {el}
                                             </Typography>
@@ -231,7 +268,7 @@ export function Teams() {
                                                 <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                     <Typography
                                                         variant="small"
-                                                        className={`text-[1em] ${getTypographybold()} ${getTextColor('dark')}`}
+                                                        className={`text-[0.8em] ${getTypographybold()} ${getTextColor('dark')}`}
                                                     >
                                                         List is empty
                                                     </Typography>
@@ -253,7 +290,7 @@ export function Teams() {
                                                                     <div>
                                                                         <Typography
                                                                             variant="small"
-                                                                            className={`${getTypographybold()} ${getTextColor('dark')}`}
+                                                                            className={`text-[0.7rem]${getTypographybold()} ${getTextColor('dark')}`}
                                                                         >
                                                                             {name}
                                                                         </Typography>
@@ -270,7 +307,7 @@ export function Teams() {
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
-                                                                    className={`py-0.5 px-2 text-[11px] font-medium w-fit ${getTypographybold()}`}
+                                                                    className={`py-0.5 px-2 text-[0.8rem] font-medium w-fit ${getTypographybold()}`}
                                                                 />
                                                             </td>
                                                             <td className={className}>
@@ -278,13 +315,9 @@ export function Teams() {
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
-                                                                <Typography
-                                                                    as="a"
-                                                                    href={"/dashboard/profile?profile=" + agentID}
-                                                                    className={`text-xs font-semibold ${getTextColor('dark')}`}
-                                                                >
+                                                                <Link to = {"/dashboard/profile?profile=" + agentID} className={`text-xs font-semibold ${getTextColor('dark')}`}>
                                                                     View
-                                                                </Typography>
+                                                                </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
                                                             { requireHelp ?

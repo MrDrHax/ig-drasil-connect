@@ -1,16 +1,40 @@
-import { Textarea, Button, IconButton, Typography, CardHeader, CardBody, CardFooter } from "@material-tailwind/react";
+import { Textarea, Button, IconButton, Typography, CardHeader, Card, CardBody, CardFooter } from "@material-tailwind/react";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
+
+import { postMessageData } from "@/data";
+import { useState } from "react";
  
-export function TwitterChatboxTextarea() {
+/**
+ * Renders a textarea component with a send button for posting messages.
+ *
+ * @param {Object} props - The properties object.
+ * @param {string} props.agent_id - The ID of the agent.
+ * @param {boolean} props.is_supervisor - Whether the message is from the supervisor.
+ * @return {JSX.Element} The rendered textarea component.
+ */
+export function TwitterChatboxTextarea({agent_id, is_supervisor}) {
 
   const controller = useMaterialTailwindController();
   const { theme } = controller;
 
+  const [message, setMessage] = useState("");
+
+  const handleChange = (event) => {
+    setMessage(event.target.value);
+  };
+
+  function clickSend() {
+    postMessageData(agent_id, message, is_supervisor);
+    setMessage("");
+  }
+
   return (
     <div className={`flex min-w-full flex-row items-center gap-2 rounded-[99px] border ${getBorderColor("search-bar")} ${getBgColor("background-cards")} ${getTextColor("dark")} p-2`}>
       <Textarea
+        value={message}
+        onChange={handleChange}
         rows={1}
         resize={true}
         placeholder="Your Message"
@@ -23,7 +47,7 @@ export function TwitterChatboxTextarea() {
         }}
       />
       <div>
-        <IconButton variant="text" className={`rounded-full ${getTextColor("dark")}`}>
+        <IconButton onClick={() => clickSend()} variant="text" className={`rounded-full ${getTextColor("dark")}`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -49,12 +73,14 @@ export function TwitterChatboxTextarea() {
  *
  * @param {Object} props - The properties of the chat message.
  * @param {string} props.message - The content of the chat message.
- * @param {string} props.rol - The role of the chat message sender.
+ * @param {boolean} props.rol - Whether the message is from a supervisor
+ * @param {string} props.hour - The timestamp of the chat message.
+ * @param {boolean} props.is_supervisor - Whether the current viewer is a supervisor.
  * @return {JSX.Element} The chat message component.
  */
-export function ChatMessage ({ message, rol,hour}){
+export function ChatMessage ({ message, rol, hour, is_supervisor }) {
   {/* Defines the color of the card based on the role of the message sender. */}
-  const isAgent = rol === 'agent';
+  const isAgent = rol === is_supervisor;
 
   const controller = useMaterialTailwindController();
   const { theme } = controller;
@@ -62,46 +88,20 @@ export function ChatMessage ({ message, rol,hour}){
   return (
      <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
         {/* Change the color of the card based on the role of the message sender. */}
-        <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '300px' }}>
+        <Card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '300px' }}>
           <CardBody>
           <Typography color="black" className={`text-base ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")}`}>
               {message} 
             </Typography>
             <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")} `} >
-                {isAgent ? "You": "Supervisor"} {hour}
+                
+                {hour.split("T")[0]} {hour.split("T")[1].split(".")[0].split(":")[0]}:{hour.split("T")[1].split(".")[0].split(":")[1]}
               </Typography>
           </CardBody>
 
-        </card>
+        </Card>
       </div>
     );
   }
 
-export function ChatMsupervisor ({ message, rol,hour}){
-  {/* Defines the color of the card based on the role of the message sender. */}
-  const isSupervisor = rol === 'supervisor';
-  
-  const controller = useMaterialTailwindController();
-  const { theme } = controller;
-  
-  return (
-    <div className={`flex ${isSupervisor ? 'justify-end' : 'justify-start'} mx-5`}>
-    {/* Change the color of the card based on the role of the message sender. */}
-      <card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isSupervisor ? getBgColor('green') : getBgColor('gray')}`}>
-        <CardBody>
-          <Typography color="black" className={`text-base ${getTypography()} ${isSupervisor ?  getTextColor("white2"):getTextColor("black")} `}>
-            {message} 
-          </Typography>
-          <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isSupervisor ?  getTextColor("white2"): getTextColor("black")}`} >
-            {isSupervisor ? "You": "agent"} {hour} 
-          </Typography>
-        </CardBody>
-      </card>
-    </div>
-  );
-}
-  
-
-
-
-export default TwitterChatboxTextarea; ChatMessage; ChatMsupervisor;
+export default TwitterChatboxTextarea; ChatMessage;

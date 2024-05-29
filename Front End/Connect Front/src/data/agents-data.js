@@ -1,4 +1,4 @@
-import { getApiPath, addTokenToHeader } from "@/configs/api-tools";
+import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-tools";
 
 /**
  * Retrieves a list of agents from the API.
@@ -12,18 +12,19 @@ import { getApiPath, addTokenToHeader } from "@/configs/api-tools";
  * @throws {Error} If the API request fails.
  */
 export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
-    let url = getApiPath() + `lists/agents?skip=${skip}&limit=${limit}&sortByDat=${sortbydat}&sortBy=${sortby}`;
+    let url = new URL(getApiPath() + 'lists/agents');
 
-    // fill in the query
-    let query = ""
+    console.log("seatch: " + search);
 
-    if (search) {
-        query += search;
-    }
+    let params = {
+        skip: skip,
+        limit: limit,
+        sortByDat: sortbydat,
+        sortBy: sortby,
+        q: search
+    };
 
-    if (query) {
-        url += `&q=${query}`;
-    }
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
     let request = new Request(url);
 
@@ -72,6 +73,23 @@ export async function AgentDetails(id) {
         id: id
     }
     */
+}
+
+export async function AgentId() {
+    let url = getApiPath() + `extras/agentID?username=${getNameFromToken()}`;
+
+    let request = new Request(url);
+
+    addTokenToHeader(request);
+
+    let response = await fetch(request);
+
+    if (!response.ok) {
+        // raise error
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+
+    return await response.json();
 }
 
 export function AgentsSummary() {
