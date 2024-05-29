@@ -29,7 +29,8 @@ import {
   getBgColor,
   getTextColor,
   getTheme,
-  getTypography
+  getTypography,
+  getTypographybold,
 } from "@/context";
 import { getApiLoginPage, getNameFromToken } from "@/configs";
 
@@ -103,19 +104,19 @@ export function DashboardNavbar() {
                 <>
                 <Link
                   to="/dashboard/home"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'home' ? getBgColor(navColor) : ''}`}
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'home' ? getBgColor(navColor) : ''}`}
                 >
                   Home
                 </Link>
                 <Link
                   to="/dashboard/team"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'team' ? getBgColor(navColor) : ''}`}
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'team' ? getBgColor(navColor) : ''}`}
                 >
                   Agents
                 </Link>
                 <Link
                   to="/dashboard/queues"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'queues' ? getBgColor(navColor) : ''}`}
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'queues' ? getBgColor(navColor) : ''}`}
                 >
                   Queues
                 </Link>
@@ -126,7 +127,7 @@ export function DashboardNavbar() {
               { roles.includes('agent') && (
                 <Link
                   to="/dashboard/agent"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${page === 'agent' ? getBgColor(navColor) : ''}`}
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'agent' ? getBgColor(navColor) : ''}`}
                 >
                   Dashboard
                 </Link>
