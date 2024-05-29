@@ -4,11 +4,7 @@ import {
     CardBody,
     Typography,
     Input,
-    Avatar,
     Chip,
-    Tooltip,
-    Progress,
-    Alert,
     Button,
     Checkbox
 } from "@material-tailwind/react";
@@ -19,7 +15,6 @@ import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
-import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
