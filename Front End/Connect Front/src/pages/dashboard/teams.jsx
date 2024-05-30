@@ -126,31 +126,6 @@ export function Teams() {
         updateData();
     }, [searchQuery, searchQuery_status, helpFilter]);
 
-    // var theThingToDo = {
-    //     type: "pie",
-    //     height: 220,
-    //     series: [
-    //         {
-    //             name: "Views",
-    //             data: [50, 20, 10, 22, 50, 10, 40],
-    //         },
-    //     ],
-    //     options: {
-    //         ...chartsConfig,
-    //         colors: "#388e3c",
-    //         plotOptions: {
-    //             bar: {
-    //                 columnWidth: "16%",
-    //                 borderRadius: 5,
-    //             },
-    //         },
-    //         xaxis: {
-    //             ...chartsConfig.xaxis,
-    //             categories: ["M", "T", "W", "T", "F", "S", "S"],
-    //         },
-    //     },
-    // };
-
     return (
         <div>
 
@@ -316,13 +291,13 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { requireHelp ?
+                                                            { /* requireHelp  True ?*/
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td> : null
+                                                            </td>/* : null */
                                                             }
                                                         </tr>
                                                     );

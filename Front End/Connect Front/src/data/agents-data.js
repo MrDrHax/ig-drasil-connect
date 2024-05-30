@@ -100,7 +100,7 @@ export async function AgentId() {
 
 export async function JoinCall(agent_id) {
 
-    let url = getApiPath() + `MongoAtlas/join_call?agent_id=${agent_id}}`;
+    let url = getApiPath() + `actions/join_call?agent_id=${agent_id}}`;
     let request = new Request(url, {method: 'POST'});
     addTokenToHeader(request);
     let response = await fetch(request);
