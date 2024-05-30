@@ -75,6 +75,12 @@ export async function AgentDetails(id) {
     */
 }
 
+/**
+ * Retrieves the agent ID associated with the current user's token.
+ *
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the agent ID.
+ * @throws {Error} If the API request fails.
+ */
 export async function AgentId() {
     let url = getApiPath() + `extras/agentID?username=${getNameFromToken()}`;
 
@@ -90,6 +96,19 @@ export async function AgentId() {
     }
 
     return await response.json();
+}
+
+export async function JoinCall(agent_id) {
+
+    let url = getApiPath() + `actions/join_call?agent_id=${agent_id}}`;
+    let request = new Request(url, {method: 'POST'});
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+
 }
 
 export function AgentsSummary() {

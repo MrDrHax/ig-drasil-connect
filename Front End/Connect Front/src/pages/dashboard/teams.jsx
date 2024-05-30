@@ -10,9 +10,8 @@ import {
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
-import { AgentList, AgentsSummary } from "@/data/agents-data";
+import { AgentList, JoinCall } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
-import { StatisticsChart } from "@/widgets/charts";
 import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
 import React, { useEffect, useState } from 'react';
@@ -20,9 +19,6 @@ import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
 
 import { useAlert } from "@/context/alerts";
-
-// Sidenav changes
-import { Sidenav } from "@/widgets/layout";
 
 function getColorOfStatus(status) {
     switch (status) {
@@ -86,8 +82,8 @@ export function Teams() {
      * @return {type} No return value.
      */
     function bargeIn(agentId) {
-        console.log("Barging in to call with agent " + agentId);
-        // TODO
+        JoinCall(agentId);
+        //console.log("Barging in to call with agent " + agentId);
     }
 
     function updateData(page = 1) {
@@ -129,31 +125,6 @@ export function Teams() {
     useEffect(() => {
         updateData();
     }, [searchQuery, searchQuery_status, helpFilter]);
-
-    // var theThingToDo = {
-    //     type: "pie",
-    //     height: 220,
-    //     series: [
-    //         {
-    //             name: "Views",
-    //             data: [50, 20, 10, 22, 50, 10, 40],
-    //         },
-    //     ],
-    //     options: {
-    //         ...chartsConfig,
-    //         colors: "#388e3c",
-    //         plotOptions: {
-    //             bar: {
-    //                 columnWidth: "16%",
-    //                 borderRadius: 5,
-    //             },
-    //         },
-    //         xaxis: {
-    //             ...chartsConfig.xaxis,
-    //             categories: ["M", "T", "W", "T", "F", "S", "S"],
-    //         },
-    //     },
-    // };
 
     return (
         <div>
@@ -320,13 +291,13 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { requireHelp ?
+                                                            { /* requireHelp  True ?*/
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td> : null
+                                                            </td>/* : null */
                                                             }
                                                         </tr>
                                                     );
