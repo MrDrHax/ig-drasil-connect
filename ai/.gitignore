@@ -1,0 +1,8 @@
+aiEnv/
+venv/
+
+chroma/
+__pycache__/
+**/__pycache__/*
+
+.dev.env
