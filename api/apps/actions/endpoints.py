@@ -1,6 +1,11 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from config import Config
+from typing import Annotated
+from AAA.requireToken import requireToken
+import AAA.userType as userType
+
+from apps.extras.endpoints import get_agentID
 
 import boto3
 
@@ -20,9 +25,42 @@ router = APIRouter(
     }
 )
 
+@router.post("/join-call")
+async def join_call(token: Annotated[str, Depends(requireToken)], agent_id: str):
+    """
+    Join a phone call in Amazon Connect.
+
+    @param agent_id: ID of the agent whose call to join.
+
+    @return: Confirmation message of the call joining.
+    """
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    client = boto3.client('connect')
+
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'Agents': [ agent_id ]      
+        }
+    )
+
+    call_id = response['UserDataList'][0]['Contacts'][0]['ContactId']
+
+    user_id = get_agentID(userType.getUserName(token))
+
+    response = client.monitor_call(
+        InstanceId=Config.INSTANCE_ID,
+        ContactId=call_id,
+        UserId=user_id,
+        AllowedMonitorCapabilities=['BARGE']
+    )
+
+    return {"message": f"Call Joined: {call_id}"}
 
 @router.post("/start-call")
-async def start_call(phone_number: str):
+async def start_call( phone_number: str):
     """
     start of a phone call in Amazon Connect.
 
