@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI,Request
+from fastapi import Depends, FastAPI,Request, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.middleware.cors import CORSMiddleware
 import sys
 import logging
@@ -71,14 +72,19 @@ try:
         allow_headers=["*"],
     )
 
+    security = HTTPBearer()
+
     # Include routers
     # app.include_router(dashboard_router)
 
     @app.post("/recommendations/{agent_id}")
-    def get_agent_recommendations(agent_id: str, json_data: dict) -> str:
+    def get_agent_recommendations(agent_id: str, json_data: dict, credential: HTTPAuthorizationCredentials = Depends(security)) -> str:
         '''
         Get recommendations for an agent based on the call data
         '''
+
+        if credential.credentials != Config.SECRET:
+            return HTTPException(status_code=401, detail="Invalid credentials")
 
         parsed_data = parseMetrics(json_data)
 
@@ -101,7 +107,10 @@ try:
         return response
     
     @app.post("/response/{call_id}")
-    async def get_client_response(call_id: str, question: Request_BodyWithPrompt) -> str:
+    async def get_client_response(call_id: str, question: Request_BodyWithPrompt, credential: HTTPAuthorizationCredentials = Depends(security)) -> str:
+        if credential.credentials != Config.SECRET:
+            return HTTPException(status_code=401, detail="Invalid credentials")
+        
         toReturn = DocumentedResponse.get_response(question.prompt, call_id, model)
 
         return toReturn

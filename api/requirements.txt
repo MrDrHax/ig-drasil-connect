@@ -10,6 +10,7 @@ click==8.1.7
 colorama==0.4.6
 colorlog==6.8.2
 cryptography==42.0.5
+dnspython==2.6.1
 exceptiongroup==1.2.0
 fastapi==0.110.0
 fastapi-cdn-host==0.4.2
@@ -20,12 +21,14 @@ httpx==0.27.0
 idna==3.6
 iniconfig==2.0.0
 jmespath==1.0.1
+Markdown==3.6
 packaging==24.0
 pluggy==1.4.0
 pycparser==2.22
 pydantic==2.6.3
 pydantic_core==2.16.3
 PyJWT==2.8.0
+pymongo==4.7.2
 pytest==8.1.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
@@ -41,4 +44,3 @@ typing_extensions==4.10.0
 tzlocal==5.2
 urllib3==2.2.1
 uvicorn==0.27.1
-pymongo==4.7.2

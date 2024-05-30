@@ -1,9 +1,17 @@
 from gpt4all import GPT4All
 from datetime import datetime
 
-from config import Config
+try:
+    from config import Config
+except ImportError:
+    class Config:
+        DEVICE = "cpu"
+        GPTMODEL = "orca-mini-3b-gguf2-q4_0.gguf"
+        DOWNLOADGPT = False
 
-model = GPT4All("orca-mini-3b-gguf2-q4_0.gguf", device=Config.DEVICE) # device='amd', device='intel'
+print('starting model...')
+model = GPT4All(Config.GPTMODEL, device=Config.DEVICE, allow_download=Config.DOWNLOADGPT)
+print('model started!')
 
 class Session:
     '''A session of GPT-4-All. It manages the history of the conversation and the generator. DO NOT USE THIS CLASS DIRECTLY. Use GPTManager instead.'''

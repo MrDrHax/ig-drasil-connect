@@ -13,14 +13,20 @@ else:
 
 # if you want to add a config variable, add it here!!!
 class Config:
-    PORT = os.getenv('PORT', 8081)
+    PORT = int(os.getenv('PORT', 8081))
     '''The port the server will run on.'''
     HOST = os.getenv('HOST', 'localhost')
     '''The host the server will run on.'''
-    DEBUG = os.getenv('DEBUG', False)
+    DEBUG = os.getenv('DEBUG', False).lower() in ['true', '1', 't', 'y', 'yes']
     '''is the server running in debug mode?'''
     DEVICE = os.getenv('DEVICE', 'cpu')
     '''What device should the model run on? gpu/cpu (can be amd, intel or cuda for specific gpu)'''
+    GPTMODEL = os.getenv('GPTMODEL', 'orca-mini-3b-gguf2-q4_0.gguf')
+    '''The model to use for generating responses.'''
+    DOWNLOADGPT = os.getenv('DOWNLOADGPT', True).lower() in ['true', '1', 't', 'y', 'yes']
+    '''Should the model be downloaded?'''
+    SECRET = os.getenv('SECRET', '123')
+    '''The secret key for the API server.'''
 
 def logConfig():
     config = "Configuration:\n"
