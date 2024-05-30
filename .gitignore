@@ -1,3 +1,6 @@
 # vscode files
 **/.vscode/*
 !**/.vscode/extensions.json
+
+# python files
+**/__pycache__/*

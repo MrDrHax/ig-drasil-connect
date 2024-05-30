@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "Serhioromano.vscode-gitflow",
+        "mhutchie.git-graph",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens",
+        "Gruntfuggly.todo-tree"
+    ]
+}

@@ -36,6 +36,10 @@ class Config:
     '''AWS SSO Instance ID. '''
     KEYCLOAK_URI = os.getenv('KEYCLOAK_URI', 'https://localhost:8443/')
     '''The URI for keycloak'''
+    GPT_URI = os.getenv('GPT_URI', 'http://localhost:8081/')
+    '''The URI for the GPT endpoint'''
+    GPT_Key = os.getenv('GPT_Key', '1234')
+    '''The key for the GPT endpoint'''
 
 
 def logConfig():

@@ -1,5 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends,HTTPException
+import requests
+from typing import Annotated
 from . import crud, models
+from cache.cache_object import cachedData
+import markdown
+from AAA.requireToken import requireToken
+import AAA.userType as userType
 
 import logging
 logger = logging.getLogger(__name__)
@@ -18,6 +24,13 @@ router = APIRouter(
     }
 )
 
-@router.get("/")
-async def read_summary(summary_id: int) -> models.Summary:
-    return models.Summary(title="test", content="test", id=3)
+@router.get("/AI/AgentPerformance")
+async def read_agent_performance_summary(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> models.AgentPerformanceSummary:
+    if not userType.testToken(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
+
+    res = await cachedData.get('fetchRecommendations', agent_id=agent_id)
+    
+    html_content = markdown.markdown(res).replace("\n", "")
+
+    return models.AgentPerformanceSummary(agent_id=agent_id, content=html_content)

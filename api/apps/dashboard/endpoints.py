@@ -431,6 +431,34 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
 #         print(e)
         
 
+@router.get("/call-summary")
+async def call_summary():
+    """
+    Description:
+        Returns a series of metrics of a call with a certain contact specified by id
+
+    Parameters:
+        * InstanceId [REQUIRED][string]: amazon connect instance identified
+        * ContactId [REQUIRED][string]: identifier of the contact
+        
+    Read the docs:
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/client/describe_contact.html
+
+    @return 
+        JSON with the information on the call
+    """
+    try:
+        client = boto3.client('connect')
+        response = client.describe_contact(
+            InstanceId=Config.INSTANCE_ID,
+            ContactId='string'
+        )
+        
+        return response
+    except Exception as e: 
+        print(e.with_traceback)
+        print(e)
+
 @router.get("/agent-status", response_model=List[dict])
 async def agent_status():
     
