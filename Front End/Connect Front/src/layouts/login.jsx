@@ -6,6 +6,7 @@ function useQuery() {
     return new URLSearchParams(useLocation().search);
 }
 
+
 export function Login() {
     let query = useQuery();
     let code = query.get("code");
@@ -20,8 +21,14 @@ export function Login() {
         .catch(error => console.error('Error:', error));
 
     return (
-        <div>
-            <h1>Making login</h1>
+        <div className="flex justify-center items-center min-h-screen">
+            <tr key="loading">
+                <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                    <span className="flex justify-center items-center min-h-screen ">
+                    <span className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></span>
+                    </span>
+                </td>
+            </tr>
         </div>
     )
 }
