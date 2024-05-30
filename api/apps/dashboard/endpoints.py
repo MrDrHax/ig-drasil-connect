@@ -38,10 +38,11 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     Returns the cards that will be displayed on the dashboard.
     '''
     cards = [
-        await get_connected_users(token),
+        # await get_connected_users(token),
         await get_capacity(token),
         await get_average_call_time(token),
-        await get_connected_agents(token)
+        await get_connected_agents(token),
+        await get_avg_handle_time()
     ]
 
     graphs = [
@@ -58,29 +59,30 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 
     return toReturn
 
-@router.get("/connected-users" , tags=["cards"])
-async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
-    '''
-    Returns the amount of connected users.
-    '''
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+# @router.get("/connected-users" , tags=["cards"])
+# async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+#     '''
+#     Returns the amount of connected users.
+#     '''
+#     if not userType.isManager(token):
+#         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    footer_info = models.CardFooter(color="text-green-500", value="+32", label="than today's average")
+#     footer_info = models.CardFooter(color="text-green-500", value="+32", label="than today's average")
 
-    return models.GenericCard(id=1, title="Connected users", value="80", icon="Book", color="red", footer=footer_info)
+#     return models.GenericCard(id=1, title="Connected users", value="80", icon="Book", color="red", footer=footer_info)
     
-@router.get("/capacity", tags=["cards"])
-async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
-    '''
-    Returns the capacity
-    '''
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
-    
-    footer_info = models.CardFooter(color="text-green-500", value="+30%", label="more expected in the next hour")
-    
-    return models.GenericCard(id=2, title="Percent of capacity", value="10%", icon="Book", color="yellow", footer=footer_info)
+#@router.get("/cards/capacity", tags=["cards"])
+#async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+#   '''
+#   Returns the capacity
+#   '''
+#   if not userType.isManager(token):
+#       raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+#   
+#   footer_info = models.CardFooter(color="text-green-500", value="+30%", label="more expected in the next hour")
+#   
+#   return models.GenericCard(id=2, title="Percent of capacity", value="10%", icon="Book", color="yellow", footer=footer_info)
+
 
 @router.get("/average_call_time", tags=["cards"])
 async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -754,7 +756,7 @@ async def get_average_call_time_duration():
     return response['MetricResults']
 
 @router.get("/graph/get-avg-contact-duration")
-async def get_avg_contact_duration()-> models.GenericGraph:
+async def get_avg_contact_duration()-> models.StatisticCard:
     
     '''
     Returns the average contact duration.
@@ -783,7 +785,10 @@ async def get_avg_contact_duration()-> models.GenericGraph:
         
         Metrics = [
             {
-                'Name': 'AVG_CONTACT_DURATION',
+                'Name': 'AVG_CONTACT_DURATION'
+            },
+            {
+                'Name': 'ABANDONMENT_RATE'
             }
         ]
         
@@ -831,3 +836,93 @@ async def get_avg_contact_duration()-> models.GenericGraph:
     )
 
     return example_graph
+
+
+@router.get("/connected/users" , tags=["cards"])
+async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+    '''
+    Returns the amount of connected users.
+    '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    client = boto3.client('connect')
+
+    users = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    userList = []
+    for user in users['UserSummaryList']:
+        userList.append(user['Id'])
+
+    
+    # Footer ya casi esta, 
+    footer_info = models.CardFooter(color="text-green-500", value="+" + str(len(userList)), label="than today's average")
+
+    return models.GenericCard(id=1, title="Connected users", value="80", icon="Book", color="red", footer=footer_info)
+
+
+@router.get("/cards/capacity", tags=["cards"])
+async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.OcupacyCard:
+    '''
+    Returns the capacity
+    '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    client = boto3.client('connect')
+
+    routing_profile_list = await routing_profiles()
+    client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+    
+    return models.GenericCard(id=2, title="Percent of capacity", value="10%", icon="Book", color="yellow", footer=footer_info)
+
+@router.get("/cards/avg-handle-time", tags=["cards"])
+async def get_avg_handle_time() -> models.GenericCard:
+    
+    routing_profile_list = await routing_profiles()
+    client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AVG_HANDLE_TIME',
+            }
+        ]
+    )
+
+    return response['MetricResults']['Collections']['Value']
