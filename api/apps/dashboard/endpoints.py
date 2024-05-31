@@ -6,7 +6,7 @@ from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
 from cache.cache_object import cachedData
-from datetime import datetime , timedelta
+from datetime import datetime , timedelta, date
 
 import random
 
@@ -96,7 +96,7 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) ->
     
     return models.GenericCard(id=3, title="Average call time", value="3m23s", icon="Clock", color="blue", footer=footer_info)
 
-@router.get("/connected_agents", tags=["cards"])
+@router.get("/card/connected_agents", tags=["cards"])
 async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the amount of connected agents.
@@ -673,6 +673,43 @@ async def get_current_user_data():
     return response['UserDataList']
 
 
+@router.get("/list-contacts")
+async def list_contacts():
+
+    client = boto3.client('connect')
+    response = client.search_contacts(
+        InstanceId=Config.INSTANCE_ID,
+        TimeRange={
+            'Type': 'INITIATION_TIMESTAMP',
+            # |'SCHEDULED_TIMESTAMP'|'CONNECTED_TO_AGENT_TIMESTAMP'|'DISCONNECT_TIMESTAMP',
+            'StartTime': datetime.today() - timedelta(days=56),
+            'EndTime': datetime.today(),
+        },
+        
+        SearchCriteria={
+            'Channels': [
+                'VOICE',
+            ],
+            'InitiationMethods': [
+                'INBOUND',
+                # |'OUTBOUND'|'TRANSFER'|'QUEUE_TRANSFER'|'CALLBACK'|'API'|'DISCONNECT'|'MONITOR'|'EXTERNAL_OUTBOUND',
+            ],
+        },
+
+        Sort={
+            'FieldName': 'INITIATION_TIMESTAMP',
+            # |'SCHEDULED_TIMESTAMP'|'CONNECTED_TO_AGENT_TIMESTAMP'|'DISCONNECT_TIMESTAMP'|'INITIATION_METHOD'|'CHANNEL',
+            'Order': 'ASCENDING'
+            # |'DESCENDING'
+        }
+    )
+
+    print(response)
+
+    return response['Contacts']
+
+
+
 # -------------------------------------------------------------------------------------------------------------------
 # ----------------------------------Aqui empiezan los fregones----------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------
@@ -756,7 +793,7 @@ async def get_average_call_time_duration():
     return response['MetricResults']
 
 @router.get("/graph/get-avg-contact-duration")
-async def get_avg_contact_duration()-> models.StatisticCard:
+async def get_avg_contact_duration()-> models.GenericGraph:
     
     '''
     Returns the average contact duration.
@@ -843,18 +880,42 @@ async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> m
     '''
     Returns the amount of connected users.
     '''
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    # if not userType.isManager(token):
+    #     raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
     client = boto3.client('connect')
 
-    users = client.list_users(
+    response = client.search_contacts(
         InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
+        TimeRange={
+            'Type': 'INITIATION_TIMESTAMP',
+            # |'SCHEDULED_TIMESTAMP'|'CONNECTED_TO_AGENT_TIMESTAMP'|'DISCONNECT_TIMESTAMP',
+            'StartTime': datetime(datetime(datetime.today() - timedelta(months=1)).year,
+                                  datetime(datetime.today() - timedelta(months=1)).month,
+                                0),                                  
+            'EndTime': datetime(datetime(datetime.today() - timedelta(months=1)).year,
+                                datetime(datetime.today() - timedelta(months=1)).month,
+                                datetime(date.maxmindays(datetime(datetime.today() - timedelta(months=1)).year,    
+                                                         datetime(datetime.today() - timedelta(months=1)).month))
+                                )
+        },
+        
+        SearchCriteria={
+            'Channels': [
+                'VOICE',
+            ],
+            'InitiationMethods': [
+                'INBOUND',
+                # |'OUTBOUND'|'TRANSFER'|'QUEUE_TRANSFER'|'CALLBACK'|'API'|'DISCONNECT'|'MONITOR'|'EXTERNAL_OUTBOUND',
+            ],
+        },
 
+        Sort={
+            'FieldName': 'INITIATION_TIMESTAMP',
+            # |'SCHEDULED_TIMESTAMP'|'CONNECTED_TO_AGENT_TIMESTAMP'|'DISCONNECT_TIMESTAMP'|'INITIATION_METHOD'|'CHANNEL',
+            'Order': 'ASCENDING'
+        }
+    )
     
     # Footer ya casi esta, 
     footer_info = models.CardFooter(color="text-green-500", value="+" + str(len(userList)), label="than today's average")
@@ -863,7 +924,7 @@ async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> m
 
 
 @router.get("/cards/capacity", tags=["cards"])
-async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.OcupacyCard:
+async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the capacity
     '''
@@ -877,11 +938,28 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.O
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    response2 = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
         StartTime = datetime.today() - timedelta(days=30),
         EndTime = datetime.today(),
         Interval = {
             'TimeZone': 'UTC',
-            'IntervalPeriod': 'DAY',
+            'IntervalPeriod': 'TOTAL',
         },
         Filters = [
             {
@@ -895,14 +973,108 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.O
             }
         ]
     )
+
+    datares1 = []
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            datares1.append(n['Value'])
+            print(datares1)
     
-    return models.GenericCard(id=2, title="Percent of capacity", value="10%", icon="Book", color="yellow", footer=footer_info)
+    datares2 = []
+    for i in response2['MetricResults']:
+        for n in i['Collections']:
+            datares2.append(n['Value'])
+            print(datares2)
+
+
+    comp = datares1[0]-datares2[0]
+
+    # dat
+
+    cardFooter = models.CardFooter(
+        color = "text-red-100" if comp > 0 else "text-green-500",
+        value = str(comp),
+        label ="than more in this mouth" if comp > 0 else "less than this month"
+    )
+    
+    card = models.GenericCard(
+        id = 1,
+        title = "Average Handle Time",
+        value =  str(datares1[0]),
+        icon = "UserIcon",
+        footer = cardFooter
+    )
+
+    
+    
+    return card
 
 @router.get("/cards/avg-handle-time", tags=["cards"])
-async def get_avg_handle_time() -> models.GenericCard:
+async def get_avg_handle_time():
     
     routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'ABANDONMENT_RATE',
+            }
+        ]
+    )
+
+    data = []
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            data.append(str(n['Value']))
+            
+    card_value = data[0]
+
+    # if card_value > 50:
+    # cardFooter_label = "percent higher than expected"
+    # else:
+    # cardFooter_label = "the abandonment rate is stable"
+
+    cardFooter = models.CardFooter(
+        color = "text-red-500",
+        value = str(card_value-50.0),
+        label = cardFooter_label,
+    )
+
+    card = models.GenericCard(
+        id = 1,
+        title = "Abandoment rate",
+        value =  data[0],
+        icon = "PhoneXMarkIcon",
+        footer = cardFooter,
+    )
+
+    return card
+
+@router.get("/graph/get-queues")
+async def get_avg_contact_duration()-> models.GenericGraph:
+    
+    '''
+    Returns the average contact duration.
+    
+    ''' 
+        
+    client = boto3.client('connect')
+
+    routing_profile_list = await routing_profiles()
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -915,14 +1087,58 @@ async def get_avg_handle_time() -> models.GenericCard:
         Filters = [
             {
             'FilterKey': 'ROUTING_PROFILE',
-            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            # Here we need to pass a list of routing profiles that we get from another endpoint
+            'FilterValues' : [i['Id'] for i in routing_profile_list],
             } 
-        ], 
+        ],
+        
         Metrics = [
             {
-                'Name': 'AVG_HANDLE_TIME',
+                'Name': 'CONTACTS_QUEUED_BY_ENQUEUE'
             }
+        
         ]
+        
+    
     )
 
-    return response['MetricResults']['Collections']['Value']
+    queues= []
+
+    #We need to get the data for the y axis points
+    data = []
+
+    for j in range(len(response['MetricResults'])):
+        # Save the timestamps in a list
+        timestamps.append(response['MetricResults'][j]['MetricInterval']['StartTime'].strftime('%Y-%m-%d'))
+        # Save the data in a list when the name is AVG_CONTACT_DURATION
+        data.append(response['MetricResults'][j]['Collections'][0]['Value']) 
+
+    # Create the graph points
+    series_example = [models.SeriesData(name=response['MetricResults'][0]['Collections'][0]['Metric']['Name'], data=data)]
+
+    # Create the x axis labels
+    xaxis_example = models.XAxisData(
+        categories=timestamps
+    )
+
+    # Create the graph options
+    example_options = models.GraphOptions(
+        xaxis=xaxis_example
+    )
+
+    # Create the graph type
+    example_chart = models.ChartData(
+        type="line",
+        series= series_example,
+        options=example_options
+    )
+
+    # Create the graph
+    example_graph = models.GenericGraph(
+        title="Average Contact Duration",
+        description="Graph showing average contact duration per day in seconds",
+        footer="Updated " + datetime.today().strftime('%Y-%m-%d'),
+        chart = example_chart
+    )
+
+    return example_graph
