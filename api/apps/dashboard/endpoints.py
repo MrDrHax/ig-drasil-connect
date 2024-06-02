@@ -958,7 +958,7 @@ async def get_connected_users() -> models.GenericCard:
     
     # Footer ya casi esta, 
     footer_info = models.CardFooter(color = "text-red-500" if today_res['TotalCount'] <= past_month_AVG else "text-green-500", 
-                                    value=(str(past_month_AVG - today_res['TotalCount']) if today_res['TotalCount'] <= past_month_AVG else ("+" + str(today_res['TotalCount'] - past_month_AVG))), 
+                                    value=(str(today_res['TotalCount'] - past_month_AVG) if today_res['TotalCount'] <= past_month_AVG else ("+" + str(today_res['TotalCount'] - past_month_AVG))), 
                                     label= "than last month's average")
 
     return models.GenericCard(id=1, title="Connected users", value="80", icon="UserGroupIcon", color="red", footer=footer_info)
@@ -975,7 +975,6 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     client = boto3.client('connect')
 
     routing_profile_list = await routing_profiles()
-    client = boto3.client('connect')
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -1050,11 +1049,18 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     
     return card
 
-@router.get("/cards/avg-handle-time", tags=["cards"])
-async def get_avg_handle_time():
+@router.get("/cards/abandonment-rate", tags=["cards"])
+async def get_abandonment_rate():
     
     routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
+
+    queues_list = await list_queues() 
+
+    queues_id_list = []    
+    for i in queues_list['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_id_list.append(i['Id'])
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -1066,44 +1072,50 @@ async def get_avg_handle_time():
         },
         Filters = [
             {
-            'FilterKey': 'ROUTING_PROFILE',
-            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            'FilterKey': 'QUEUE',
+            'FilterValues' : queues_id_list,  
             } 
-        ], 
+        ],
+        Groupings=['QUEUE'],
         Metrics = [
             {
                 'Name': 'ABANDONMENT_RATE',
             }
         ]
     )
-
+    
     data = []
     for i in response['MetricResults']:
         for n in i['Collections']:
-            data.append(str(n['Value']))
-            
-    card_value = data[0]
+            data.append(str(n['Value']))  # Correctly access the value
 
-    if card_value > 50:
+    card_value = float(data[0])
+
+    # print(card_value)
+
+    if card_value > 50.0:
         cardFooter_label = "percent higher than expected"
+        cardFooter_value = str(card_value - 50.0)
     else:
-        cardFooter_label = "the abandonment rate is stable"
+        cardFooter_label = "The abandonment rate is stable"
+        cardFooter_value = str(card_value)
 
     cardFooter = models.CardFooter(
-        color = "text-red-500",
-        value = str(card_value-50.0),
-        label = cardFooter_label,
+        color="text-red-500",
+        value=cardFooter_value,
+        label=cardFooter_label,
     )
 
     card = models.GenericCard(
-        id = 1,
-        title = "Abandoment rate",
-        value =  data[0],
-        icon = "PhoneXMarkIcon",
-        footer = cardFooter,
+        id=1,
+        title="Abandoment rate",
+        value=data[0],  # Ensure this is a string
+        icon="PhoneXMarkIcon",
+        footer=cardFooter,
     )
 
     return card
+
 
 @router.get("/graph/get-queues")
 async def get_queues():
@@ -1117,40 +1129,41 @@ async def get_queues():
 
     queues_raw = await list_queues() 
 
-    queues_list = []
+    queues_list = []    
     
-    
-    for i in queues_raw['QueueSummaryList']: 
-        queues_list.append(str(i['Id']))
-    
+    for i in queues_raw['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_list.append([i['Id'], i['Name']])
 
     response = client.get_current_metric_data(
         InstanceId=Config.INSTANCE_ID,
         Filters = {
-            'Queues' : [ 
-                [i['Id'] for i in queues_list[0]],
-            ]
+            'Queues' : [i[0] for i in queues_list],
         },
+        Groupings=['QUEUE',],
         CurrentMetrics = [
             {
-                'Name': 'CONTACTS_IN_QUEUE',
+                'Name': 'CONTACTS_IN_QUEUE', 
                 'Unit': 'COUNT'
             }
-        ]
+        ],
     )
+    for i in queues_list:
+        print(i[0]) 
+    
 
-    return response['CurrentMetrics']
-    # #We need to get the data for the y axis points
-    # data = []
+    data = []
 
-    # for j in range(len(response['MetricResults'])):
-    #     data.append(response['MetricResults'][j]['Collections'][0]['Value']) 
+    return response
+
+    # for j in response['MetricResults']:
+    #     data.append(j['Collections'][0]['Value']) 
     
     # series_example = [models.SeriesData(name=response['MetricResults'][0]['Collections'][0]['Metric']['Name'], data=data)]
 
     # # Create the x axis labels
     # xaxis_example = models.XAxisData(
-    #     categories=queues_list
+    #     categories=[i[1] for i in queues_list]
     # )
 
     # # Create the graph options
@@ -1168,9 +1181,66 @@ async def get_queues():
     # # Create the graph
     # example_graph = models.GenericGraph(
     #     title="Queues",
-    #     description="Graph shows  ",
+    #     description="Graph shows capacity the all queues",
     #     footer="" ,
     #     chart = example_chart
     # )
 
     # return example_graph
+
+@router.get("/agent/avg-holds", tags=["agent"])
+async def get_avg_holds():
+    '''
+    The total count of cases existing in a given domain. 
+    '''
+    
+    routing_profile_list = await routing_profiles()
+    client = boto3.client('connect')
+    
+    queues_list = await list_queues() 
+
+    queues_id_list = []    
+    for i in queues_list['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_id_list.append(i['Id'])    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'QUEUE',
+            'FilterValues' : queues_id_list,  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AVG_HOLDS',
+            }
+        ]
+    )
+
+    data = []
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            data.append(str(n['Value']))
+    
+    cardFooter = models.CardFooter(
+        color="text-red-500",
+        value="",
+        label="The average number of times a voice contact was put on hold ",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Average Holds",
+        value=data[0],  # Ensure this is a string
+        icon="HandRaisedIcon",
+        footer=cardFooter,
+    )
+
+    return card
