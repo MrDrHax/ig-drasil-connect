@@ -11,8 +11,8 @@ from cache.cache_object import cachedData
 import boto3
 
 router = APIRouter(
-    prefix="/dashboard",
-    tags=["dashboard"],
+    prefix="/dashboardAgents_router",
+    tags=["dashboardAgents_router"],
     responses={
         200: {"description": "Success"},
         # 202: {"description": "Accepted, request is being processed. Applies for connect requests that might take a while."},
@@ -156,51 +156,53 @@ async def get_current_cases():
 
     return card
 
-@router.get("/agent/max_time_queue", tags=["agent"])
-async def get_max_time_queue():
+@router.get("/card/agent/People_to_answer", tags=["card"])
+async def get_People_to_answer():
     '''
-    Time max in the queue 
-    '''
+    Returns the number of people all queues
     
-    routing_profile_list = await routing_profiles()
+    ''' 
+    
     client = boto3.client('connect')
     
-    response = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = datetime.today(),
-        EndTime = datetime.today(),
-        Interval = {
-            'TimeZone': 'UTC',
-            'IntervalPeriod': 'TOTAL',
+    queues_raw = await list_queues() 
+
+    queues_list = []    
+    
+    for i in queues_raw['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_list.append([i['Id'], i['Name']])
+
+    response = client.get_current_metric_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Queues' : [i[0] for i in queues_list],
         },
-        Filters = [
+        Groupings=['QUEUE',],
+        CurrentMetrics = [
             {
-            'FilterKey': 'ROUTING_PROFILE',
-            'FilterValues' : [i['Id'] for i in routing_profile_list],  
-            } 
-        ], 
-        Metrics = [
-            {
-                'Name': 'MAX_QUEUED_TIME',
+                'Name': 'CONTACTS_IN_QUEUE', 
+                'Unit': 'COUNT'
             }
-        ]
+        ],
     )
 
-    data = []
+    data=0
+    
     for i in response['MetricResults']:
         for n in i['Collections']:
-            data.append(str(n['Value']))
+            data += n['Value']
     
     cardFooter = models.CardFooter(
         color="text-red-500",
         value="",
-        label="The total count of cases existing this month",
+        label="There are currently this many people in all queues, waiting to be answered",
     )
 
     card = models.GenericCard(
         id=1,
-        title="Current Cases",
-        value=data[0],  # Ensure this is a string
+        title="People to answer",
+        value=str(data), 
         icon="BriefcaseIcon",
         footer=cardFooter,
     )
