@@ -97,8 +97,8 @@ async def get_agents(qpams: Annotated[QueryParams, Depends()], token: Annotated[
     statuses: "connected", "disconnected", "on-call", "busy", "on-break"
     '''
 
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    # if not userType.isManager(token):
+    #     raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     data = await cachedData.get("routing_profiles_data")
 
