@@ -44,21 +44,14 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
         await get_connected_agents(token),
         # await get_avg_handle_time(),
         await get_abandonment_rate(token),
-        await get_avg_holds(token),
-        await get_capacity(token)
+        # await get_avg_holds(token),
     ]
 
     graphs = [
         await graph_example(),
         await get_avg_contact_duration(token),
-        await get_queues(token)
-        
+        await get_queues(token),  
     ]
-    '''    
-    await get_unfinished_calls_graph(token),
-    await get_average_call_rating_graph(token),
-    await get_queues_graph(token)
-    '''
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
 
@@ -69,6 +62,7 @@ async def graph_example() -> models.GenericGraph:
     '''
     Returns an example of a generic graph.
     '''
+
 
     series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
 
@@ -99,10 +93,8 @@ async def graph_example() -> models.GenericGraph:
 
 
 @router.get("/list-queues")
-async def list_queues(token: Annotated[str, Depends(requireToken)]):
+async def list_queues():
 
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
     response = client.list_queues(
@@ -112,10 +104,8 @@ async def list_queues(token: Annotated[str, Depends(requireToken)]):
     return response
 
 @router.get("/routing-profiles", response_model=List[dict])
-async def routing_profiles(token: Annotated[str, Depends(requireToken)]):
+async def routing_profiles():
     
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
 
@@ -128,10 +118,8 @@ async def routing_profiles(token: Annotated[str, Depends(requireToken)]):
 
 
 @router.get("/get-online-users-data")
-async def get_online_users_data(token: Annotated[str, Depends(requireToken)]):
+async def get_online_users_data():
 
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
     users = client.list_users(
@@ -151,10 +139,9 @@ async def get_online_users_data(token: Annotated[str, Depends(requireToken)]):
 
 
 @router.get("/get-not-connected-users-data")
-async def get_not_connected_users_data(token: Annotated[str, Depends(requireToken)]):
+async def get_not_connected_users_data():
 
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+   
 
     client = boto3.client('connect')
     users = client.list_users(
@@ -181,7 +168,7 @@ async def get_not_connected_users_data(token: Annotated[str, Depends(requireToke
     return userList
 
 @router.get("/average-call-time-duration")
-async def get_average_call_time(token: Annotated[str, Depends(requireToken)]):
+async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->models.GenericCard:
     
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
@@ -213,7 +200,24 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)]):
     
     )
 
-    return response['MetricResults']
+    data=response['MetricResults'][0]['Collections'][0]['Value']
+
+    cardFooter = models.CardFooter(
+        color ="text-green-500",
+        value="",
+        label="The average duration of a contact in minutes this month"
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Average Call Time",
+        value=str(data/60),
+        icon="ClockIcon",
+        footer=cardFooter,
+        color="blue"
+    )
+
+    return card
 
 @router.get("/graph/get-avg-contact-duration")
 async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])-> models.GenericGraph:
@@ -369,8 +373,15 @@ async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> 
     footer_info = models.CardFooter(color = "text-red-500" if today_res['TotalCount'] <= past_month_AVG else "text-green-500", 
                                     value=(str(today_res['TotalCount'] - past_month_AVG) if today_res['TotalCount'] <= past_month_AVG else ("+" + str(today_res['TotalCount'] - past_month_AVG))), 
                                     label= "than last month's average")
+    card= models.GenericCard(
+        id=1,
+        title="Connected users",
+        value=str(today_res['TotalCount']),
+        icon="UserIcon",
+        footer=footer_info
+    )
 
-    return models.GenericCard(id=1, title="Connected users", value="80", icon="UserGroupIcon", color="red", footer=footer_info)
+    return card
 
 
 @router.get("/cards/capacity", tags=["cards"])
@@ -602,7 +613,7 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
 
 
 @router.get("/agent/avg-holds", tags=["agent"])
-async def get_avg_holds(token: Annotated[str, Depends(requireToken)] ,agent_id:str)-> models.GenericCard:
+async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:str)-> models.GenericCard:
     '''
     The total count of cases existing in a given domain. 
     '''
@@ -696,15 +707,14 @@ async def get_avg_holds(token: Annotated[str, Depends(requireToken)] ,agent_id:s
 
     return card
 
-
 @router.get("/card/agent/People_to_answer", tags=["card"])
-async def get_People_to_answer(token: Annotated[str,Depends(requireToken)])-> models.GenericCard:
+async def get_People_to_answer()-> models.GenericCard:
     '''
     Returns the number of people all queues
     
     ''' 
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    # if not userType.isManager(token):
+    #     raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
     
@@ -748,9 +758,143 @@ async def get_People_to_answer(token: Annotated[str,Depends(requireToken)])-> mo
         value=str(data), 
         icon="BriefcaseIcon",
         footer=cardFooter,
+        color="green"
     )
 
     return card
+
+#---------------------------------------------------------------
+#----here schedule endpoints-----------------------------------
+#---------------------------------------------------------------
+
+@router.get("/card/agent/schedule", tags=["card"])
+async def get_schedule(agent_id:str):
+
+    client = boto3.client('connect')
+
+                                   
+    EndTime =  datetime.today()
+
+    today_res = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=31),
+        EndTime = EndTime,
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_ADHERENT_TIME',
+            }
+        ]
+    )
+
+    data=[]
+
+    for i in today_res['MetricResults']:
+        for n in i['Collections']:
+            data.append(n['Value'])
+    
+
+
+    return today_res
+    
+@router.get("/cards/capacity", tags=["cards"])
+async def get_capacity(token: Annotated[str, Depends(requireToken)],agent_id) -> models.GenericCard:
+    '''
+    Returns the capacity
+    '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    client = boto3.client('connect')
+
+    routing_profile_list = await routing_profiles()
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : agent_id,  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    response2 = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : agent_id,  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    datares1 = []
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            datares1.append(n['Value'])
+            print(datares1)
+    
+    datares2 = []
+    for i in response2['MetricResults']:
+        for n in i['Collections']:
+            datares2.append(n['Value'])
+            print(datares2)
+
+
+    comp = datares1[0]-datares2[0]
+
+    # dat
+
+    cardFooter = models.CardFooter(
+        color = "text-red-500" if comp > 0 else "text-green-500",
+        value = str(comp),
+        label ="than more in this mouth" if comp > 0 else "less than this month"
+    )
+    
+    card = models.GenericCard(
+        id = 1,
+        title = "Average Handle Time",
+        value =  str(datares1[0]),
+        icon = "UserIcon",
+        footer = cardFooter,
+        color="blue"
+    )
+
+    
+    
+    return card
+
+
+    
+
 
 
 
@@ -939,32 +1083,32 @@ async def get_People_to_answer(token: Annotated[str,Depends(requireToken)])-> mo
 # # ----------------------------------Aqui empiezan los no forzados----------------------------------------------------
 # # -------------------------------------------------------------------------------------------------------------------
 
-# # ------------------------------ Funciona
-# @router.get("/list-users-data", response_model=List[dict])
-# async def list_users_data():
-#     """
-#     Description:
-#         Return a list of agents of an instance.
+# ------------------------------ Funciona
+@router.get("/list-users-data", response_model=List[dict])
+async def list_users_data():
+    """
+    Description:
+        Return a list of agents of an instance.
     
-#     Parameters:
-#         * InstanceId [REQUIRED][string]: id of the Amazon Connect instance.
-#         * NextToken [string]: id of the Amazon Connect instance.
-#         * MaxResults [integer]: id of the Amazon Connect instance. Default=100
+    Parameters:
+        * InstanceId [REQUIRED][string]: id of the Amazon Connect instance.
+        * NextToken [string]: id of the Amazon Connect instance.
+        * MaxResults [integer]: id of the Amazon Connect instance. Default=100
 
-#     @return 
-#         List containing the agents of an instance.
-#     """
+    @return 
+        List containing the agents of an instance.
+    """
     
     
 
-#     client = boto3.client('connect')
+    client = boto3.client('connect')
 
-#     # Get info about the users of said instance
-#     response = client.list_users(
-#         InstanceId=Config.INSTANCE_ID,
-#     )
+    # Get info about the users of said instance
+    response = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
 
-#     return response['UserSummaryList']
+    return response['UserSummaryList']
 
 # # ---------------------------------------------------- Volver a checar (requiere numero de telefono)
 # @router.get("/get-current-metric-data")
