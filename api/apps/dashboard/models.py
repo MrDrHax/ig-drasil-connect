@@ -38,6 +38,14 @@ class ChartData(BaseModel):
     options: GraphOptions
     ''' The options to be displayed in the chart. '''
 
+class OcupacyCard(BaseModel):
+    color: str 
+    icon: str
+    title: str
+    value: int
+    footer: dict[str, str] = Field({}, examples={"color": "text-green-500","value":"+3%", "label": "minutes ago"})
+      
+
 class GenericGraph(BaseModel):
     title: str = Field("Queues", examples=["Queues"])
     ''' The title of the graph.'''
