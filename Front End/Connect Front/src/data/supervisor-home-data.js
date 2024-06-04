@@ -18,3 +18,17 @@ export async function SupervisorHomeData() {
   // This returns a JSON object that needs to be separated into the cards and graphs
   return await response.json();
 }
+
+export async function AgentHomeData(agent_id) {
+  let url = getApiPath() + `dashboard/agent_cards?agent_id=` + agent_id;
+  let request = new Request(url);
+  addTokenToHeader(request);
+  let response = await fetch(request);
+  if (!response.ok) {
+    // raise error
+    throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+  }
+
+  // This returns a JSON object that needs to be separated into the cards and graphs
+  return await response.json();
+}

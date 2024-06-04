@@ -28,6 +28,7 @@ import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import {Notifications} from "../dashboard/notifications.jsx";
 import { getBgColor,getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
+import { AgentHomeData } from "@/data/supervisor-home-data.js";
 
 
 export function Agent() {
@@ -38,7 +39,22 @@ export function Agent() {
   const [open, setOpen] = useState(1);
  
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
+  const [cards, setCards] = useState([]);
 
+  function getIcon(icon) {
+    switch (icon) {
+      case "Arrow":
+        return ArrowUpIcon;
+      case "Book":
+        return BookOpenIcon;
+      case "Clock":
+        return ClockIcon;
+      case "Person":
+        return UserGroupIcon;
+      default:
+        return CheckCircleIcon;
+    }
+  }
 
   function updateData() {
 
@@ -47,6 +63,11 @@ export function Agent() {
           sessionStorage.setItem("userID", data);
       });
     }
+
+    AgentHomeData(sessionStorage.getItem("userID")).then((data) => {
+      setCards(data.cards);
+
+    });
   }
 
   //Call the function just once
@@ -57,12 +78,12 @@ export function Agent() {
   return (
     <div className="mt-8">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
+        { cards.map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
             {...rest}
             title={title}
-            icon={React.createElement(icon, {
+            icon={React.createElement(getIcon(icon), {
               className: "w-6 h-6 text-white",
             })}
             footer={
