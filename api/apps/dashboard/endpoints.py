@@ -1033,38 +1033,38 @@ async def list_users_data():
     
 # #     return response_iterator
 
-# @router.get("/agent-profile", tags=["profile"])
-# async def get_agent_profile(id: str) -> models.AgentProfileData:
-#     '''
-#     Returns the profile of an agent.
+@router.get("/agent-profile", tags=["profile"])
+async def get_agent_profile(id: str) -> models.AgentProfileData:
+     '''
+     Returns the profile of an agent.
 
-#     To get the full list, go to /lists/agents
-#     '''
-#     try:
-#         client = boto3.client('connect')
-#         response = client.describe_user(
-#             InstanceId=Config.INSTANCE_ID,
-#             UserId=id
-#         )
+     To get the full list, go to /lists/agents
+     '''
+     try:
+         client = boto3.client('connect')
+         response = client.describe_user(
+             InstanceId=Config.INSTANCE_ID,
+             UserId=id
+        )
 
 
-#         FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
-#         Agent_email = response["User"]["Username"]
+         FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
+         Agent_email = response["User"]["Username"]
 
-#         try:
-#             Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
-#         except:
-#             Agent_mobile = "Unknown"
+         try:
+             Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
+         except:
+             Agent_mobile = "Unknown"
 
-#         # FullName, Agent_email, Agent_mobile = cachedData.get("agent_profile_data", id=id)
+         # FullName, Agent_email, Agent_mobile = cachedData.get("agent_profile_data", id=id)
 
-#         # logger.info(f"{FullName}, {Agent_email}, {Agent_mobile}")
+         # logger.info(f"{FullName}, {Agent_email}, {Agent_mobile}")
 
-#         return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile)
+         return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile)
 
-#     except Exception as e:
-#         logger.error(f"Error in get_agent_profile: {e}")
-#         raise HTTPException(status_code=500, detail="Internal server error")
+     except Exception as e:
+         logger.error(f"Error in get_agent_profile: {e}")
+         raise HTTPException(status_code=500, detail="Internal server error")
 
 # # list_recommenders_cache = []
 
