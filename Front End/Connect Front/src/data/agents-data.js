@@ -63,16 +63,6 @@ export async function AgentDetails(id) {
     }
 
     return await response.json();
-
-    /*
-    return {
-        avatar: "/img/team-2.jpeg",
-        name: "John Doe",
-        queue: "Support",
-        status: "on-call",
-        id: id
-    }
-    */
 }
 
 /**
@@ -110,19 +100,3 @@ export async function JoinCall(agent_id) {
     return await response.json();
 
 }
-
-export function AgentsSummary() {
-    console.warn("AgentsSummary function is not implemented!!!");
-
-    return {
-        agentCount: 10,
-        table: {
-            connected: 5,
-            disconnected: 3,
-            onCall: 2
-        },
-        usageLevel: 40,
-    }
-}
-
-export default AgentList;
