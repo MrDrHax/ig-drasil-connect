@@ -50,6 +50,19 @@ async def read_agent_ratings(agent_id: str, token: Annotated[str, Depends(requir
 
     return res
 
+
+@router.get("/AgentContacts", tags=["contacts"])
+async def read_agent_contacts(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> list[dict]:
+    """
+    Returns a list of contacts for the agent.
+    """
+    if not userType.testToken(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
+
+    res = await cachedData.get('getAllAgentContact', agent_id=agent_id)
+
+    return res
+
 @router.get("/AgentRatingGraph", tags=["profile" ,"graph"] )
 async def read_agent_rating_graph(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> list[dashboardModels.GenericGraph]:
     """

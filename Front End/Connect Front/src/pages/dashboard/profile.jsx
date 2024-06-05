@@ -51,6 +51,7 @@ export function Profile() {
   const [ratingData, setRatingData] = useState([]);
   const [avgRating, setAvgRating] = useState(-1);
   const [numRatings, setNumRatings] = useState(0);
+  const [avgRatingFloat, setAvgRatingFloat] = useState(0.0);
 
   const [searchParams, setSearchParams] = useSearchParams();
   searchParams.get("profile")
@@ -68,6 +69,7 @@ export function Profile() {
     })
 
     AgentRatingData(searchParams.get("profile")).then((data) => {
+      setAvgRatingFloat(data[0]);
       setAvgRating(Math.round(data[0]));
       setNumRatings(data[1]);
     })
@@ -109,6 +111,9 @@ export function Profile() {
                   {/* Rating is not loaded until the data is loaded */}
                   { avgRating == -1 ? null : <Rating value={avgRating} readonly /> }
 
+                  <Typography className={`${getTypography()} ${getTextColor("white3")} text-[16px]`}>
+                    {avgRatingFloat}
+                  </Typography>
                   <Typography color="blue-gray" className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[10px]`}>
                     Based on {numRatings} analysed call{ numRatings > 1 ? 's' : ''}.
                   </Typography>
@@ -141,9 +146,9 @@ export function Profile() {
               title="Agent AI/n Recommendations"
               description= {"Al/n, your virtual assistant recommends: " + lexRecommendationData()[0].recomendation}
               details={{
-                "name": dataToDisplay.name,
-                mobile: dataToDisplay.mobile,
-                email: dataToDisplay.email,
+                "Name": dataToDisplay.name,
+                "Mobile Phone": dataToDisplay.mobile,
+                "Email": dataToDisplay.email,
               }}
             />
 

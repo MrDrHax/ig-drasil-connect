@@ -108,12 +108,19 @@ async def getAllAgentContact(agent_id: str) -> list[dict]:
 
     return response['Contacts']
 
-cachedData.add('getAllAgentContact', getLatestAgentContact, 120)
+cachedData.add('getAllAgentContact', getAllAgentContact, 120)
 
 def calculateRating(data: json) -> int:
     # Extract relevant data
-    agent_sentiment = data["ConversationCharacteristics"]["Sentiment"]["OverallSentiment"]["AGENT"]
-    customer_sentiment = data["ConversationCharacteristics"]["Sentiment"]["OverallSentiment"]["CUSTOMER"]
+    try:
+        agent_sentiment = data["ConversationCharacteristics"]["Sentiment"]["OverallSentiment"]["AGENT"]
+    except:
+        agent_sentiment = 0
+    try:
+        customer_sentiment = data["ConversationCharacteristics"]["Sentiment"]["OverallSentiment"]["CUSTOMER"]
+    except:
+        customer_sentiment = 0
+    
     interruptions_count = data["ConversationCharacteristics"]["Interruptions"]["TotalCount"]
     interruptions_time = data["ConversationCharacteristics"]["Interruptions"]["TotalTimeMillis"]
     agent_talk_time = data["ConversationCharacteristics"]["TalkTime"]["DetailsByParticipant"]["AGENT"]["TotalTimeMillis"]
@@ -129,6 +136,9 @@ def calculateRating(data: json) -> int:
     max_interruptions = 10  # Assuming 10 as a threshold for many interruptions
     interruptions_normalized = 1 - min(interruptions_count / max_interruptions, 1)
 
+    # Normalize interruptions time (Assuming interruptions time is high, so inversely scale it)
+    interruptions_time_normalized = 1 - min(interruptions_time / total_conversation_time, 1)
+
     # Normalize non-talk time (Assuming higher non-talk time is bad, so inversely scale it)
     non_talk_time_normalized = 1 - min(non_talk_time / total_conversation_time, 1)
 
@@ -138,8 +148,8 @@ def calculateRating(data: json) -> int:
 
     # Combine all normalized scores to calculate the final rating
     final_score = (agent_sentiment_normalized + customer_sentiment_normalized + 
-                   interruptions_normalized + non_talk_time_normalized + 
-                   talk_time_normalized) / 5
+                   interruptions_normalized + interruptions_time_normalized + non_talk_time_normalized + 
+                   talk_time_normalized) / 6
 
     # Scale final score to 0-5
     final_rating = final_score * 5
@@ -157,28 +167,32 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
 
     agent_ratings = []
 
-    #for contact in contactData:
-    contactID = contactData['Id']
+    for contact in contactData:
+        contactID = contact['Id']
 
-    file =f'{contactID}_analysis_' 
+        file =f'{contactID}_analysis_' 
 
-    matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
+        matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
 
-    if len(matches) == 0:
-        raise HTTPException(status_code=404, detail="Transcript not found")
+        if len(matches) == 0:
+            raise HTTPException(status_code=404, detail="Transcript not found")
 
-    file = matches[0]
+        file = matches[0]
 
-    response = clients3.get_object(
-        Bucket='amazon-connect-d62f5eebe090',
-        Key=file
-    )
+        response = clients3.get_object(
+            Bucket='amazon-connect-d62f5eebe090',
+            Key=file
+        )
 
-    transcript = response['Body'].read().decode('utf-8')
+        transcript = response['Body'].read().decode('utf-8')
 
-    transcript = json.loads(transcript)
+        transcript = json.loads(transcript)
 
-    agent_ratings.append(models.AgentRating(rating=calculateRating(transcript), timestamp=contactData['InitiationTimestamp']))
+        logger.warn(transcript['ConversationCharacteristics'])
+
+        # Filter out short conversations (less than 10 seconds)
+        if transcript['ConversationCharacteristics']['TotalConversationDurationMillis'] > 100:
+            agent_ratings.append(models.AgentRating(rating=calculateRating(transcript), timestamp=contact['InitiationTimestamp']))
 
     return agent_ratings
 
