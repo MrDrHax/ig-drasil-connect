@@ -4,7 +4,7 @@ import { LinkIcon } from "@heroicons/react/24/outline";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 
 import { postMessageData } from "@/data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
  
 /**
  * Renders a textarea component with a send button for posting messages.

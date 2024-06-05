@@ -1,3 +1,4 @@
+import { AgentId } from '@/data';
 import { v4 as uuidv4 } from 'uuid';
 
 export function getApiPath() {
@@ -120,8 +121,8 @@ export async function storeToken(data) {
     sessionStorage.setItem('access_token', access_token);
     sessionStorage.setItem('refresh', refresh);
 
+    // check if it's a supervisor
     sessionStorage.setItem('Supervisor', isSupervisor());
-    //sessionStorage.setItem('userID', data.deviceID);
 }
 
 export async function getApiToken(code) {

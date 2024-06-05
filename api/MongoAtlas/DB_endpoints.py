@@ -5,6 +5,8 @@ from config import Config
 from MongoAtlas.DB_connection import DataBase
 from . import models
 
+from apps.extras.endpoints import get_agentID
+
 from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
@@ -62,6 +64,9 @@ async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id:
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager or an agent to access this resource.")
     
 #    return db['chats'].find_one({"agent_id": agent_id})
+
+    if agent_id == 'null':
+        agent_id = await get_agentID(token)
 
     try:
         chat = db['chats'].find_one({"agent_id": agent_id})

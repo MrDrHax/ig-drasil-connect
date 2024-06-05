@@ -13,9 +13,10 @@ export function Login() {
 
     // Saving the tokens in local storage
     getApiToken(code)
-        .then(data => {
+        .then(data => {            
             storeToken(data)
-                .then(() => window.location.href = sessionStorage.getItem('Supervisor') === 'true' ? '/dashboard/home' : '/dashboard/agent')
+                .then(() => 
+                     window.location.href = sessionStorage.getItem('Supervisor') === 'true' ? '/dashboard/home' : '/dashboard/agent')
                 .catch(error => console.error('Error:', error));
         })
         .catch(error => console.error('Error:', error));
