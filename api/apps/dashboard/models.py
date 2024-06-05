@@ -183,3 +183,7 @@ class AgentProfileData(BaseModel):
     '''The email of the agent.'''  
     mobile: str = Field(...)
     '''The mobile of the agent.'''
+
+class GenericAlert(BaseModel):
+    Text: str = Field("Alert text", examples=["Alert text"])
+    color: str = Field("red", examples=["red", "green", "yellow"])
