@@ -26,7 +26,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
     let ccp_link = "https://igdrasilcallcenter.my.connect.aws/ccp-v2"
     let container_div = document.getElementById("container-div");
   
-    connect.core.initCCP(container_div, {ccpUrl: ccp_link, softphone : {allowFramedSoftphone: true}});
+    connect.core.initCCP(container_div, {ccpUrl: ccp_link, softphone : {allowFramedSoftphone: true}, debug: true});
   }, []);
 
   return (

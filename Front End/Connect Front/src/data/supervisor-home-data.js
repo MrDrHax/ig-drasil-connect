@@ -19,6 +19,13 @@ export async function SupervisorHomeData() {
   return await response.json();
 }
 
+/**
+ * Retrieves agent home data from the API for a specific agent.
+ *
+ * @param {string} agent_id - The ID of the agent.
+ * @return {Promise<Object>} A promise that resolves to the agent home data as a JSON object.
+ * @throws {Error} If the API request fails.
+ */
 export async function AgentHomeData(agent_id) {
   let url = getApiPath() + `dashboard/agent_cards?agent_id=` + agent_id;
   let request = new Request(url);
@@ -30,5 +37,38 @@ export async function AgentHomeData(agent_id) {
   }
 
   // This returns a JSON object that needs to be separated into the cards and graphs
+  return await response.json();
+}
+
+/**
+ * Retrieves agent rating data from the API for a specific agent.
+ *
+ * @param {string} agent_id - The ID of the agent.
+ * @return {Promise<Object>} A promise that resolves to the agent rating data as a JSON object.
+ * @throws {Error} If the API request fails.
+ */
+export async function AgentRatingGraphData(agent_id) {
+  let url = getApiPath() + `summaries/AgentRatingGraph?agent_id=` + agent_id;
+  let request = new Request(url);
+  addTokenToHeader(request);
+  let response = await fetch(request);
+  if (!response.ok) {
+    // raise error
+    throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+  }
+
+  return await response.json();
+}
+
+export async function AgentRatingData(agent_id) {
+  let url = getApiPath() + `summaries/AgentRatingAvg?agent_id=` + agent_id;
+  let request = new Request(url);
+  addTokenToHeader(request);
+  let response = await fetch(request);
+  if (!response.ok) {
+    // raise error
+    throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+  }
+
   return await response.json();
 }
