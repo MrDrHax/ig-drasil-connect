@@ -60,7 +60,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 @router.get("/agent_cards", tags=["agent_view"])
 async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id: str) -> models.DashboardData:
     '''
-    Returns the cards that will be displayed on the dashboard.
+    Returns the cards that will be displayed on the agent dashboard.
     '''
     cards = [
         await get_avg_holds(token, agent_id),
@@ -473,7 +473,7 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     cardFooter = models.CardFooter(
         color = "text-red-500" if comp > 0 else "text-green-500",
         value = str(comp),
-        label ="than more in this mouth" if comp > 0 else "less than this month"
+        label ="more than last month" if comp > 0 else "less than last month"
     )
     
     card = models.GenericCard(
@@ -494,7 +494,7 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    routing_profile_list = await routing_profiles()
+    #routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
 
     queues_list = await list_queues() 
@@ -536,7 +536,7 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
     # print(card_value)
 
     if card_value > 50.0:
-        cardFooter_label = "percent higher than expected"
+        cardFooter_label = "percent higher than last months average"
         cardFooter_value = str(card_value - 50.0)
     else:
         cardFooter_label = "The abandonment rate is stable"
@@ -637,7 +637,7 @@ async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:st
     The total count of cases existing in a given domain. 
     '''
 
-    if not userType.isManager(token):
+    if not userType.isAgent(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     client = boto3.client('connect')
 
@@ -844,7 +844,7 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
     '''
     Returns the productive time of an agent
     '''
-    if not userType.isManager(token):
+    if not userType.isAgent(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
     client = boto3.client('connect')
@@ -887,37 +887,51 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
         ]
     )
 
-    datares1 = []
-    for i in response['MetricResults']:
-        for n in i['Collections']:
-            datares1.append(n['Value'])
-            print(datares1)
-    
-    datares2 = []
-    for i in response2['MetricResults']:
-        for n in i['Collections']:
-            datares2.append(n['Value'])
-            print(datares2)
+    try:
+        
+        datares1 = []
+        for i in response['MetricResults']:
+            for n in i['Collections']:
+                datares1.append(n['Value'])
+                print(datares1)
+        
+        datares2 = []
+        for i in response2['MetricResults']:
+            for n in i['Collections']:
+                datares2.append(n['Value'])
+                print(datares2)
 
+        comp = datares1[0]-datares2[0]
 
-    comp = datares1[0]-datares2[0]
+        cardFooter = models.CardFooter(
+            color = "text-red-500" if comp > 0 else "text-green-500",
+            value = str(comp),
+            label ="more than last month" if comp > 0 else "less than last month"
+        )
+        
+        card = models.GenericCard(
+            id = 1,
+            title = "Average Handle Time",
+            value =  str(datares1[0]),
+            icon = "UserIcon",
+            footer = cardFooter,
+            color="blue"
+        )
 
-    cardFooter = models.CardFooter(
-        color = "text-red-500" if comp > 0 else "text-green-500",
-        value = str(comp),
-        label ="than more in this mouth" if comp > 0 else "less than this month"
-    )
-    
-    card = models.GenericCard(
-        id = 1,
-        title = "Average Handle Time",
-        value =  str(datares1[0]),
-        icon = "UserIcon",
-        footer = cardFooter,
-        color="blue"
-    )
-
-    
+    # If there is no data for the agent return no data
+    except:
+        card = models.GenericCard(
+            id = 0,
+            title = "Average Handle Time",
+            value =  "No data",
+            icon = "UserIcon",
+            footer = models.CardFooter(
+                color = "text-red-500",
+                value = "",
+                label ="No data"
+            ),
+            color="blue"
+        )
     
     return card
 

@@ -15,7 +15,7 @@ export function Login() {
     getApiToken(code)
         .then(data => {
             storeToken(data)
-                .then(() => window.location.href = '/dashboard/home')
+                .then(() => window.location.href = sessionStorage.getItem('Supervisor') === 'true' ? '/dashboard/home' : '/dashboard/agent')
                 .catch(error => console.error('Error:', error));
         })
         .catch(error => console.error('Error:', error));

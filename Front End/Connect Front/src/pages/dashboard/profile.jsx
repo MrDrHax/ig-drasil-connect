@@ -127,6 +127,7 @@ export function Profile() {
                 email: dataToDisplay.email,
 
                 /* Change Social Media Icons to proficiencies */
+                /*
                 "social media": (
                   <div className="flex items-center gap-4">
                     <i className="fa-brands fa-facebook text-blue-700" />
@@ -134,6 +135,7 @@ export function Profile() {
                     <i className="fa-brands fa-instagram text-purple-500" />
                   </div>
                 ),
+                */
                 
               }}
             />
