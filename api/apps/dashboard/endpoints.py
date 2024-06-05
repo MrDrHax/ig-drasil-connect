@@ -976,6 +976,45 @@ async def get_usename(agent_id:str):
     for i in response['UserSummaryList']:
         if i['Id'] == agent_id:
             return i['Username']
+        
+
+# DONT DELETE THIS ROUTE
+@router.get("/agent-profile", tags=["profile"])
+async def get_agent_profile(id: str) -> models.AgentProfileData:
+    '''
+    Returns the profile of an agent.
+
+    To get the full list, go to /lists/agents
+    '''
+    try:
+        client = boto3.client('connect')
+        response = client.describe_user(
+            InstanceId=Config.INSTANCE_ID,
+            UserId=id)
+
+
+        FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
+        Agent_email = response["User"]["Username"]
+
+        try:
+            Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
+        except:
+            Agent_mobile = "Unknown"
+
+        roleids = response['User']['SecurityProfileIds']
+     
+        roles = []
+        for roleid in roleids:
+            role = client.describe_security_profile(
+                InstanceId=Config.INSTANCE_ID,
+                SecurityProfileId=roleid)
+            roles.append(role['SecurityProfile']['SecurityProfileName'])
+
+        return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile, roles=roles)
+
+    except Exception as e:
+        logger.error(f"Error in get_agent_profile: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 #------ Alerts endpoints
