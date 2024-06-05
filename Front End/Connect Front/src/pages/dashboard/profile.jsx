@@ -99,9 +99,10 @@ export function Profile() {
                 </Typography>
                 <Typography variant="small" className={`text-[0.8rem] ${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
                 {/* Role List */}
-                  { getRolesFromToken().includes('manager') && getRolesFromToken().includes('agent') ? 'Agent / Supervisor' : 
-                  !getRolesFromToken().includes('manager') ? 'Agent' :
-                  !getRolesFromToken().includes('agent') ? 'Supervisor' : ''}
+                  { dataToDisplay.roles == null ? '' : 
+                  dataToDisplay.roles.includes('Admin') ? 'Agent / Supervisor' : 
+                  dataToDisplay.roles.includes('Agent') ? 'Agent' :
+                  dataToDisplay.roles.includes('CallCenterManager') ? 'Supervisor' : ''}
 
                 </Typography>
                 <div className="flex items-center gap-2 font-bold text-blue-gray-500">
@@ -139,26 +140,15 @@ export function Profile() {
             <ProfileInfoCard
               title="Agent AI/n Recommendations"
               description= {"Al/n, your virtual assistant recommends: " + lexRecommendationData()[0].recomendation}
-              // "Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
               details={{
                 "name": dataToDisplay.name,
                 mobile: dataToDisplay.mobile,
                 email: dataToDisplay.email,
-
-                /* Change Social Media Icons to proficiencies */
-                /*
-                "social media": (
-                  <div className="flex items-center gap-4">
-                    <i className="fa-brands fa-facebook text-blue-700" />
-                    <i className="fa-brands fa-twitter text-blue-400" />
-                    <i className="fa-brands fa-instagram text-purple-500" />
-                  </div>
-                ),
-                */
-                
               }}
             />
-            <div>
+
+              {/* Add Last Customer Calls */}
+              <div>
               <Typography variant="small" className={`text-[0.8rem] ${getTypographybold()} ${getTextColor("dark")} pb-5`}>
                   Last customer calls
                 </Typography>

@@ -60,12 +60,9 @@ async def read_agent_rating_graph(agent_id: str, token: Annotated[str, Depends(r
 
     list = await cachedData.get('getListAgentRatings', agent_id=agent_id)
 
-    if len(list) == 1:
-        ratings = [ list[0].rating ]
-        times = [ list[0].timestamp.strftime("%m-%d %H:%M") ]
-    else:
-        ratings = [ x.rating for x in list ]
-        times = [ x.timestamp.strftime("%m-%d %H:%M") for x in list ]
+
+    ratings = [ x.rating for x in list ]
+    times = [ x.timestamp.strftime("%m-%d %H:%M") for x in list ]
 
     chart_info = dashboardModels.ChartData(type="line", series=[dashboardModels.SeriesData(name="Rating", data=ratings)], options=dashboardModels.GraphOptions(xaxis=dashboardModels.XAxisData(categories=times)))
     res = dashboardModels.GenericGraph(title="Agent Rating Graph", description="Graph showing agent rating through time", footer="Updated " + datetime.now().strftime("%m-%d @ %H:%M"), chart=chart_info)
