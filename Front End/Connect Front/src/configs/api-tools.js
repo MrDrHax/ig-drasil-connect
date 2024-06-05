@@ -1,3 +1,4 @@
+import { AgentId } from '@/data';
 import { v4 as uuidv4 } from 'uuid';
 
 export function getApiPath() {
@@ -92,6 +93,24 @@ export function addTokenToHeader(request) {
     return request;
 }
 
+export function isSupervisor() {
+    try{
+        let roles = getRolesFromToken();
+
+        console.warn(roles);
+        for (let i = 0; i < roles.length; i++) {
+            if (roles[i] === "manager") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    catch{
+        return true
+    }
+}
+
 export async function storeToken(data) {
     let token = data.id_token;
     let access_token = data.access_token;
@@ -101,7 +120,9 @@ export async function storeToken(data) {
     sessionStorage.setItem('token', token);
     sessionStorage.setItem('access_token', access_token);
     sessionStorage.setItem('refresh', refresh);
-    //sessionStorage.setItem('userID', data.deviceID);
+
+    // check if it's a supervisor
+    sessionStorage.setItem('Supervisor', isSupervisor());
 }
 
 export async function getApiToken(code) {

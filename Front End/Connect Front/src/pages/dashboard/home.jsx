@@ -10,7 +10,7 @@ import {
   MenuItem
 } from "@material-tailwind/react";
 import {
-  EllipsisVerticalIcon,
+  EllipsisVerticalIcon
 } from "@heroicons/react/24/outline";
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
@@ -32,6 +32,7 @@ export function Home() {
 
   const [cards, setCards] = useState([]);
   const [graphs, setGraphs] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
 
   function getIcon(icon) {
@@ -54,6 +55,7 @@ export function Home() {
     SupervisorHomeData().then((data) => {
       setCards(data.cards);
       setGraphs(data.graphs);
+      setIsLoaded(true);
       //console.log(data);
     });
   }
@@ -65,43 +67,62 @@ export function Home() {
 
   return (
     <div className="mt-4">
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        { cards.map(({ icon, title, footer, ...rest }) => (
-          //statisticsCardsData().map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(getIcon(icon), {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
-      </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        { graphs.map((props) => (
-          //statisticsChartsData.map((props) => (
-          <StatisticsChart
-            key={props.title}
-            {...props}
-            footer={
-              <Typography
-                //variant="small"
-                className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}
-              >
-                <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
-                &nbsp;{props.footer}
-              </Typography>
-            }
-          />
-        ))}
+        {!isLoaded ? (
+        <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+          <span className="flex justify-center items-center">
+          <span className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></span>
+          </span>
+          <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+            Cards are now loading...
+          </Typography>
+        </div>
+        ) : (
+          cards.map(({ icon, title, footer, ...rest }) => (
+            <StatisticsCard
+              key={title}
+              {...rest}
+              title={title}
+              icon={React.createElement(getIcon(icon), {
+                className: "w-6 h-6 text-white",
+              })}
+              footer={
+                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                  <strong className={footer.color}>{footer.value}</strong>
+                  &nbsp;{footer.label}
+                </Typography>
+              }
+            />
+          ))
+        )}
       </div>
+
+      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+        {!isLoaded ? (
+          <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+            <span className="flex justify-center items-center">
+            <span className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></span>
+            </span>
+            <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+            Graphs are now loading...
+          </Typography>
+          </div>
+        ) : (
+          graphs.map((props) => (
+            <StatisticsChart
+              key={props.title}
+              {...props}
+              footer={
+                <Typography className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                  <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
+                  &nbsp;{props.footer}
+                </Typography>
+              }
+            />
+          ))
+        )}
+      </div>
+
 
       {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">

@@ -173,7 +173,7 @@ class OngoingCallData(BaseModel):
     '''The average rating of a call. Range is 0 to 5'''
 
 class AgentProfileData(BaseModel):
-    name: str = Field(...)
+    name: str = Field('John Doe', examples=['John Doe', 'Jane Doe', 'John Smith'])
     '''The name of the agent.'''
     queue: str = Field('Support', examples=['Support', 'Finance', 'Sales'])
     '''The queue the agent is in.'''
@@ -183,6 +183,8 @@ class AgentProfileData(BaseModel):
     '''The email of the agent.'''  
     mobile: str = Field(...)
     '''The mobile of the agent.'''
+    roles: list[str] = Field([], examples=["Agent", "Supervisor", "Queue Supervisor"])
+    '''The roles of the agent.'''
 
 class GenericAlert(BaseModel):
     Text: str = Field("Alert text", examples=["Alert text"])

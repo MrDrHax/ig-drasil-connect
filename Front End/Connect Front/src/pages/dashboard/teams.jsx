@@ -12,7 +12,7 @@ import {
 // import { authorsTableData, projectsTableData } from "@/data";
 import { AgentList, JoinCall } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
-import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
@@ -192,15 +192,19 @@ export function Teams() {
                                 onChange={handleSearchStatus}
                             />
                         </div>
-                        <div className="mr-auto md:mr-4 md:w-56">
+                        <div className="mr-auto md:mr-4 md:w-56 flex items-center space-x-2">
+                            {/* Needs help filter*/}
                             <Checkbox
                                 color="white"
                                 label="Needs Help"
                                 labelProps={{ className: "text-white" }}
                                 checked={helpFilter}
                                 onChange={handleHelpFilter}
-                                
                             />
+                            {/* Update agents list button*/}
+                            <Button onClick={() => updateData()} className="ml-2" color="gray" variant="gradient">
+                                <ArrowPathIcon className="h-5 w-5"/>
+                            </Button>
                         </div>
                     </CardHeader>
                     <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
@@ -291,13 +295,13 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { /* requireHelp  True ?*/
+                                                            { requireHelp ?
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td>/* : null */
+                                                            </td> : null 
                                                             }
                                                         </tr>
                                                     );
