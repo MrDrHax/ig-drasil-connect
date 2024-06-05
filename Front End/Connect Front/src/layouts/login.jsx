@@ -28,7 +28,6 @@ export function Login() {
                     <span className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800">
                     </span>
                     </span>
-                    
                 </td>
             </tr>
         </div>
