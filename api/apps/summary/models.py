@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from datetime import datetime
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -17,3 +19,7 @@ class AgentPerformanceSummary(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AgentRating(BaseModel):
+    rating: float = Field(5, example=5, description="The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
+    timestamp: datetime = Field(datetime.now(), example=datetime.now(), description="The timestamp of when the rating was given")
