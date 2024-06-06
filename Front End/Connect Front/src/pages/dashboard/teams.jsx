@@ -22,18 +22,24 @@ import { useAlert } from "@/context/alerts";
 
 function getColorOfStatus(status) {
     switch (status) {
+        // Statuses while not in a call
         case "Available":
             return "green";
         case "Training":
             return "blue";
         case "On break":
-            return "yellow";
+            return "purple";
         case "Busy":
             return "orange";
         case "Needs Assistance":
             return "red";
-        default:
+        case "Offline":
             return "gray";
+        // Statuses while in a call
+        case "ENDED":
+            return "deep-orange";
+        default:
+            return "yellow";
     }
 }
 
@@ -286,7 +292,7 @@ export function Teams() {
                                                                 />
                                                             </td>
                                                             <td className={className}>
-                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
+                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'yellow' ? <ExclamationCircleIcon className="h-6 w-6 text-yellow-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
@@ -295,7 +301,7 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { requireHelp ?
+                                                            { requireHelp || getColorOfStatus(status) == 'yellow' ?
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
