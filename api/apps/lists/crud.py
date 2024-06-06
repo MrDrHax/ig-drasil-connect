@@ -25,7 +25,7 @@ async def get_routingProfilesArns():
     routingProfiles = await cachedData.get('get_routing_profile_list')
     return [profile['Arn'] for profile in routingProfiles]
 
-cachedData.add("get_routingProfilesArns", get_routingProfilesArns, 30) # 24 hours
+cachedData.add("get_routingProfilesArns", get_routingProfilesArns, 60*24) # 24 hours
 
 async def get_agent_name_data(id: str) -> str:
     client = boto3.client('connect')
