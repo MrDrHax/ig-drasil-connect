@@ -295,13 +295,13 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { /* requireHelp  True ?*/
+                                                            { requireHelp ?
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td>/* : null */
+                                                            </td> : null 
                                                             }
                                                         </tr>
                                                     );

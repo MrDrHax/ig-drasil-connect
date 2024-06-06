@@ -96,7 +96,7 @@ export function Agent() {
         ))}
       </div>
 
-      {/*Aqui es la tarjeta importa de los datos del usuario*/}
+      {/*Client Data*/}
       <div className="p-4 mb-10">
   <div className="grid grid-cols-2 gap-4">
     {customerDataAgent().map(({name, descripcion, footer, ...rest }) => (
@@ -134,7 +134,7 @@ export function Agent() {
 
 
 
-{/*Aqui es sobre el sistema de alerta del home page */}
+{/*Agent Alerts */}
 <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getTypography()} ${getBgColor("background-cards")}`}>
           <CardHeader
@@ -178,7 +178,7 @@ export function Agent() {
         </Card>
 
 
-  {/* Aquí esta para cambiar el Card de recomendaciones*/}
+  {/* Recomendations Card*/}
   <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
     <CardHeader
       floated={false}
@@ -220,7 +220,7 @@ export function Agent() {
   </div>
 
     
-  {/* Aqui es para el chat del agente*/}
+  {/*Agent Chat*/}
   <ChatBox agent_id={sessionStorage.getItem("userID")} is_supervisor={false}/>
 
   </div>

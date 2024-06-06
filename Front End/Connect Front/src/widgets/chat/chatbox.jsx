@@ -7,9 +7,9 @@ import {
 } from "@material-tailwind/react";
 
 import {
-  messageData, getChatData
+  messageData, getChatData, AgentId
 } from "@/data";
-import { getBgColor, getTextColor, useMaterialTailwindController,getTypographybold } from "@/context";
+import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypographybold } from "@/context";
 import {TwitterChatboxTextarea ,ChatMessage} from "@/widgets/chat";
 
 import {useState, useEffect} from 'react';
@@ -21,22 +21,24 @@ import {useState, useEffect} from 'react';
  */
 export function ChatBox({agent_id, is_supervisor}) {
     const controller = useMaterialTailwindController();
-    const { theme } = controller;
+    const { navColor, theme } = controller;
 
     const [dataToDisplay, setData] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(false);
 
 
     function updateData() {
-
+        setIsLoaded(false);
         getChatData(agent_id).then((data) => {
           setData(data);
+          setIsLoaded(true);
         });
       }
     
       //Call the function just once
       useEffect(() => {
         updateData();
-      }, []);
+      }, [agent_id]);
 
     return (
         <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} `} >
@@ -54,16 +56,20 @@ export function ChatBox({agent_id, is_supervisor}) {
             </CardHeader>
             <CardBody className={`overflow-y-scroll border border-${getTextColor("dark")} px-0 pt-0 pb-2 ` } style={{ maxHeight: '400px'}} >
             
-                {/* Renders the chat messages from the API calls */}
-                {dataToDisplay.map(({ content, supervisor_sender, timestamp }) => (
+                {!isLoaded || agent_id === null ?
+                /* Renders a loading indicator while the data is being fetched */
+                  <tr key="loading">
+                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                        <span className="flex justify-center items-center">
+                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                        </span>
+                    </td>
+                  </tr>
+                /* Renders the chat messages from the API calls */
+                : dataToDisplay.map(({ content, supervisor_sender, timestamp }) => (
                     <ChatMessage message={content} rol={supervisor_sender} hour={timestamp} is_supervisor={is_supervisor}/>
                 ))}
 
-            {/* Renders the chat messages from a Hard-coded array.
-            {messageData.map(({ message, rol, hour }) => (
-                <ChatMessage message={message} rol={rol} hour={hour} />
-            ))}
-            */}
 
             </CardBody>
             <CardBody className="p-4">
