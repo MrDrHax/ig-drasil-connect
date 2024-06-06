@@ -33,10 +33,7 @@ import {
   getTypography,
   getTypographybold,
 } from "@/context";
-import { getApiLoginPage, getNameFromToken } from "@/configs";
-
-
-import {getRolesFromToken} from '@/configs/api-tools';
+import { getApiLoginPage, getNameFromToken, getRolesFromToken } from "@/configs";
 
 function handleTabClick(tab) {
   history.push(`/${tab}`);
@@ -154,8 +151,22 @@ export function DashboardNavbar() {
           </IconButton>
 
           {/* Profile dropdown */}
-          <Tooltip placement="bottom" content="Profile">
-            <>
+          <Tooltip placement="bottom" className="border border-blue-gray-50 bg-white px-4 py-3 shadow-xl shadow-black/10"
+          content={ <div className="w-80">
+                      <Typography color="blue-gray" className="font-medium">
+                        {getNameFromToken()}
+                      </Typography>
+                      {getRolesFromToken().map((role, index) => (
+                        <Typography
+                          key={index}
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal opacity-80"
+                        >
+                          {role == "manager" ||  role == "agent" ? role : null}
+                        </Typography>
+                      ))}
+                    </div>}>
               <Button
                 variant="text"
                 color="blue-gray"
@@ -164,14 +175,7 @@ export function DashboardNavbar() {
                 <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
                 {getNameFromToken()}
               </Button>
-              <IconButton
-                variant="text"
-                color="blue-gray"
-                className="grid xl:hidden"
-              >
-                <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
-              </IconButton>
-            </>
+              
           </Tooltip>
           <Menu>
             <MenuHandler>
