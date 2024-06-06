@@ -10,7 +10,7 @@ from datetime import datetime , timedelta, date
 from tools.lazySquirrel import LazySquirrel
 from ..lists.endpoints import get_agents
 
-import random
+import random, math
 
 import boto3
 from config import Config
@@ -336,7 +336,7 @@ async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> 
     card= models.GenericCard(
         id=1,
         title="Agents in call.",
-        value=f'{agentsInCall}/{totalAgents} agents',
+        value=f'{agentsInCall} out of {totalAgents} connected agents',
         icon="UserIcon",
         footer=footer_info,
         color="pink",
@@ -432,6 +432,8 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
 @router.get("/cards/abandonment-rate", tags=["cards"])
 async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
 
+    # TODO fix this hot trash
+
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
@@ -466,33 +468,35 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
             }
         ]
     )
-    
-    data = []
-    for i in response['MetricResults']:
-        for n in i['Collections']:
-            data.append(str(n['Value']))  # Correctly access the value
 
-    card_value = float(data[0])
+    card_values = [i['Collections'][0]['Value'] for i in response['MetricResults']]
+    card_value = sum(card_values) / len(card_values)
 
     # print(card_value)
 
-    if card_value > 50.0:
-        cardFooter_label = "percent higher than last months average"
-        cardFooter_value = str(card_value - 50.0)
+    if (card_value > 80):
+        footerColor = "text-red-500"
+        footerSpecialText = f'{card_value - 80:.2f}%'
+        footerDesc = 'more than the max recommended rate.'
+    elif (card_value > 50):
+        footerColor = "text-orange-500"
+        footerSpecialText = f'{card_value - 50:.2f}%'
+        footerDesc = 'more than the recommended rate.'
     else:
-        cardFooter_label = "The abandonment rate is stable"
-        cardFooter_value = "0.0"
+        footerColor = "text-green-500"
+        footerSpecialText = f'{0}%'
+        footerDesc = 'more than the max recommended rate.'
 
     cardFooter = models.CardFooter(
-        color="text-red-500",
-        value=cardFooter_value,
-        label=cardFooter_label,
+        color=footerColor,
+        value=footerSpecialText,
+        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent.",
     )
 
     card = models.GenericCard(
         id=1,
-        title="Abandoment rate",
-        value=data[0],  # Ensure this is a string
+        title="Abandonment rate",
+        value="{:.2f}%".format(card_value),
         icon="PhoneXMarkIcon",
         footer=cardFooter,
     )
