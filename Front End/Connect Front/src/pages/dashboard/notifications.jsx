@@ -58,6 +58,7 @@ export function Notifications() {
   return (
     <div className="mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7 ">
           {info.map(({Text,TextRecommendation,color })=> (
+
             <Alert
               key={color}
               open={showAlerts[color]}
