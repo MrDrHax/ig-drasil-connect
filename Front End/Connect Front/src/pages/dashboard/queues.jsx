@@ -9,7 +9,7 @@ import {
   Progress,
   Button,
   Select,
-  Option,
+  Option
 } from "@material-tailwind/react";
 import { AgentList, QueueList, agentQueue } from "@/data";
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
@@ -30,6 +30,8 @@ export function Queues() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [desc_queue, setDesc_queue] = useState({});
+
   // pagination vars
   const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
   const [pagination_totalPages, pagination_setTotalPages] = useState(0);
@@ -45,6 +47,12 @@ export function Queues() {
       showAlertWithMessage("green", "Barging in to call with agent", 5000);
     else
       showAlertWithMessage("red", "Failed to barge in to call with agent", 5000); */
+  }
+
+  function showDesc(queueName) {
+    // Set the description to true for the queue that was clicked
+
+    setDesc_queue({ ...desc_queue, [queueName]: !desc_queue[queueName] });
   }
 
   function updateData(page = 1) {
@@ -116,94 +124,108 @@ useEffect(() => {
                   </td>
                 </tr> 
                 : dataToDisplay.map(
-                ({ name, usage, averageWaitTime, maxContacts }, key) => {
-                  const className = `py-3 px-5 ${key === dataToDisplay.length - 1
+                ({ name, description, usage, averageWaitTime, maxContacts }, key) => {
+                  const className = `py-3 px-5 ${key === dataToDisplay.length
                       ? ""
-                      : "border-b border-blue-gray-50"
+                      : "border-t border-blue-gray-50"
                     }`;
 
                   return (
-                    <tr key={name}>
-                      {/* Name */}
-                      <td className={className}>
-                        <div className="flex items-center  gap-4">
+                    <>
+                      <tr key={name} onClick={() => showDesc(name)} >
+                        {/* Name */}
+                        <td className={className}>
+                          <div className="flex items-center gap-4">
 
-                          <div>
+                            <div>
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className={`text-[0.8rem] ${getTypographybold()} ${getTextColor('black')}`}
+                              >
+                                {name}
+                              </Typography>
+
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Ongoing Calls */}
+                        <td className={className}>
+                          <Typography className={`text-[0.7rem] ${getTypography()} ${getTextColor('black')}`}>
+                            {usage}
+                          </Typography>
+                          {/*<Typography className="text-xs font-normal text-blue-gray-500">
+                              {ongoingCalls[1]}
+                            </Typography>*/}
+                        </td>
+
+                        {/* Average Wait Time */}
+                        <td className={className}>
+                          <Typography
+                            className={`text-[0.7rem] ${getTypography()} ${averageWaitTime <= 1 ? "text-green-600" : averageWaitTime <= 2.30 ? "text-orange-600" : "text-red-600"
+                              }`}
+                          >
+                            {averageWaitTime}
+                          </Typography>
+
+                          {/*<Typography className="text-xs font-normal text-blue-gray-500">
+                              {ongoingCalls[1]}
+                            </Typography>*/}
+                        </td>
+
+                        {/* Usage */}
+                        <td className={className}>
+                          <div className="w-10/12">
                             <Typography
                               variant="small"
-                              color="blue-gray"
-                              className={`text-[0.8rem] ${getTypography()} ${getTextColor('black')}`}
+                              className={`mb-1 block text-[0.7rem] font-medium ${getTextColor('black')}`}
                             >
-                              {name}
+                              {usage / maxContacts * 100}%
                             </Typography>
-
+                            <Progress
+                              value={usage / maxContacts * 100}
+                              variant="gradient"
+                              color={usage / maxContacts * 100 <= 50 ? "green" : usage / maxContacts * 100 > 50 && usage / maxContacts * 100 <= 80 ? "orange" : "red"}
+                              className="h-1"
+                            />
                           </div>
-                        </div>
-                      </td>
-
-                      {/* Ongoing Calls */}
-                      <td className={className}>
-                        <Typography className={`text-[0.7rem] ${getTypography()} ${getTextColor('black')}`}>
-                          {usage}
-                        </Typography>
-                        {/*<Typography className="text-xs font-normal text-blue-gray-500">
-                            {ongoingCalls[1]}
-                           </Typography>*/}
-                      </td>
-
-                      {/* Average Wait Time */}
-                      <td className={className}>
-                        <Typography
-                          className={`text-[0.7rem] ${getTypography()} ${averageWaitTime <= 1 ? "text-green-600" : averageWaitTime <= 2.30 ? "text-orange-600" : "text-red-600"
-                            }`}
-                        >
-                          {averageWaitTime}
-                        </Typography>
-
-                        {/*<Typography className="text-xs font-normal text-blue-gray-500">
-                            {ongoingCalls[1]}
-                           </Typography>*/}
-                      </td>
-
-                      {/* Usage */}
-                      <td className={className}>
-                        <div className="w-10/12">
-                          <Typography
-                            variant="small"
-                            className={`mb-1 block text-[0.7rem] font-medium ${getTextColor('black')}`}
-                          >
-                            {usage / maxContacts * 100}%
-                          </Typography>
-                          <Progress
-                            value={usage / maxContacts * 100}
-                            variant="gradient"
-                            color={usage / maxContacts * 100 <= 50 ? "green" : usage / maxContacts * 100 > 50 && usage / maxContacts * 100 <= 80 ? "orange" : "red"}
-                            className="h-1"
-                          />
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className={className}>
-                        <Chip
-                          variant="gradient"
-                          color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"}
-                          value={usage / maxContacts * 100 <= 80 ? "Free" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "Stressed" : "Exceeded"}
-                          className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
-                        />
-                      </td>
-
-                      {/* Move Agent to this Queue in case of not free usage */}
-                      { usage / maxContacts * 100 < 80 ? null :
-                        <td className="w-20" >
-                          <Select label="Move Agent" className="w-full">
-                            data
-                            <option value="Option 1">{getAgentList(name)}</option>
-                          </Select>
                         </td>
-                      }
 
-                    </tr>
+                        {/* Status */}
+                        <td className={className}>
+                          <Chip
+                            variant="gradient"
+                            color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"}
+                            value={usage / maxContacts * 100 <= 80 ? "Free" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "Stressed" : "Exceeded"}
+                            className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
+                          />
+                        </td>
+
+                        {/* Move Agent to this Queue in case of not free usage */}
+                        { usage / maxContacts * 100 < 80 ? null :
+                          <td className="w-20" >
+                            <Select label="Move Agent" className="w-full">
+                              data
+                              <option value="Option 1">{getAgentList(name)}</option>
+                            </Select>
+                          </td>
+                        }
+
+                      </tr>
+                      { !desc_queue[name] ? null :
+
+                      <tr key={name + "desc"} className="border-b border-blue-gray-50">
+                        <td colSpan="10" className="py-3 px-5">
+                          <Typography
+                            className={`text-[0.8rem] center ${getTypography()} ${getTextColor('black')}`}
+                          >
+                            {description}
+                          </Typography>
+                        </td>
+                      </tr>
+                      }
+                    </>
                   );
                 }
               )}

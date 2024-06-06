@@ -144,9 +144,12 @@ async def get_queues_data():
             # queue info/description
             queue_data = await cachedData.get('get_queue_description', queueID=q['Id'])
 
-            MaxContacts = int(queue_data.get('MaxContacts', 10) * 0.8) # 80% of the max contacts
-            #status = queue_data.get('Status', 'DISABLED')
-            status = queue_data['Status']
+            MaxContacts = int(queue_data.get('MaxContacts', 10))
+            #MaxContacts = int(queue_data.get('MaxContacts', 10) * 0.8) # 80% of the max contacts
+            status = queue_data.get('Status', 'DISABLED')
+            #status = queue_data['Status']
+
+            description = queue_data.get('Description', '')
 
         except (BotoCoreError, ClientError) as error:
             print(f"Error fetching current metric data: {error}")
@@ -161,6 +164,7 @@ async def get_queues_data():
             builtData.append(models.QueueDataListItem(
                 queueID=q['Id'],
                 name=q['Name'],
+                description=description,
                 maxContacts=MaxContacts,
                 usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
                 enabled=status == "ENABLED",
