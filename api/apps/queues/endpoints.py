@@ -39,12 +39,6 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     '''
     cards = [
         # await get_connected_users(token),
-        # await get_capacity(token),
-        # await get_average_call_time(token),
-        # await get_connected_agents(token),
-        # # await get_avg_handle_time(),
-        # await get_abandonment_rate(token),
-        # await get_avg_holds(token),
     ]
 
     graphs = [
@@ -58,3 +52,32 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     return toReturn
 
 # list_queues
+
+@router.get("/get/queues", tags=["cards"])
+async def get_queues(token: Annotated[str, Depends(requireToken)]):
+    '''
+    Returns the queues that will be displayed on the dashboard.
+    '''
+    availableQueues = ["Tickets Management", "Customize Assistance", "Event News", "Default Queue","Supervisor", "Callback"]
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    client = boto3.client('connect')
+    queues = client.list_queues(
+        InstanceId = Config.INSTANCE_ID,
+    )
+
+    myQueues = []
+    for queue in queues['QueueSummaryList']:
+        if queue['QueueType'] == "STANDARD":
+            if queue['Name'] in availableQueues:
+                myQueues.append(queue)
+
+    queues_data = client.describe_queue(
+        InstanceId = Config.INSTANCE_ID,
+        QueueId = myQueues[0]['Id']
+    )
+
+
+    return queues_data

@@ -39,19 +39,19 @@ async def read_agent_performance_summary(agent_id: str, token: Annotated[str, De
 
     return models.AgentPerformanceSummary(agent_id=agent_id, content=html_content)
 
-@router.get("/AI/AgentTranscript")
-async def read_agent_transcript_summary(agent_id: str) -> models.AgentTranscriptSummary:
-    res = await cachedData.get('getLatestAgentTranscript', agent_id=agent_id)
+# @router.get("/AI/AgentTranscript")
+# async def read_agent_transcript_summary(agent_id: str) -> models.AgentTranscriptSummary:
+#     res = await cachedData.get('getLatestAgentTranscript', agent_id=agent_id)
 
-    data = json.loads(res)
+#     data = json.loads(res)
     
-    return models.AgentTranscriptSummary(agent_id=agent_id, content=str(data))
+#     return models.AgentTranscriptSummary(agent_id=agent_id, content=str(data))
 
-@router.get("/AI/AgentContact")
-async def read_agent_contact_summary(agent_id: str) -> models.AgentTranscriptSummary:
-    res = await cachedData.get('getLatestAgentContact', agent_id=agent_id)
+# @router.get("/AI/AgentContact")
+# async def read_agent_contact_summary(agent_id: str) -> models.AgentTranscriptSummary:
+#     res = await cachedData.get('getLatestAgentContact', agent_id=agent_id)
 
-    return models.AgentTranscriptSummary(agent_id=agent_id, content=str(res))
+#     return models.AgentTranscriptSummary(agent_id=agent_id, content=str(res))
 
 
 @router.get("/AgentRatings")
