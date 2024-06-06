@@ -28,6 +28,7 @@ try:
     from apps.summary.endpoints import router as summary_router
     from apps.actions.endpoints import router as actions_router
     from apps.extras.endpoints import router as extras_router
+    from apps.dashboardAgent.endpoints import router as dashboardAgents_router
     from MongoAtlas.DB_endpoints import router as database_router
 
 except Exception as e:
@@ -83,6 +84,7 @@ try:
     app.include_router(actions_router)
     app.include_router(extras_router)
     app.include_router(database_router)
+    app.include_router(dashboardAgents_router)
 
     @app.get("/")
     def read_root():

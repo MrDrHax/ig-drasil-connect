@@ -7,10 +7,12 @@ import {
   Chip,
   Tooltip,
   Progress,
-
+  Button,
+  Select,
+  Option,
 } from "@material-tailwind/react";
-import { QueueList, agentQueue } from "@/data";
-import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
+import { AgentList, QueueList, agentQueue } from "@/data";
+import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 import React, { useEffect, useState } from 'react';
 import { useAlert } from "@/context/alerts";
@@ -35,6 +37,15 @@ export function Queues() {
   const [pagination_totalItems, pagination_setTotalItems] = useState(0);
 
   const { showAlertWithMessage } = useAlert();
+
+  function moveAgentToRoutingProfile(queueName) {
+    showAlertWithMessage("yellow", "Moved agent to routing profile: " + queueName, 5000);
+
+/*     if (result.status == 200)
+      showAlertWithMessage("green", "Barging in to call with agent", 5000);
+    else
+      showAlertWithMessage("red", "Failed to barge in to call with agent", 5000); */
+  }
 
   function updateData(page = 1) {
     let query = searchQuery ? "name=" + searchQuery : null;
@@ -95,8 +106,16 @@ useEffect(() => {
               </tr>
             </thead>
             <tbody>
-              { dataToDisplay.map(
-                //agentQueue.map(
+              { !isLoaded ?
+                // Loading
+                <tr key="loading">
+                  <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                      <span className="flex justify-center items-center">
+                          <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                      </span>
+                  </td>
+                </tr> 
+                : dataToDisplay.map(
                 ({ name, usage, averageWaitTime, maxContacts }, key) => {
                   const className = `py-3 px-5 ${key === dataToDisplay.length - 1
                       ? ""
@@ -163,6 +182,8 @@ useEffect(() => {
                           />
                         </div>
                       </td>
+
+                      {/* Status */}
                       <td className={className}>
                         <Chip
                           variant="gradient"
@@ -171,6 +192,16 @@ useEffect(() => {
                           className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
                         />
                       </td>
+
+                      {/* Move Agent to this Queue in case of not free usage */}
+                      { usage / maxContacts * 100 < 80 ? null :
+                        <td className="w-20" >
+                          <Select label="Move Agent" className="w-full">
+                            data
+                            <option value="Option 1">{getAgentList(name)}</option>
+                          </Select>
+                        </td>
+                      }
 
                     </tr>
                   );

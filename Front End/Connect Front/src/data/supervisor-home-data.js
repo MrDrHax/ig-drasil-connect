@@ -72,3 +72,15 @@ export async function AgentRatingData(agent_id) {
 
   return await response.json();
 }
+
+export async function Alerts(){
+  let url = getApiPath() + `dashboard/alerts/get_alerts_supervisor`;
+  let request = new Request(url);
+  let response = await fetch(request);
+  if (!response.ok) {
+    // raise error
+    throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+  }
+
+  return await response.json();
+}

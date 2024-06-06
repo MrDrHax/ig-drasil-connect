@@ -50,10 +50,10 @@ async def join_call(token: Annotated[str, Depends(requireToken)], agent_id: str)
 
     if len(response['UserDataList'][0]['Contacts']) == 0:
         raise HTTPException(status_code=404, detail="No contact found for the agent.")
-
+    
     call_id = response['UserDataList'][0]['Contacts'][0]['ContactId']
 
-    response = client.monitor_call(
+    response = client.monitor_contact(
         InstanceId=Config.INSTANCE_ID,
         ContactId=call_id,
         UserId=user_id,
