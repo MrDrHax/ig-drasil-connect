@@ -88,6 +88,13 @@ export async function AgentId() {
     return await response.json();
 }
 
+/**
+ * Joins a phone call in Amazon Connect for the specified agent.
+ *
+ * @param {string} agent_id - The ID of the agent whose call to join.
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the confirmation message of the call joining.
+ * @throws {Error} If the API request fails.
+ */
 export async function JoinCall(agent_id) {
 
     let url = getApiPath() + `actions/join_call?agent_id=${agent_id}}`;
