@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
 import { Avatar, Typography } from "@material-tailwind/react";
+import { Chip } from "@material-tailwind/react";
 import { getBgColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 
-export function MessageCard({ img, name, message, action }) {
+export function MessageCard({ img, summary, status, duration, agentSentiment, customerSentiment, timestamp}) {
   const controller = useMaterialTailwindController();
 
   return (
@@ -10,37 +11,47 @@ export function MessageCard({ img, name, message, action }) {
       <div className="flex items-center gap-4">
         <Avatar
           src={img}
-          alt={name}
-          variant="rounded"
+          alt={timestamp}
+          variant="circular"
           className="shadow-lg shadow-blue-gray-500/25"
         />
         <div>
           <Typography
-            //variant="small"
-            className={`text-sm ${getTypographybold()} ${getTextColor("white3")} text-[0.8rem]`}
+            className={`text-sm ${getTypographybold()} ${getTextColor("white3")} text-[1rem]`}
           >
-            {name}
+            {timestamp}
           </Typography>
-          <Typography className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[0.6rem]`}>
-            {message}
+          <Typography className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[0.8rem]`}>
+            {summary}
+          </Typography>
+
+          <Typography
+            className={`text-sm ${getTypographybold()} ${getTextColor("white3")} text-[0.6rem]`}
+          >
+            {status}
+          </Typography>
+
+          <Typography
+            className={`text-sm ${getTypography()} ${getTextColor("white3")} text-[0.6rem]`}
+          >
+            {(duration / 60000).toFixed(0)} minutes {(duration / 1000).toFixed(1)} seconds
+          </Typography>
+
+          <Typography
+            className={`text-sm ${getTypography()} ${agentSentiment > 1 ? "text-green-500" : agentSentiment < -1 ? "text-red-500" : getTextColor("white3")} text-[0.6rem]`}
+          >
+            Agent Sentiment was {agentSentiment > 1 ? "Positive" : agentSentiment < -1 ? "Negative" : "Neutral"}
+          </Typography>
+          <Typography
+            className={`text-sm ${getTypography()} ${customerSentiment > 1 ? "text-green-500" : customerSentiment < -1 ? "text-red-500" : getTextColor("white3")} text-[0.6rem]`}
+          >
+            Customer Sentiment was {customerSentiment > 1 ? "Positive" : customerSentiment < -1 ? "Negative" : "Neutral"}
           </Typography>
         </div>
       </div>
-      {action}
     </div>
   );
 }
-
-MessageCard.defaultProps = {
-  action: null,
-};
-
-MessageCard.propTypes = {
-  img: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  message: PropTypes.node.isRequired,
-  action: PropTypes.node,
-};
 
 MessageCard.displayName = "/src/widgets/cards/message-card.jsx";
 
