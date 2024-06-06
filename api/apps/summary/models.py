@@ -42,3 +42,12 @@ class AgentSentimentRating(BaseModel):
     sentiment : float = Field(0.0, example=0.0, description="The sentiment of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=1)
     ratingTitle: str = Field("Agent rating", example="Agent rating", description="Agent rating. In JSON format.")
     rating: float = Field(5, example=5, description="The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
+
+class AgentContactProfile(BaseModel):
+    summary: str = Field("Contact summary", example="Contact summary", description="Contact summary.")
+    status: str = Field("No status", example="COMPLETED", description="The final status of the contact.")
+    duration: int = Field(0, example=0, description="The duration of the contact in milliseconds.")
+    agentSentiment: float = Field(0, example=5, description="The sentiment of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
+    customerSentiment: float = Field(0, example=5, description="The sentiment of the customer. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
+    timestamp: str = Field("%m-%d %H:%M", example="%m-%d %H:%M", description="The timestamp of when the contact was given")
+
