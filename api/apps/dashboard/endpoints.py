@@ -948,6 +948,40 @@ async def list_users_data():
 
     return response['UserSummaryList']
 
+
+@router.get("/agent-last-contact")
+async def agent_last_contact(agent_id: str):
+    client = boto3.client('connect')
+    
+    searchRes = client.search_contacts(
+        InstanceId=Config.INSTANCE_ID,
+        TimeRange={
+            'Type': 'CONNECTED_TO_AGENT_TIMESTAMP',
+            'StartTime': datetime.now() - timedelta(days=30),
+            'EndTime': datetime.now()
+        },
+        SearchCriteria={
+            'AgentIds': [agent_id]
+        },
+        Sort={
+            'FieldName': 'CONNECTED_TO_AGENT_TIMESTAMP',
+            'Order': 'DESCENDING'
+        },
+        MaxResults=1
+    )
+
+    if 'Contacts' in searchRes and len(searchRes['Contacts']) > 0:
+        contact_id = searchRes['Contacts'][0]['Id']
+
+        describeRes = client.describe_contact(
+            InstanceId=Config.INSTANCE_ID,
+            ContactId=contact_id
+        )
+    
+    return describeRes
+    
+    
+
 # # ---------------------------------------------------- Volver a checar (requiere numero de telefono)
 # @router.get("/get-current-metric-data")
 # async def check_agent_availability(queue_id: str):

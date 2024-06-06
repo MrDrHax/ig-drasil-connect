@@ -17,3 +17,10 @@ class AgentPerformanceSummary(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AgentTranscriptSummary(BaseModel):
+    agent_id: str
+    content: str = Field("Agent transcript summary", example="Agent transcript summary", description="Agent transcript summary. In HTML format.")
+
+    class Config:
+        from_attributes = True
