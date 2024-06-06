@@ -216,7 +216,7 @@ useEffect(() => {
                       { !desc_queue[name] ? null :
 
                       <tr key={name + "desc"} className="border-b border-blue-gray-50">
-                        <td colSpan="10" className="py-3 px-5">
+                          <td colSpan="10" className={getBgColor("gray") + " py-3 px-5"}>
                           <Typography
                             className={`text-[0.8rem] center ${getTypography()} ${getTextColor('black')}`}
                           >

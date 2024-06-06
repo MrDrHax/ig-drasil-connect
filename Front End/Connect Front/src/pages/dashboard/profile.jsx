@@ -148,8 +148,8 @@ export function Profile() {
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
             <ProfileInfoCard
-              title="Agent AI/n Recommendations"
-              description= {"Al/n, your virtual assistant recommends: " + lexRecommendationData()[0].recomendation}
+              title="Agent AI.n Recommendations"
+              description= {"Al.n is under maintenance, please check back later."}
               details={{
                 "Name": dataToDisplay.name,
                 "Mobile Phone": dataToDisplay.mobile,

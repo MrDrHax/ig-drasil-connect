@@ -38,12 +38,12 @@ export function MessageCard({ img, summary, status, duration, agentSentiment, cu
           </Typography>
 
           <Typography
-            className={`text-sm ${getTypography()} ${agentSentiment > 1 ? "text-green-500" : agentSentiment < -1 ? "text-red-500" : getTextColor("white3")} text-[0.6rem]`}
+            className={`text-sm ${getTypography()} ${agentSentiment > 1 ? "text-green-500" : agentSentiment < -1 ? "text-red-500" : getTextColor("orange")} text-[0.6rem]`}
           >
             Agent Sentiment was {agentSentiment > 1 ? "Positive" : agentSentiment < -1 ? "Negative" : "Neutral"}
           </Typography>
           <Typography
-            className={`text-sm ${getTypography()} ${customerSentiment > 1 ? "text-green-500" : customerSentiment < -1 ? "text-red-500" : getTextColor("white3")} text-[0.6rem]`}
+            className={`text-sm ${getTypography()} ${customerSentiment > 1 ? "text-green-500" : customerSentiment < -1 ? "text-red-500" : getTextColor("orange")} text-[0.6rem]`}
           >
             Customer Sentiment was {customerSentiment > 1 ? "Positive" : customerSentiment < -1 ? "Negative" : "Neutral"}
           </Typography>
