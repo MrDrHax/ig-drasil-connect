@@ -73,11 +73,74 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]):
         if queue['QueueType'] == "STANDARD":
             if queue['Name'] in availableQueues:
                 myQueues.append(queue)
+                print(queue['Id'])
+                print(queue['Name'])
 
-    queues_data = client.describe_queue(
-        InstanceId = Config.INSTANCE_ID,
-        QueueId = myQueues[0]['Id']
+    queues_data = client.get_metric_data_v2(
+        # InstanceId = Config.INSTANCE_ID,
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e',
+        StartTime = datetime.now() - timedelta(days=34),
+        EndTime = datetime.now(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [{
+            'FilterKey': 'QUEUE',
+            'FilterValues': [queue['Id'] for queue in myQueues],
+        }],
+        Groupings = ['QUEUE'],
+        Metrics = [
+            {
+                'Name': 'AVG_QUEUE_ANSWER_TIME'
+            }
+        ]
     )
+
+    queue_series =[]
+    for queue in myQueues:
+        queue_series.append(models.SeriesData(name=queue['Name'], data=[]))
+
+    queue_series = models.SeriesData(name="Queue 1", data=[20,30,50,40,10])
+
+    series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
+
+    xaxis_example = models.XAxisData(
+        categories=["Jan", "Feb", "March", "Apr", "May"]
+    )
+
+    example_options = models.GraphOptions(
+        colors=["#3b82f6", "#f87171"],
+        xaxis=xaxis_example
+    )
+
+    example_chart = models.ChartData(
+        type="line",
+        series= series_example,
+        options=example_options
+    )
+
+    example_graph = models.GenericGraph(
+        title="Example Graph",
+        description="Graph showing number of calls per month",
+        footer="Updated 1st of June",
+        chart = example_chart
+    )
+
+    # return example_graph
 
 
     return queues_data
+
+
+
+    # AGENT_ANSWER_RATE
+    # AGENT_OCCUPANCY -> solo para: Routing Profile, Agent, Agent Hierarchy
+    # AVG_CONTACT_DURATION, AVG_INTERACTION_TIME, AVG_HANDLE_TIME
+    # AVG_QUEUE_ANSWER_TIME
+    # CONTACTS_ABANDONED
+    # CONTACTS_PUT_ON_HOLD
+    # CONTACTS_QUEUED
+
+    # MAX_QUEUED_TIME
+

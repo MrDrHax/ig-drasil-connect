@@ -75,28 +75,7 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
         userList.append(user['Id'])
 
     users_data = client.get_current_user_data(
-        InstanceId = Config.INSTANCE_ID,
-        ResouceARN = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e',
-        StartTime = datetime.now() - timedelta(days=35),
-        EndTime = datetime.now(),
-        Filters = {
-            'FilterKey': 'QUEUE',
-            'FilterValue': userList
-        },
-        Metrics = [
-            {
-                # AGENT_ANSWER_RATE
-                # AGENT_ANSWER_RATE
-                # AGENT_OCCUPANCY -> solo para: Routing Profile, Agent, Agent Hierarchy
-                # AVG_CONTACT_DURATION, AVG_INTERACTION_TIME, AVG_HANDLE_TIME
-                # AVG_QUEUE_ANSWER_TIME
-                # CONTACTS_ABANDONED
-                # CONTACTS_PUT_ON_HOLD
-                # CONTACTS_QUEUED
-
-                # MAX_QUEUED_TIME
-            }
-        ]
+        InstanceId=Config.INSTANCE_ID,
     )
 
     count = 0
