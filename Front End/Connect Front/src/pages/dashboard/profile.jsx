@@ -22,18 +22,15 @@ import {
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
-import { conversationsData } from "@/data";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 import { AgentDetails } from "@/data/agents-data";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
-import {getRolesFromToken} from '@/configs/api-tools';
-
 import {lexRecommendationData} from "@/data";
 
-import { AgentRatingGraphData, AgentRatingData } from "@/data/supervisor-home-data";
+import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/data/supervisor-home-data";
 
 /**
  * Renders the user profile page with tabs for app and chat views.
@@ -47,11 +44,14 @@ export function Profile() {
 
   const [view, setView] = useState('app');
   const [dataToDisplay, setData] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   
   const [ratingData, setRatingData] = useState([]);
   const [avgRating, setAvgRating] = useState(-1);
   const [numRatings, setNumRatings] = useState(0);
   const [avgRatingFloat, setAvgRatingFloat] = useState(0.0);
+
+  const [conversations, setConversations] = useState([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   searchParams.get("profile")
@@ -74,6 +74,11 @@ export function Profile() {
       setNumRatings(data[1]);
     })
 
+    AgentConversations(searchParams.get("profile")).then((data) => {
+      setConversations(data);
+    })
+
+    setIsLoaded(true);
   }
 
   //Call the function just once
@@ -112,7 +117,7 @@ export function Profile() {
                   { avgRating == -1 ? null : <Rating value={avgRating} readonly /> }
 
                   <Typography className={`${getTypography()} ${getTextColor("white3")} text-[16px]`}>
-                    {avgRatingFloat}
+                    {avgRatingFloat.toFixed(1)}
                   </Typography>
                   <Typography color="blue-gray" className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[10px]`}>
                     Based on {numRatings} analysed call{ numRatings > 1 ? 's' : ''}.
@@ -158,9 +163,18 @@ export function Profile() {
                   Last customer calls
                 </Typography>
                 <ul className={`flex flex-col gap-6`}>
-                  {conversationsData.map((props) => (
+                  { conversations.length == 0 ?
+                  <tr key="loading">
+                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                        <span className="flex justify-center items-center">
+                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                        </span>
+                    </td>
+                  </tr> :
+                  conversations.map((props) => (
                     <MessageCard
-                      key={props.name}
+                      key={props.timestamp}
+                      img="/img/favicon.png"
                       {...props}
                     />
                   ))}

@@ -13,6 +13,7 @@ import {
   MenuList,
   MenuItem,
   Avatar,
+  Tooltip
 } from "@material-tailwind/react";
 import {
   UserCircleIcon,
@@ -151,23 +152,27 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-          <Link to="https://igdrasilconnect.awsapps.com/start">
-            <Button
-              variant="text"
-              color="blue-gray"
-              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
-            >
-              <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
-              {getNameFromToken()}
-            </Button>
-            <IconButton
-              variant="text"
-              color="blue-gray"
-              className="grid xl:hidden"
-            >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
-            </IconButton>
-          </Link>
+
+          {/* Profile dropdown */}
+          <Tooltip placement="bottom" content="Profile">
+            <>
+              <Button
+                variant="text"
+                color="blue-gray"
+                className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
+              >
+                <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
+                {getNameFromToken()}
+              </Button>
+              <IconButton
+                variant="text"
+                color="blue-gray"
+                className="grid xl:hidden"
+              >
+                <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
+              </IconButton>
+            </>
+          </Tooltip>
           <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
