@@ -22,6 +22,8 @@ try:
     from config import Config
     # Import routers
     from apps.dashboard.endpoints import router as dashboard_router
+    from apps.agents.endpoints import router as agents_router
+    from apps.queues.endpoints import router as queues_router
     from apps.lists.endpoints import router as lists_router
     from apps.summary.endpoints import router as summary_router
     from apps.actions.endpoints import router as actions_router
@@ -74,6 +76,8 @@ try:
     )
 
     # Include routers
+    app.include_router(agents_router)
+    app.include_router(queues_router)
     app.include_router(dashboard_router)
     app.include_router(lists_router)
     app.include_router(summary_router)

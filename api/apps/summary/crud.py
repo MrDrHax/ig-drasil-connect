@@ -196,6 +196,42 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
 
 cachedData.add('getListAgentRatings', getListAgentRatings, 120)
 
+async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
+    contactData = await cachedData.get('getLatestAgentContact', agent_id=agent_id)
+    contactID = contactData['Id']
+
+    file =f'{contactID}_analysis_' 
+
+    clients3 = boto3.client('s3')
+
+    response = clients3.list_objects_v2(
+        Bucket='amazon-connect-d62f5eebe090',
+    )
+
+    matches = [obj['Key'] for obj in response['Contents'] if file in obj['Key']]
+
+    if len(matches) == 0:
+        raise HTTPException(status_code=404, detail="Transcript not found")
+
+    file = matches[0]
+
+    response = clients3.get_object(
+        Bucket='amazon-connect-d62f5eebe090',
+        Key=file
+    )
+
+    transcript =  response['Body'].read().decode('utf-8')
+
+    transcript_json = json.loads(transcript)
+    
+    
+    sentiment = transcript_json['ConversationCharacteristics']['Sentiment']['OverallSentiment']['CUSTOMER']
+    
+    
+    return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating" ,sentimentTitle="Customer sentiment rating", sentiment=sentiment, ratingTitle="Agent rating based of metrics", rating=calculateRating(transcript_json))
+
+cachedData.add('getSentimentRating', getSentimentRating, 120)
+
 async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile]:
     contactData = await cachedData.get('getAllAgentContact', agent_id=agent_id)
 

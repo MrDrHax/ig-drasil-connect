@@ -43,7 +43,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
         # await get_connected_users(token),
         await get_capacity(token),
         await get_average_call_time(token),
-        await get_connected_agents(token),
+        await get_connected_users(token),
         # await get_avg_handle_time(),
         await get_abandonment_rate(token),
         # await get_avg_holds(token),
@@ -127,7 +127,6 @@ async def routing_profiles():
 
     return response
 
-
 @router.get("/get-online-users-data")
 async def get_online_users_data():
 
@@ -146,7 +145,7 @@ async def get_online_users_data():
         }
     )
     return response['UserDataList']
-    
+
 @router.get("/get-not-connected-users-data")
 async def get_not_connected_users_data():
 
@@ -315,7 +314,7 @@ async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])
 
 
 @router.get("/connected/users" , tags=["cards"])
-async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the amount of connected agents.
     '''
@@ -838,7 +837,7 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
         for i in response2['MetricResults']:
             for n in i['Collections']:
                 datares2.append(n['Value'])
-                print(datares2)
+                # print(datares2)
 
         comp = datares1[0]-datares2[0]
 
@@ -892,10 +891,40 @@ async def list_users_data():
     response = await cachedData.get("list_users_data")
 
     return response
+  
+@router.get("/agent-last-contact")
+async def agent_last_contact(agent_id: str):
+    client = boto3.client('connect')
+    
+    searchRes = client.search_contacts(
+        InstanceId=Config.INSTANCE_ID,
+        TimeRange={
+            'Type': 'CONNECTED_TO_AGENT_TIMESTAMP',
+            'StartTime': datetime.now() - timedelta(days=30),
+            'EndTime': datetime.now()
+        },
+        SearchCriteria={
+            'AgentIds': [agent_id]
+        },
+        Sort={
+            'FieldName': 'CONNECTED_TO_AGENT_TIMESTAMP',
+            'Order': 'DESCENDING'
+        },
+        MaxResults=1
+    )
+
+    if 'Contacts' in searchRes and len(searchRes['Contacts']) > 0:
+        contact_id = searchRes['Contacts'][0]['Id']
+
+        describeRes = client.describe_contact(
+            InstanceId=Config.INSTANCE_ID,
+            ContactId=contact_id
+        )
+    
+    return describeRes
 
 @router.get("/usename", tags=["data"])
 async def get_usename(agent_id:str):
-
     response = await cachedData.get("get_usename", agent_id=agent_id)
 
     return response

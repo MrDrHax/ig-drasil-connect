@@ -15,7 +15,6 @@ class GenericCard(BaseModel):
     icon: str = Field("Arrow", examples=["arrow"], description="The icon that will get added")
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
     footer: CardFooter
-    warning: bool = Field(False, examples=[True, False])
 
 class SeriesData(BaseModel):
     name: str = Field("Series 1", examples=["Series 1", "Series 2", "Series 3"])
@@ -186,18 +185,3 @@ class AgentProfileData(BaseModel):
     '''The mobile of the agent.'''
     roles: list[str] = Field([], examples=["Agent", "Supervisor", "Queue Supervisor"])
     '''The roles of the agent.'''
-
-
-class LastContactCard(BaseModel):
-    title: str = Field("Last contact", examples=["Last contact"])
-    ''' The title of the card.'''
-    last_contact: str = Field("2 minutes ago", examples=["2 minutes ago", "5 minutes ago", "10 minutes ago"])
-    '''The last contact of the agent.'''
-    footer_txt: str = Field("That's today's average.", examples=["That's today's average."])
-    '''The footer text of the card.'''
-
-class GenericAlert(BaseModel):
-    Text: str = Field("Alert text", examples=["Alert text"])
-    TextRecommendation: str = Field("Alert recommendation", examples=["Alert recommendation"])
-    color: str = Field("red", examples=["red", "green", "yellow"])
-
