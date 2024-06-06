@@ -41,7 +41,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
         # await get_connected_users(token),
         await get_capacity(token),
         await get_average_call_time(token),
-        await get_connected_agents(token),
+        await get_connected_users(token),
         # await get_avg_handle_time(),
         await get_abandonment_rate(token),
         # await get_avg_holds(token),
@@ -134,27 +134,6 @@ async def routing_profiles():
     )
 
     return response['RoutingProfileSummaryList']
-
-
-@router.get("/get-online-users-data")
-async def get_online_users_data():
-
-
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
-
-    response = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'Agents': userList
-        }
-    )
-    return response['UserDataList']
 
 
 @router.get("/get-not-connected-users-data")
@@ -324,7 +303,7 @@ async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])
 
 
 @router.get("/connected/users" , tags=["cards"])
-async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the amount of connected users.
     '''
@@ -899,20 +878,20 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
         for i in response2['MetricResults']:
             for n in i['Collections']:
                 datares2.append(n['Value'])
-                print(datares2)
+                # print(datares2)
 
         comp = datares1[0]-datares2[0]
 
         cardFooter = models.CardFooter(
             color = "text-red-500" if comp > 0 else "text-green-500",
-            value = str(comp),
+            value = str(round(comp, 3)),
             label ="more than last month" if comp > 0 else "less than last month"
         )
         
         card = models.GenericCard(
             id = 1,
             title = "Average Handle Time",
-            value =  str(datares1[0]),
+            value =  str(round(datares1[0], 3)),
             icon = "UserIcon",
             footer = cardFooter,
             color="blue"
