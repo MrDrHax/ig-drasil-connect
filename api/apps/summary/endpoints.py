@@ -114,3 +114,15 @@ async def read_agent_rating(agent_id: str, token: Annotated[str, Depends(require
     res[0] = res[0] / res[1]
 
     return res
+
+@router.get("/AgentSentimentRating", tags=["contacts"])
+async def read_agent_contact_summary(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> models.AgentSentimentRating:
+    """
+    Returns a list of contacts for the agent.
+    """
+    if not userType.testToken(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
+
+    res = await cachedData.get('getSentimentRating', agent_id=agent_id)
+    
+    return res
