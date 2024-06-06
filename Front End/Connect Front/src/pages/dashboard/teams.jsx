@@ -35,9 +35,7 @@ function getColorOfStatus(status) {
             return "red";
         case "Offline":
             return "gray";
-        // Statuses while in a call
-        case "ENDED":
-            return "deep-orange";
+        // Statuses while in a call are shown as yellow
         default:
             return "yellow";
     }
@@ -88,7 +86,12 @@ export function Teams() {
      * @return {type} No return value.
      */
     function bargeIn(agentId) {
-        JoinCall(agentId);
+        let result = JoinCall(agentId);
+
+        if (result.status == 200)
+            showAlertWithMessage("green", "Barging in to call with agent", 5000);
+        else
+            showAlertWithMessage("red", "Failed to barge in to call with agent", 5000);
         //console.log("Barging in to call with agent " + agentId);
     }
 

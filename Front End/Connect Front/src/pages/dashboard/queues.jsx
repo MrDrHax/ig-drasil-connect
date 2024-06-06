@@ -7,6 +7,7 @@ import {
   Chip,
   Tooltip,
   Progress,
+  Button,
 
 } from "@material-tailwind/react";
 import { QueueList, agentQueue } from "@/data";
@@ -35,6 +36,15 @@ export function Queues() {
   const [pagination_totalItems, pagination_setTotalItems] = useState(0);
 
   const { showAlertWithMessage } = useAlert();
+
+  function moveAgentToRoutingProfile(agentId, routingprofileId) {
+    showAlertWithMessage("yellow", "Moved agent to routing profile: " + routingprofileId, 5000);
+
+/*     if (result.status == 200)
+      showAlertWithMessage("green", "Barging in to call with agent", 5000);
+    else
+      showAlertWithMessage("red", "Failed to barge in to call with agent", 5000); */
+  }
 
   function updateData(page = 1) {
     let query = searchQuery ? "name=" + searchQuery : null;
@@ -171,6 +181,8 @@ useEffect(() => {
                           />
                         </div>
                       </td>
+
+                      {/* Status */}
                       <td className={className}>
                         <Chip
                           variant="gradient"
@@ -179,6 +191,16 @@ useEffect(() => {
                           className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
                         />
                       </td>
+
+                      {/* Move Agent to this Queue in case of not free usage */}
+                      { usage / maxContacts * 100 > 80 ? null :
+                        <td className={className}>
+                          <Button onClick={() => moveAgentToRoutingProfile('test', name)}
+                            variant="gradient" color={usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"} className="py-0.5 px-2 text-[11px] font-medium w-fit">
+                            Move Agent
+                          </Button>
+                        </td>
+                      }
 
                     </tr>
                   );
