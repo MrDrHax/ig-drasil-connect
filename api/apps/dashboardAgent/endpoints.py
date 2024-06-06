@@ -3,7 +3,6 @@ from . import models, crud
 from typing import List
 from typing import Annotated
 from config import Config
-from models import AgentQueueData
 from datetime import datetime , timedelta, date
 from cache.cache_object import cachedData
 
@@ -11,8 +10,8 @@ from cache.cache_object import cachedData
 import boto3
 
 router = APIRouter(
-    prefix="/dashboardAgents_router",
-    tags=["dashboardAgents_router"],
+    prefix="/dashboardAgents",
+    tags=["dashboardAgents"],
     responses={
         200: {"description": "Success"},
         # 202: {"description": "Accepted, request is being processed. Applies for connect requests that might take a while."},
@@ -38,27 +37,6 @@ async def routing_profiles():
 
     return response['RoutingProfileSummaryList']
 
-@router.get("/client/queue", response_model=List[AgentQueueData], tags=["data"])
-async def list_queues() -> List[AgentQueueData]:
-    '''
-    Returns the number of clients waiting on the queue of an agent.
-
-    Standard queues: This is where contacts wait before they are routed 
-    to and accepted by agents.
-
-    Agent queues: These queues are created automatically when you add an 
-    agent to your contact center.
-    '''
-    agent_queue_data = [
-        AgentQueueData(agentID="agent123", queueID="queue456",
-                       queueName="Support Queue", numberOfPeopleInQueue=20),
-        AgentQueueData(agentID="agent456", queueID="queue789",
-                       queueName="Sales Queue", numberOfPeopleInQueue=30),
-        AgentQueueData(agentID="agent789", queueID="queue123",
-                       queueName="Technical Support Queue", numberOfPeopleInQueue=50)
-    ]
-
-    return agent_queue_data
 
 
 @router.get("/data/connected", tags=["data"])

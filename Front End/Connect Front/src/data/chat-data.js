@@ -30,8 +30,15 @@ export async function postMessageData(agentId, message, is_supervisor) {
         throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
     }
 
+    if (!is_supervisor) {
+        let url2= getApiPath() + `dashboard/alerts/supervisor/message?agent_id=${agentId}`;
+        new Request(url2, {method: 'POST'});
+    }
+
     return await response.json();
 }
+
+
 
 export const messageData = [
     { 
