@@ -7,6 +7,7 @@ from AAA.requireToken import requireToken
 import AAA.userType as userType
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
+from tools.lazySquirrel import LazySquirrel
 from ..lists.endpoints import get_agents
 
 import random
@@ -209,16 +210,18 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->m
 
     data=response['MetricResults'][0]['Collections'][0]['Value']
 
+    extra = data/60 - 3
+
     cardFooter = models.CardFooter(
-        color ="text-green-500",
-        value="",
-        label="The average duration of a contact in minutes this month"
+        color = "text-green-500" if extra < 3 else "text-red-500",
+        value = "{p:.2f}".format(p=extra) + "m",
+        label = ("less than max" if extra < 3 else "more than recommended") + ". The average duratino of a contact in minutes this month. Calls should be less than 3 minutes."
     )
 
     card = models.GenericCard(
         id=1,
         title="Average Call Time",
-        value="{p:.2f}".format(p=data/60),
+        value="{p:.2f}".format(p=data/60) + "m",
         icon="ClockIcon",
         footer=cardFooter,
         color="blue"
@@ -314,78 +317,29 @@ async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])
 @router.get("/connected/users" , tags=["cards"])
 async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
-    Returns the amount of connected users.
+    Returns the amount of connected agents.
     '''
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    data = await cachedData.get('routing_profiles_data')
+
+    totalAgents = len(data)
+    agentsInCall = len(LazySquirrel(data).filter_by('status', 'on call').get())
+    agentsWhoNeedHelp = len(LazySquirrel(data).filter_by('status', 'needs assistance').get())
     
-    client = boto3.client('connect')
-
-    StartTime =  datetime((date.today() - timedelta(days=31)).year,
-                          (date.today() - timedelta(days=31)).month, 1)
-                                   
-    EndTime =  datetime((date.today() - timedelta(days=31)).year, 
-                                (date.today() - timedelta(days=31)).month, 
-                                (datetime(date.today().year, date.today().month, 1) - timedelta(days=1)).day,
-                                23, 59, 59)
+    footer_info = models.CardFooter(
+        color = "text-red-500" if agentsWhoNeedHelp > 0 else "text-green-500", 
+        value= f"{agentsWhoNeedHelp} agents", 
+        label= "need help. Get more details on the agents tab.")
     
-    past_month_res = client.search_contacts(
-        InstanceId=Config.INSTANCE_ID,
-        TimeRange={
-            'Type': 'INITIATION_TIMESTAMP',
-            'StartTime': StartTime,                                  
-            'EndTime': EndTime,
-        },
-        
-        SearchCriteria={
-            'Channels': [
-                'VOICE',
-            ],
-            'InitiationMethods': [
-                'INBOUND',
-            ],
-        },
-
-        Sort={
-            'FieldName': 'INITIATION_TIMESTAMP',
-            'Order': 'ASCENDING'
-        }
-    )
-
-    today_res = client.search_contacts(
-        InstanceId=Config.INSTANCE_ID,
-        TimeRange={
-            'Type': 'INITIATION_TIMESTAMP',
-            'StartTime': datetime(datetime.now().year, datetime.now().month, datetime.now().day),
-            'EndTime': datetime.now(),
-        },
-        
-        SearchCriteria={
-            'Channels': [
-                'VOICE',
-            ],
-            'InitiationMethods': [
-                'INBOUND',
-            ],
-        },
-
-        Sort={
-            'FieldName': 'INITIATION_TIMESTAMP',
-            'Order': 'ASCENDING'
-        }
-    )
-
-    past_month_AVG = round(past_month_res['TotalCount']/30)
-    
-    footer_info = models.CardFooter(color = "text-red-500" if today_res['TotalCount'] <= past_month_AVG else "text-green-500", 
-                                    value=(str(today_res['TotalCount'] - past_month_AVG) if today_res['TotalCount'] <= past_month_AVG else ("+" + str(today_res['TotalCount'] - past_month_AVG))), 
-                                    label= "than last month's average")
     card= models.GenericCard(
         id=1,
-        title="Connected users",
-        value=str(today_res['TotalCount']),
+        title="Agents in call.",
+        value=f'{agentsInCall}/{totalAgents} agents',
         icon="UserIcon",
-        footer=footer_info
+        footer=footer_info,
+        color="pink",
     )
     return card
 
@@ -459,16 +413,18 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
 
     cardFooter = models.CardFooter(
         color = "text-red-500" if comp > 0 else "text-green-500",
-        value = "{p:.2f}".format(p=comp),
-        label ="more than last month" if comp > 0 else "less than last month"
+        value = "{:.2f}s".format(comp),
+        label = ("more than last month" if comp > 0 else "less than last month") + ". The handle times should be less than 3 seconds. Handle time is the time it takes for an agent to take a call from when it first rings."
     )
     
     card = models.GenericCard(
         id = 1,
-        title = "Percentage of time \t  active agents",
-        value = "{p:.2f}".format(p=datares1[0]),
+        title = "Average Handle Time",
+        value =  "{:.2f}s".format(datares1[0]),
         icon = "UserIcon",
-        footer = cardFooter
+        footer = cardFooter,
+        warning = datares1[0] > 3,
+        color = "orange"
     )
 
     return card

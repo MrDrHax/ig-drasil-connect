@@ -15,6 +15,7 @@ class GenericCard(BaseModel):
     icon: str = Field("Arrow", examples=["arrow"], description="The icon that will get added")
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
     footer: CardFooter
+    warning: bool = Field(False, examples=[True, False])
 
 class SeriesData(BaseModel):
     name: str = Field("Series 1", examples=["Series 1", "Series 2", "Series 3"])
