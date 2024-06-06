@@ -177,7 +177,7 @@ export function DashboardNavbar() {
               </Button>
               
           </Tooltip>
-          <Menu>
+          {/* <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
                 <BellIcon className={`h-10 w-5 ${getTextColor("contrast")}`} />
@@ -254,7 +254,7 @@ export function DashboardNavbar() {
                 </div>
               </MenuItem>
             </MenuList>
-          </Menu>
+          </Menu> */}
           <IconButton
             variant="text"
             color="blue-gray"
