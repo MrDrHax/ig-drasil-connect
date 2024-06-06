@@ -185,3 +185,8 @@ class AgentProfileData(BaseModel):
     '''The mobile of the agent.'''
     roles: list[str] = Field([], examples=["Agent", "Supervisor", "Queue Supervisor"])
     '''The roles of the agent.'''
+
+class GenericAlert(BaseModel):
+    Text: str = Field("Alert text", examples=["Alert text"])
+    TextRecommendation: str = Field("Alert recommendation", examples=["Alert recommendation"])
+    color: str = Field("red", examples=["red", "green", "yellow"])

@@ -7,6 +7,7 @@ from AAA.requireToken import requireToken
 import AAA.userType as userType
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
+from ..lists.endpoints import get_agents
 
 import random
 
@@ -114,31 +115,20 @@ async def graph_example() -> models.GenericGraph:
 @router.get("/list-queues")
 async def list_queues():
 
-
-    client = boto3.client('connect')
-    response = client.list_queues(
-    InstanceId=Config.INSTANCE_ID,
-    )
+    response =await cachedData.get("list_queue")
 
     return response
 
 @router.get("/routing-profiles", response_model=List[dict])
 async def routing_profiles():
     
+    response = await cachedData.get("list_routing_profile")
 
-    client = boto3.client('connect')
-
-    # Get a list of all routing profiles
-    response = client.list_routing_profiles(
-        InstanceId=Config.INSTANCE_ID
-    )
-
-    return response['RoutingProfileSummaryList']
+    return response
 
 
 @router.get("/get-online-users-data")
 async def get_online_users_data():
-
 
     client = boto3.client('connect')
     users = client.list_users(
@@ -155,12 +145,9 @@ async def get_online_users_data():
         }
     )
     return response['UserDataList']
-
-
+    
 @router.get("/get-not-connected-users-data")
 async def get_not_connected_users_data():
-
-   
 
     client = boto3.client('connect')
     users = client.list_users(
@@ -186,13 +173,14 @@ async def get_not_connected_users_data():
 
     return userList
 
+
 @router.get("/average-call-time-duration")
 async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->models.GenericCard:
     
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-    routing_profile_list = await routing_profiles()
+    routing_profile_list = await cachedData.get("list_routing_profile")
     client = boto3.client('connect')
     
     response = client.get_metric_data_v2(
@@ -250,7 +238,7 @@ async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])
 
     client = boto3.client('connect')
 
-    routing_profile_list = await routing_profiles()
+    routing_profile_list = await cachedData.get("list_routing_profile")
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -399,7 +387,6 @@ async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> 
         icon="UserIcon",
         footer=footer_info
     )
-
     return card
 
 
@@ -413,7 +400,7 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     
     client = boto3.client('connect')
 
-    routing_profile_list = await routing_profiles()
+    routing_profile_list = await cachedData.get("list_routing_profile") 
     
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -472,20 +459,18 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
 
     cardFooter = models.CardFooter(
         color = "text-red-500" if comp > 0 else "text-green-500",
-        value = str(comp),
+        value = "{p:.2f}".format(p=comp),
         label ="more than last month" if comp > 0 else "less than last month"
     )
     
     card = models.GenericCard(
         id = 1,
-        title = "Average Handle Time",
-        value =  str(datares1[0]),
+        title = "Percentage of time \t  active agents",
+        value = "{p:.2f}".format(p=datares1[0]),
         icon = "UserIcon",
         footer = cardFooter
     )
 
-    
-    
     return card
 
 @router.get("/cards/abandonment-rate", tags=["cards"])
@@ -497,7 +482,7 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
     #routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
 
-    queues_list = await list_queues() 
+    queues_list = await cachedData.get("list_queue")
 
     queues_id_list = []    
     for i in queues_list['QueueSummaryList']:
@@ -558,7 +543,6 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
 
     return card
 
-
 @router.get("/graph/get-queues")
 async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
     
@@ -566,12 +550,9 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
     Returns the number of people in each queue
     
     ''' 
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
-
     client = boto3.client('connect')   
 
-    queues_raw = await list_queues() 
+    queues_raw = await cachedData.get("list_queue")
 
     queues_list = []    
     
@@ -621,11 +602,11 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
     example_graph = models.GenericGraph(
         title="Queues",
         description="Graph shows capacity the all queues",
-        footer="" ,
+        footer="Updated " + datetime.today().strftime('%Y-%m-%d') ,
         chart = example_chart
     )
 
-    return example_graph
+    return example_graph   
 
 
 # aqui va parte del agente hasta que funcione el dashboard agent
@@ -649,7 +630,7 @@ async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:st
                                 (datetime(date.today().year, date.today().month, 1) - timedelta(days=1)).day,
                                 23, 59, 59)
     
-    queues_list = await list_queues() 
+    queues_list = await cachedData.get("list_queue")
 
     queues_id_list = []    
     for i in queues_list['QueueSummaryList']:
@@ -732,7 +713,7 @@ async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:st
 
     card = models.GenericCard(
         id=1,
-        title="Average Holds",
+        title="Average customer hold time",
         value=str(today_data[0]),# Ensure this is a string
         icon="HandRaisedIcon",
         footer=cardFooter,
@@ -741,17 +722,17 @@ async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:st
     return card
 
 @router.get("/card/agent/People_to_answer", tags=["card"])
-async def get_People_to_answer()-> models.GenericCard:
+async def get_People_to_answer(token: Annotated[str, Depends(requireToken)])-> models.GenericCard:
     '''
     Returns the number of people all queues
     
     ''' 
-    # if not userType.isManager(token):
-    #     raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
     
-    queues_raw = await list_queues() 
+    queues_raw = await cachedData.get("list_queue")
 
     queues_list = []    
     
@@ -835,8 +816,6 @@ async def get_schedule(agent_id:str):
         for n in i['Collections']:
             data.append(n['Value'])
     
-
-
     return today_res
     
 @router.get("/cards/capacity/agent", tags=["cards"])
@@ -905,14 +884,14 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
 
         cardFooter = models.CardFooter(
             color = "text-red-500" if comp > 0 else "text-green-500",
-            value = str(comp),
+            value = "{p:.2f}".format(p=comp),
             label ="more than last month" if comp > 0 else "less than last month"
         )
         
         card = models.GenericCard(
             id = 1,
-            title = "Average Handle Time",
-            value =  str(datares1[0]),
+            title = "porcentage of time active",
+            value =  "{p:.2f}".format(p=datares1[0]),
             icon = "UserIcon",
             footer = cardFooter,
             color="blue"
@@ -950,103 +929,17 @@ async def list_users_data():
     @return 
         List containing the agents of an instance.
     """
-    
-    
+    response = await cachedData.get("list_users_data")
 
-    client = boto3.client('connect')
+    return response
 
-    # Get info about the users of said instance
-    response = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
+@router.get("/usename", tags=["data"])
+async def get_usename(agent_id:str):
 
-    return response['UserSummaryList']
+    response = await cachedData.get("get_usename", agent_id=agent_id)
 
-# # ---------------------------------------------------- Volver a checar (requiere numero de telefono)
-# @router.get("/get-current-metric-data")
-# async def check_agent_availability(queue_id: str):
-#     """
-#     Description:
-#         Real-time information of the call.
-#     Parameters:
-#         * InstanceId [REQUIRED][string]: id of the Amazon Connect instance.
-#         * Filters [REQUIRED][dictionary]:  
-#             - 
-
-#     Read the docs:
-#     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/client/get_current_metric_data.html#
-
-#     @return 
-#         Metrics about an on-going call.
-
-#         ex. queue_id = '18494127-588c-4497-8291-9dacaee44341'
-#     """    
-
-
-#     client = boto3.client('connect')
-
-#     # Get info for the first routing profile
-#     response = client.get_current_metric_data(
-#         InstanceId=Config.INSTANCE_ID,
-#         Filters={
-#             'Queues': [queue_id],
-
-#             'Channels': [
-#                 'VOICE'
-#             ]
-#         },
-#         CurrentMetrics=[
-#         {
-#             'Name': 'AGENTS_ONLINE',
-#             'Unit': 'COUNT'
-#         },
-#         ]
-#     )
-
-#     return response['MetricResults']
-
-#     # data = cachedData.get("check_agent_availability_data")
-
-#     # return data
-# # -------------------------------------------------Needs review
-# # @router.get("/agent-status", response_model=List[dict])
-# # async def check_agent_availability():
-# #     """
-# #     Description:
-# #         Verifies the status of agents in Amazon Connect.
-# #         It can be one of four things:
-
-# #         * AVAILABLE: on-duty and not in call
-# #         * OFFLINE: not on-duty and disconnected
-# #         * BUSY: with an open thread or ongoing call
-# #         * NEEDS ASSISTANCE: needs help from supervisor
-
-# #     Parameters:
-# #         * InstanceId [REQUIRED][string]: amazon connect instance identified
-# #         * AgentStatusTypes [list]: The available agent status types
-# #         * PaginationConfig [dictionary]
-# #             * MaxItems [int]: total number of items to return
-# #             * PageSize [int]: the size of each page
+    return response
         
-# #     Read the docs:
-# #     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/paginator/ListAgentStatuses.html
-
-# #     @return 
-# #         List containing the availability status of agents. (Not yet known)
-# #     """
-
-# #     client = boto3.client('connect')
-# #     paginator = client.get_paginator('list_agent_statuses')
-
-# #     # Get info for the first routing profile
-# #     response_iterator = paginator.paginate(
-# #         InstanceId = Config.INSTANCE_ID,
-# #         AgentStatusTypes = [
-# #             'AVAILABLE','OFFLINE','BUSY','ON BREAK','NEEDS ASSISTANCE',
-# #         ])
-    
-# #     return response_iterator
-
 
 # DONT DELETE THIS ROUTE
 @router.get("/agent-profile", tags=["profile"])
@@ -1086,270 +979,89 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
         logger.error(f"Error in get_agent_profile: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-# # list_recommenders_cache = []
 
-# # @router.get("/list-recommenders", response_model=List[dict])
-# # async def list_recommenders():
-# #     try:
-# #         client = boto3.client('connect')
-# #         response = client.list_queues(
-# #             InstanceId='string',
-# #             MaxResults=10
-# #         )
-        
-# #         return response
-# #     except Exception as e: 
-# #         print(e.with_traceback)
-# #         print(e)
-        
+#------ Alerts endpoints
 
-# @router.get("/call-summary")
-# async def call_summary():
-#     """
-#     Description:
-#         Returns a series of metrics of a call with a certain contact specified by id
+@router.get("/alerts/supervisor/NA", tags=["alerts"])
+async def get_alert_supervisor_NA():
+    '''
+    Sends back the message of how many agent need help.
+    '''
+    res = await cachedData.get("get_alert_supervisor_NA")
 
-#     Parameters:
-#         * InstanceId [REQUIRED][string]: amazon connect instance identified
-#         * ContactId [REQUIRED][string]: identifier of the contact
-        
-#     Read the docs:
-#     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/client/describe_contact.html
-
-#     @return 
-#         JSON with the information on the call
-#     """
-#     try:
-#         client = boto3.client('connect')
-#         response = client.describe_contact(
-#             InstanceId=Config.INSTANCE_ID,
-#             ContactId='string'
-#         )
-        
-#         return response
-#     except Exception as e: 
-#         print(e.with_traceback)
-#         print(e)
-
-# @router.get("/agent-status", response_model=List[dict])
-# async def agent_status():
-    
-#     '''
-#     Returns the agent status.
-    
-#     '''
-    
-#     client = boto3.client('connect')
-#     response = client.list_agent_statuses(
-#         InstanceId=Config.INSTANCE_ID
-#     )
-    
-#     return response['AgentStatusSummaryList']    
-
-# @router.get("/queue-description")
-# async def queue_description(queue_id: str):
-#     client = boto3.client('connect')
-#     response = client.describe_queue(
-#         InstanceId=Config.INSTANCE_ID,
-#         QueueId=queue_id
-#     )
-    
-#     return response['Queue']
-
-# @router.get("/describe-routing-profile")
-# async def describe_routing_profile(routing_profile_id: str):
-#     client = boto3.client('connect')
-#     response = client.describe_routing_profile(
-#         InstanceId=Config.INSTANCE_ID,
-#         RoutingProfileId=routing_profile_id
-#     )
-    
-#     return response['RoutingProfile']
+    return res
 
 
-# @router.get("/list-routing-profile-queues")
-# async def list_routing_profile_queues(routing_profile_id: str):
-#     client = boto3.client('connect')
+alert_message= []
 
-#     response = client.list_routing_profile_queues(
-#         InstanceId=Config.INSTANCE_ID,
-#         RoutingProfileId=routing_profile_id
-#     )['RoutingProfileQueueConfigSummaryList']
-    
-#     return response
+@router.post("/alerts/supervisor/message", tags=["alerts"])
+async def post_alert_supervisor_message(agent_id:str):
+    '''
+    Sends an alert if supervisor has a message
+    '''
 
-# @router.get("/describe-contact")
-# async def describe_contact(contact_id: str):
+    data = await list_users_data()
 
-#     client = boto3.client('connect')
-#     response = client.describe_contact(
-#         InstanceId=Config.INSTANCE_ID,
-#         ContactId=contact_id
-#     )
+    for i in data:
+        if i['Id'] == agent_id:
+            agent = i['Username']
+            break
 
-#     return response['Contact']
+    alert= models.GenericAlert(
+        Text="You have a message from agent "+ agent ,
+        TextRecommendation=". You should check your messages in the chat correspondant to the agent",
+        color="blue",
+    )
 
-# # 802dc0a071714366b20b7dd891929556
-# @router.get("/desciribe-user")
-# async def describe_user(user_id:str):
+    alert_message.append(alert)
 
-#     client = boto3.client('connect')
-#     response = client.describe_user(
-#         InstanceId=Config.INSTANCE_ID,
-#         UserId= user_id
-#     )
-#     return response['User']
+    return None
 
 
-# # @router.get("/get-transcript")
-# # async def get_transcript(Contacd_Id: str, Connection_Token: str):
+@router.get("/alerts/supervisor/available", tags=["alerts"])
+async def get_alert_supervisor_available()-> models.GenericAlert:
+    '''
+    returns the alert type log, if there is any available
+    '''
+    res = await cachedData.get("get_alert_supervisor_available")
 
-# #     client = boto3.client('connectparticipant')
-# #     response = client.get_transcript(
-# #         ContactId = Contacd_Id,
-# #         ConnectionToken = request.cookies['access_token'], # Requerimos este token de autenticación.
-# #     )
-# #     return response['User']
-
-
-# @router.get("/metric-data")
-# async def metric_data(queue_id:str):
-
-#     client = boto3.client('connect')
-#     response = client.get_metric_data(
-#         InstanceId=Config.INSTANCE_ID,
-#         StartTime=datetime(2024, 5, 25, 0),
-#         EndTime=datetime(2024, 5, 25, 16),
-#         Filters={
-#             'Queues': [
-#                 queue_id
-#                 ]
-#         },
-#         Groupings=[
-#             'QUEUE'
-#         ],
-#         HistoricalMetrics=[
-#             {
-#                 'Name': 'INTERACTION_TIME',
-#             # 'Threshold': {
-#             #     'Comparison': 'LT',
-#             #     'ThresholdValue': 123.0
-#             # },
-#                 'Statistic': 'AVG',
-#                 'Unit': 'SECONDS'
-#             },
-#         ]
-#     )
-
-#     print(response)
-
-#     return response['MetricResults']
-
-# @router.get("/current-metric-data")
-# async def current_metric_data(queue_id:str):
-
-#     client = boto3.client('connect')
-#     response = client.get_current_metric_data(
-#         InstanceId=Config.INSTANCE_ID,
-#         Filters={
-#             'Queues': [
-#                 queue_id
-#             ],
-#             'Channels': [
-#                 'VOICE'
-#             ]
-#         },
-#         Groupings=['QUEUE'],
-#         CurrentMetrics=[
-#         {
-#             'Name': 'AGENTS_AVAILABLE',
-#             'Unit': 'COUNT'
-#         },
-#         ]
-#     )
-
-#     print(response)
-
-#     return response['MetricResults']
+    return res
 
 
-# @router.get("/current-user-data")
-# async def get_current_user_data():
+@router.get("/alerts/supervisor/nonResponse", tags=["alerts"])
+async def get_alert_supervisor_nonResponse():
+    '''
+    sends back the alert of the agent that has not responded during the call with the client
+    '''
+    res = await cachedData.get("get_alert_supervisor_nonResponse")
 
-#     client = boto3.client('connect')
-#     response = client.get_current_user_data(
-#         InstanceId=Config.INSTANCE_ID,
-#         Filters={
-#             'Agents': [
-#                 '1c38eb16-8f2c-4c9a-b723-8f0621583179',
-#                 '270a9b75-7c3d-40de-b524-25011c6aeeb8',
-#                 '305376be-597e-4c30-8cc1-d0ceb88699fe',
-#                 '35eb516c-0c56-45a2-ab53-b09a43f196c3',
-#                 '50f98823-5278-47fb-8c1a-e56fa525404a',
-#                 '51ec1227-4119-412e-b0e6-2e3bbc6ae1a4',
-#                 '7688a303-17b8-4402-b03f-d7ab051bde4e',
-#                 '7d6be46a-287b-48fc-8bdb-70655a978247',
-#                 '83656f24-be8f-4cc6-aca9-c3bf5c42e21a',
-#                 '8d6f58c4-d1f5-4024-9ab0-c57666dd791b',
-#                 '94c89e21-3aac-44b5-8ffa-c898061fddfd',
-#                 'a3f8c7e6-712c-4c13-a9ae-5ed13e1f6523',                
-#                 'b2ba1a5d-6f46-40a5-aa24-6b5032bf79fd',
-#                 'ba862485-c72a-4fb9-8f98-58415b19482b',
-#                 'c6437a67-db38-49da-8188-778ac2f1f555',
-#                 'cf1410c7-01e9-484a-971a-e481924ee68e',
-#                 'd2eed6e2-7bef-4983-83c8-cfd359d8cdbd',
-#                 'fb1b7cb4-2e81-4d16-a50e-9726de5cc15a'
-#             ],
-#         #    'ContactFilter': {
-#         #         'ContactStates': [
-#         #             'CONNECTED'
-#         #         ]
-#         #     },
-#         },
-#         # CurrentMetrics=[
-#         # {
-#         #     'Name': 'AGENTS_AVAILABLE',
-#         #     'Unit': 'COUNT'
-#         # },
-#         # ]
-#     )
-
-#     print(response)
-
-#     return response['UserDataList']
+    return res
 
 
-# @router.get("/list-contacts")
-# async def list_contacts():
+@router.get("/alerts/get_alerts_supervisor", tags=["alerts"])
+async def get_alert_supervisor():
+    '''
+    sends bock the alert of the supervisor
+    '''
+    alerts=[]
 
-#     client = boto3.client('connect')
-#     response = client.search_contacts(
-#         InstanceId=Config.INSTANCE_ID,
-#         TimeRange={
-#             'Type': 'INITIATION_TIMESTAMP',
-#             # |'SCHEDULED_TIMESTAMP'|'CONNECTED_TO_AGENT_TIMESTAMP'|'DISCONNECT_TIMESTAMP',
-#             'StartTime': datetime.today() - timedelta(days=56),
-#             'EndTime': datetime.today(),
-#         },
-        
-#         SearchCriteria={
-#             'Channels': [
-#                 'VOICE',
-#             ],
-#             'InitiationMethods': [
-#                 'INBOUND',
-#                 # |'OUTBOUND'|'TRANSFER'|'QUEUE_TRANSFER'|'CALLBACK'|'API'|'DISCONNECT'|'MONITOR'|'EXTERNAL_OUTBOUND',
-#             ],
-#         },
+    NA= await get_alert_supervisor_NA()
+    AV= await get_alert_supervisor_available()
+    NR= await get_alert_supervisor_nonResponse()
 
-#         Sort={
-#             'FieldName': 'INITIATION_TIMESTAMP',
-#             # |'SCHEDULED_TIMESTAMP'|'CONNECTED_TO_AGENT_TIMESTAMP'|'DISCONNECT_TIMESTAMP'|'INITIATION_METHOD'|'CHANNEL',
-#             'Order': 'ASCENDING'
-#             # |'DESCENDING'
-#         }
-#     )
+    if NA:
+        alerts.append(NA)
+    if AV:
+        alerts.append(AV)
+    if NR: 
+        for i in NR:
+            alerts.append(i)
 
-#     print(response)
+    if len(alert_message) > 0:
+        for i in alert_message:
+            alerts.append(i)
+        alert_message.clear()
 
-#     return response['Contacts']
+    return alerts
+
+

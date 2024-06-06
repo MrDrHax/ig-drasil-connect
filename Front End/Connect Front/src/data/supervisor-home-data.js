@@ -80,6 +80,18 @@ export async function AgentRatingData(agent_id) {
   return await response.json();
 }
 
+export async function Alerts(){
+  let url = getApiPath() + `dashboard/alerts/get_alerts_supervisor`;
+  let request = new Request(url);
+  addTokenToHeader(request);
+  let response = await fetch(request);
+  if (!response.ok) {
+    // raise error
+    throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+  }
+
+  return await response.json();
+
 /**
  * Retrieves the last up to 5 conversations from the API for a specific agent.
  *
