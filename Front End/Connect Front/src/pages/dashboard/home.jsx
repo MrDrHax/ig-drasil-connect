@@ -12,7 +12,7 @@ import {
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { RecomendationCard } from "@/widgets/cards";
-import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} from "@heroicons/react/24/solid";
+import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon, FaceSmileIcon} from "@heroicons/react/24/solid";
 import {NotificationsCard} from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
@@ -30,6 +30,8 @@ export function Home() {
   const [cards, setCards] = useState([]);
   const [graphs, setGraphs] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  let agent_id = localStorage.getItem("userID");
 
 
   function getIcon(icon) {
@@ -123,7 +125,7 @@ export function Home() {
 
       {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <NotificationsCard/>
+        <NotificationsCard is_supervisor={true} agent_id={agent_id}/>
 
         {/* Aquí esta para cambiar el Card de recomendaciones*/}
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
