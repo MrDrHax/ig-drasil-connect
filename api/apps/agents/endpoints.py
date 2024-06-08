@@ -43,6 +43,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
+        await queues_agent_answer_rate(token),
         # await graph_example(),
         # await get_avg_contact_duration(token),
         # await get_queues(token),  
@@ -76,6 +77,9 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
 
     users_data = client.get_current_user_data(
         InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Agents': userList
+        }
     )
 
     count = 0
@@ -162,11 +166,98 @@ async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
 
     return card
 
-@router.get("/list/list-agent-statuses")
-async def list_agent_statuses():
+
+@router.get("/queues/agent-answer-rate", tags=["cards"])
+async def queues_agent_answer_rate(token: Annotated[str, Depends(requireToken)]):
+    '''
+    Returns the queues that will be displayed on the dashboard.
+    '''
+    userNT = ["94c89e21-3aac-44b5-8ffa-c898061fddfd"]
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    client = boto3.client('connect')
+    users = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    userList = []
+    userDic = {}
+    for user in users['UserSummaryList']:
+        if user['Id'] not in userNT:
+            userList.append(user['Id'])
+            userDic[user['Id']] = user['Username']
+
+
+    user_data = client.get_metric_data_v2(
+        # InstanceId = Config.INSTANCE_ID,
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e',
+        StartTime = datetime.now() - timedelta(days=34),
+        EndTime = datetime.now(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [{
+            'FilterKey': 'AGENT',
+            'FilterValues': userList,
+        }],
+        Groupings = ['AGENT'],
+        Metrics = [
+            {
+                'Name': 'AGENT_ANSWER_RATE'
+            }
+        ]
+    )
+
+    user_series =[]
+    categories = []
+    for user in user_data['MetricResults']:
+        user_series.append(models.SeriesData(name = userDic[user['Dimensions']['AGENT']], 
+                                              data=[round(user['Collections'][0]['Value'],3)]))
+        categories.append(userDic[user['Dimensions']['AGENT']])
+
+    user_xaxis = models.XAxisData(
+        categories = categories
+    )
+
+    user_options = models.GraphOptions(
+        colors = ["#3b82f6", "#f87171"],
+        xaxis = user_xaxis
+    )
+
+    user_chart = models.ChartData(
+        type = "bar",
+        series = user_series,
+        options = user_options
+    )
+
+    user_graph = models.GenericGraph(
+        title = "Agent Answer Rate",
+        description = "This graph shows the answer rate of each agent.",
+        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        chart = user_chart
+    )
+
+    return user_graph
+
+    # AGENT_ANSWER_RATE
+    # AGENT_OCCUPANCY -> solo para: Routing Profile, Agent, Agent Hierarchy
+    # AVG_CONTACT_DURATION, AVG_INTERACTION_TIME, AVG_HANDLE_TIME
+    # AVG_QUEUE_ANSWER_TIME
+    # CONTACTS_ABANDONED
+    # CONTACTS_PUT_ON_HOLD
+    # CONTACTS_QUEUED
+
+    # MAX_QUEUED_TIME
+
+
+
+@router.get("/list/list-agent")
+async def list_agent():
     
     client = boto3.client('connect')
-    resp = client.list_agent_statuses(
+    resp = client.list_users(
         InstanceId=Config.INSTANCE_ID
 
     )

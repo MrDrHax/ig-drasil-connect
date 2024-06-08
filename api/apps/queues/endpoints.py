@@ -38,13 +38,15 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     Returns the cards that will be displayed on the dashboard.
     '''
     cards = [
+        await queues_contacts_on_queue(token)  
         # await get_connected_users(token),
     ]
 
     graphs = [
+        await queues_answer_time(token),
+        await queues_contact_duration(token)  
         # await graph_example(),
         # await get_avg_contact_duration(token),
-        # await get_queues(token),  
     ]
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
@@ -53,8 +55,86 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 
 # list_queues
 
-@router.get("/get/queues", tags=["cards"])
-async def get_queues(token: Annotated[str, Depends(requireToken)]):
+# @router.get("/queues/contacts-on-queue", tags=["cards"])
+# async def queues_contacts_on_queue(token: Annotated[str, Depends(requireToken)]):
+#     '''
+#     Returns the answer time of the queues that will be displayed on a graph.
+#     '''
+#     availableQueues = ["Tickets Management", "Customize Assistance", "Event News", "Default Queue","Supervisor", "Callback"]
+
+#     if not userType.isManager(token):
+#         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+#     client = boto3.client('connect')
+#     queues = client.list_queues(
+#         InstanceId = Config.INSTANCE_ID,
+#     )
+
+#     myQueues = []
+#     myQueuesDic = {}
+#     for queue in queues['QueueSummaryList']:
+#         if queue['QueueType'] == "STANDARD":
+#             if queue['Name'] in availableQueues:
+#                 myQueues.append(queue)
+#                 myQueuesDic[queue['Id']] = queue['Name']
+#                 print(queue['Name'])
+#                 print(queue['Id'])
+
+#     queues_data = client.get_metric_data_v2(
+#         # InstanceId = Config.INSTANCE_ID,
+#         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e',
+#         StartTime = datetime(datetime.now().year, datetime.now().month, datetime.now().day, 0, 0, 0),
+#         EndTime = datetime.now(),
+#         Interval = {
+#             'TimeZone': 'UTC',
+#             'IntervalPeriod': 'TOTAL',
+#         },
+#         Filters = [{
+#             'FilterKey': 'QUEUE',
+#             'FilterValues': [queue['Id'] for queue in myQueues],
+#         }],
+#         Groupings = ['QUEUE'],
+#         Metrics = [
+#             {
+#                 'Name': 'CONTACTS_ABANDONED',
+#                 'MetricFilters': [{
+#                     'MetricFilterKey': 'INITIATION_METHOD',
+#                     'MetricFilterValues': [
+#                         'INBOUND',
+#                     ]
+#                 }]
+#             }
+#         ]
+#     )
+
+#     queue_series =[]
+#     categories = []
+#     # for queue in queues_data['MetricResults']:
+#     #     queue_series.append(models.SeriesData(name = myQueuesDic[queue['Dimensions']['QUEUE']], 
+#     #                                           data=[queue['Collections'][0]['Value']]))
+#     #     categories.append(myQueuesDic[queue['Dimensions']['QUEUE']])
+
+
+#     # cardFooter = models.CardFooter(
+#     #     color = color,
+#     #     value= str(count),
+#     #     label="Available agents",
+#     # )
+
+#     # card = models.GenericCard(
+#     #     id=1,
+#     #     title="online agents",
+#     #     value= str(users_data['ApproximateTotalCount']),
+#     #     icon="HandRaisedIcon",
+#     #     footer=cardFooter,
+#     # )
+
+#     return queues_data
+
+
+
+@router.get("/queues/answer-time", tags=["cards"])
+async def queues_answer_time(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
     '''
     Returns the queues that will be displayed on the dashboard.
     '''
@@ -69,12 +149,12 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]):
     )
 
     myQueues = []
+    myQueuesDic = {}
     for queue in queues['QueueSummaryList']:
         if queue['QueueType'] == "STANDARD":
             if queue['Name'] in availableQueues:
                 myQueues.append(queue)
-                print(queue['Id'])
-                print(queue['Name'])
+                myQueuesDic[queue['Id']] = queue['Name']
 
     queues_data = client.get_metric_data_v2(
         # InstanceId = Config.INSTANCE_ID,
@@ -98,41 +178,116 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]):
     )
 
     queue_series =[]
-    for queue in myQueues:
-        queue_series.append(models.SeriesData(name=queue['Name'], data=[]))
+    categories = []
+    for queue in queues_data['MetricResults']:
+        queue_series.append(models.SeriesData(name = myQueuesDic[queue['Dimensions']['QUEUE']], 
+                                              data=[queue['Collections'][0]['Value']]))
+        categories.append(myQueuesDic[queue['Dimensions']['QUEUE']])
 
-    queue_series = models.SeriesData(name="Queue 1", data=[20,30,50,40,10])
 
-    series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
-
-    xaxis_example = models.XAxisData(
-        categories=["Jan", "Feb", "March", "Apr", "May"]
+    queue_xaxis = models.XAxisData(
+        categories = categories
     )
 
-    example_options = models.GraphOptions(
-        colors=["#3b82f6", "#f87171"],
-        xaxis=xaxis_example
+    queue_options = models.GraphOptions(
+        colors = ["#3b82f6", "#f87171"],
+        xaxis = queue_xaxis
     )
 
-    example_chart = models.ChartData(
-        type="line",
-        series= series_example,
-        options=example_options
+    queue_chart = models.ChartData(
+        type = "bar",
+        series = queue_series,
+        options = queue_options
     )
 
-    example_graph = models.GenericGraph(
-        title="Example Graph",
-        description="Graph showing number of calls per month",
-        footer="Updated 1st of June",
-        chart = example_chart
+    queue_graph = models.GenericGraph(
+        title = "Queue Answer Time",
+        description = "This graph shows the average time it takes for a call to be answered by queue.",
+        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        chart = queue_chart
     )
 
-    # return example_graph
+    return queue_graph
+    # return queues_data
 
 
-    return queues_data
 
 
+@router.get("/queues/contact-duration", tags=["cards"])
+async def queues_contact_duration(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
+    '''
+    Returns the queues that will be displayed on the dashboard.
+    '''
+    availableQueues = ["Tickets Management", "Customize Assistance", "Event News", "Default Queue","Supervisor", "Callback"]
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    client = boto3.client('connect')
+    queues = client.list_queues(
+        InstanceId = Config.INSTANCE_ID,
+    )
+
+    myQueues = []
+    myQueuesDic = {}
+    for queue in queues['QueueSummaryList']:
+        if queue['QueueType'] == "STANDARD":
+            if queue['Name'] in availableQueues:
+                myQueues.append(queue)
+                myQueuesDic[queue['Id']] = queue['Name']
+
+    queues_data = client.get_metric_data_v2(
+        # InstanceId = Config.INSTANCE_ID,
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e',
+        StartTime = datetime.now() - timedelta(days=34),
+        EndTime = datetime.now(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [{
+            'FilterKey': 'QUEUE',
+            'FilterValues': [queue['Id'] for queue in myQueues],
+        }],
+        Groupings = ['QUEUE'],
+        Metrics = [
+            {
+                'Name': 'AVG_CONTACT_DURATION'
+            }
+        ]
+    )
+
+    queue_series =[]
+    categories = []
+    for queue in queues_data['MetricResults']:
+        queue_series.append(models.SeriesData(name = myQueuesDic[queue['Dimensions']['QUEUE']], 
+                                              data=[queue['Collections'][0]['Value']]))
+        categories.append(myQueuesDic[queue['Dimensions']['QUEUE']])
+
+
+    queue_xaxis = models.XAxisData(
+        categories = categories
+    )
+
+    queue_options = models.GraphOptions(
+        colors = ["#3b82f6", "#f87171"],
+        xaxis = queue_xaxis
+    )
+
+    queue_chart = models.ChartData(
+        type = "bar",
+        series = queue_series,
+        options = queue_options
+    )
+
+    queue_graph = models.GenericGraph(
+        title = "Queue averae contact duration",
+        description = "This graph shows the average time it takes for a call to be accomplished by queue.",
+        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        chart = queue_chart
+    )
+
+    return queue_graph
 
     # AGENT_ANSWER_RATE
     # AGENT_OCCUPANCY -> solo para: Routing Profile, Agent, Agent Hierarchy
