@@ -45,11 +45,16 @@ class LazySquirrel:
         return self
 
     def paginate(self, skip, limit):
+        result = self.get()
+        paginated_result = result[skip:skip + limit]
+        return pagination_string(result, skip, skip + limit), paginated_result
+    
+    def get(self):
         result = self.data
         for operation in self.operations:
             result = operation(result)
-        paginated_result = result[skip:skip + limit]
-        return pagination_string(result, skip, skip + limit), paginated_result
+        return result
+
     
 if __name__ == "__main__":
     testdata = [

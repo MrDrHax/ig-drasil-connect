@@ -188,8 +188,6 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
 
         transcript = json.loads(transcript)
 
-        logger.warn(transcript['ConversationCharacteristics'])
-
         # Filter out short conversations (less than 10 seconds)
         if transcript['ConversationCharacteristics']['TotalConversationDurationMillis'] > 100:
             agent_ratings.append(models.AgentRating(rating=calculateRating(transcript), timestamp=contact['InitiationTimestamp']))
@@ -197,7 +195,6 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
     return agent_ratings
 
 cachedData.add('getListAgentRatings', getListAgentRatings, 120)
-
 
 async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
     contactData = await cachedData.get('getLatestAgentContact', agent_id=agent_id)
@@ -234,3 +231,55 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
     return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating" ,sentimentTitle="Customer sentiment rating", sentiment=sentiment, ratingTitle="Agent rating based of metrics", rating=calculateRating(transcript_json))
 
 cachedData.add('getSentimentRating', getSentimentRating, 120)
+
+async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile]:
+    contactData = await cachedData.get('getAllAgentContact', agent_id=agent_id)
+
+    clients3 = boto3.client('s3')
+
+    objects = clients3.list_objects_v2(
+        Bucket='amazon-connect-d62f5eebe090',
+    )
+
+    parsed_contacts = []
+
+    for contact in contactData:
+        contactID = contact['Id']
+
+        file =f'{contactID}_analysis_' 
+
+        matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
+
+        if len(matches) == 0:
+            raise HTTPException(status_code=404, detail="Transcript not found")
+
+        file = matches[0]
+
+        response = clients3.get_object(
+            Bucket='amazon-connect-d62f5eebe090',
+            Key=file
+        )
+
+        transcript = response['Body'].read().decode('utf-8')
+
+        transcript = json.loads(transcript)
+
+        # Filter out short conversations (less than 10 seconds)
+        if transcript['ConversationCharacteristics']['TotalConversationDurationMillis'] > 100:
+            # Try to get summary
+            try:
+                summary = transcript['ConversationCharacteristics']['ContactSummary']['PostContactSummary']['Content']
+            except:
+                summary = "No summary found."
+            # Try to get sentiment
+            try:
+                sentiment = transcript['ConversationCharacteristics']['Sentiment']['OverallSentiment']['AGENT']
+                c_sentiment = transcript['ConversationCharacteristics']['Sentiment']['OverallSentiment']['CUSTOMER']
+            except:
+                sentiment = 0.0
+                c_sentiment = 0.0
+            parsed_contacts.append(models.AgentContactProfile(summary=summary,status=transcript['JobStatus'], duration=transcript['ConversationCharacteristics']['TotalConversationDurationMillis'], agentSentiment=sentiment, customerSentiment=c_sentiment , timestamp=contact['InitiationTimestamp'].strftime("%m-%d %H:%M")))
+
+    return parsed_contacts
+
+cachedData.add('getListContactParsed', getListContactParsed, 120)
