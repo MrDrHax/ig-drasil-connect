@@ -921,36 +921,4 @@ async def get_alert_supervisor_nonResponse():
     return alert
 cachedData.add("get_alert_supervisor_nonResponse", get_alert_supervisor_nonResponse, 60)
 
-async def get_alert_agent_nonResponse(agent_id):
-    client = boto3.client('connect')
-    agent= await list_users_data()
-
-    response = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = datetime.today()-timedelta(days=1),
-        EndTime = datetime.today(),
-        Filters = [
-            {
-            'FilterKey': 'AGENT',
-            'FilterValues' : agent_id,  
-            } 
-        ], 
-
-        Groupings=['AGENT', ],
-
-        Metrics = [
-            {
-                'Name': 'AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS',
-            }
-        ]
-    )
-    data = response['MetricResults'][0]['Collections'][0]['Value']
-    if data > 0:
-        alert = models.GenericAlert(
-            Text="You have not responded during the call with the client.",
-            TextRecommendation="You could ask for help from a supervisor or ask the client if he has any questions.",
-            color="orange",
-        )
-        
-    return alert
-cachedData.add("get_alert_agent_nonResponse", get_alert_agent_nonResponse, 60)
+    
