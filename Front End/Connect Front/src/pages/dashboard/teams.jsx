@@ -92,7 +92,7 @@ export function Teams() {
 
         ChangeStatus(agentId, status).then(result => {
             setChanged(!changed);
-            if (result.message == "Status changed")
+            if (result && result.message == "Status changed")
                 showAlertWithMessage("green", "Status changed", 5000);
             else
                 showAlertWithMessage("red", "Failed to change status", 5000);

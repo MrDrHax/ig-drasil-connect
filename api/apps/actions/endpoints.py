@@ -95,3 +95,34 @@ async def change_status(token: Annotated[str, Depends(requireToken)], agent_id: 
     )
 
     return {"message": "Status changed"}
+
+@router.post("/change_routing_profile")
+async def change_routing_profile(token: Annotated[str, Depends(requireToken)], agent_id: str, routing_profile_name: str):
+    """
+    Change the routing profile of an agent.
+
+    @param agent_id: ID of the agent whose routing profile to change.
+    @param routing_profile: New routing profile of the agent.
+
+    @return: Confirmation message of the routing profile change.
+    """
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    response = await cachedData.get('get_routing_profile_list')
+
+    for profile in response:
+        if profile['Name'] == routing_profile_name:
+            routing_profile_id = profile['Id']
+
+    if routing_profile_id == None:
+        raise HTTPException(status_code=400, detail="Invalid routing profile.")
+    
+    client = boto3.client('connect')
+    response = client.update_user_routing_profile(
+        InstanceId=Config.INSTANCE_ID,
+        UserId= agent_id,
+        RoutingProfileId=routing_profile_id
+    )
+
+    return {"message": "Routing profile changed"}

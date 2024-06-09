@@ -99,7 +99,7 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
 
     card = models.GenericCard(
         id=1,
-        title="online agents",
+        title="Online agents",
         value= str(users_data['ApproximateTotalCount']),
         icon="HandRaisedIcon",
         footer=cardFooter,

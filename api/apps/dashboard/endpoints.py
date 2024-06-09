@@ -8,9 +8,6 @@ import AAA.userType as userType
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
 from tools.lazySquirrel import LazySquirrel
-from ..lists.endpoints import get_agents
-
-import random, math
 
 import boto3
 from config import Config
@@ -213,7 +210,7 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->m
 
     cardFooter = models.CardFooter(
         color = "text-green-500" if extra < 3 else "text-red-500",
-        value = "{p:.2f}".format(p=extra) + "m",
+        value = "{p:.2f}".format(p=extra) + " minutes",
         label = ("less than max" if extra < 3 else "more than recommended") + ". The average duratino of a contact in minutes this month. Calls should be less than 3 minutes."
     )
 

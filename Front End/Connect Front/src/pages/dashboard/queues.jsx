@@ -8,10 +8,12 @@ import {
   Tooltip,
   Progress,
   Button,
-  Select,
-  Option
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
 } from "@material-tailwind/react";
-import { AgentList, QueueList, agentQueue } from "@/data";
+import { AgentList, QueueList, ChangeRoutingProfile } from "@/data";
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 import React, { useEffect, useState } from 'react';
@@ -27,6 +29,9 @@ export function Queues() {
   const { navColor } = controller;
 
   const [dataToDisplay, setData] = useState([]);
+  const [agents, setAgentList] = useState([]);
+  const [routingProfiles, setRoutingProfileList] = useState({});
+
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -40,27 +45,93 @@ export function Queues() {
 
   const { showAlertWithMessage } = useAlert();
 
-  function moveAgentToRoutingProfile(queueName) {
-    showAlertWithMessage("yellow", "Moved agent to routing profile: " + queueName, 5000);
-
-/*     if (result.status == 200)
-      showAlertWithMessage("green", "Barging in to call with agent", 5000);
-    else
-      showAlertWithMessage("red", "Failed to barge in to call with agent", 5000); */
+  /**
+   * Moves the agent to the given routing profile.
+   *
+   * @param {string} agentID - The ID of the agent.
+   * @param {string} agentName - The name of the agent.
+   * @param {string} routingProfileName - The name of the routing profile.
+   * @return {void} This function does not return anything.
+   */
+  function moveAgentToRoutingProfile(agentID, agentName, routingProfiles) {
+    ChangeRoutingProfile(agentID, routingProfiles).then(result => {
+      if (result && result.message == "Routing profile changed")
+        showAlertWithMessage("green", `${agentName}'s routing profile changed to ${routingProfiles}`, 5000);
+      else
+        showAlertWithMessage("red", "Failed to change routing profile", 5000);
+    });
   }
 
+  /**
+   * Returns a Menu element for the given agent name and queue ID with the possible routing profiles.
+   *
+   * @param {string} agentName - The name of the agent.
+   * @param {array} queueList - The list of queues the agent is in.
+   * @param {number} queueID - The ID of the queue.
+   * @param {array} possibleRoutingProfiles - The list of possible routing profiles to move the agent to.
+   * @return {JSX.Element} The Menu element.
+   */
+  function getOptions(agentName, agentID, queueList, queueID, possibleRoutingProfiles) {
+    // Check if the agent is already in the queue
+    if (!queueList.includes(queueID)) {
+      return (
+        // Show a menu with the possible routing profiles for each agent
+        <Menu placement="left" allowHover offset={15}>
+          <MenuHandler>
+            <MenuItem>  
+             {agentName}
+            </MenuItem>
+          </MenuHandler>
+          <MenuList>
+          {possibleRoutingProfiles.map((profile) => (
+            <MenuItem
+              key={profile}
+              onClick={() => {
+                moveAgentToRoutingProfile(agentID, agentName, profile);
+              }}
+            >
+              {profile}
+            </MenuItem>
+          ))}
+          </MenuList>
+        </Menu>
+      );
+    }
+    else {
+      return (<></>)
+    }
+  }
+
+  /**
+   * Updates the description state for the given queue name.
+   *
+   * @param {string} queueName - The name of the queue.
+   * @return {void} This function does not return anything.
+   */
   function showDesc(queueName) {
     // Set the description to true for the queue that was clicked
 
     setDesc_queue({ ...desc_queue, [queueName]: !desc_queue[queueName] });
   }
 
+  /*
+   * Updates the data to be displayed in the table.
+   *
+   * @param {number} page - The page number to get data for.
+   * @return {void} This function does not return anything.
+   */
   function updateData(page = 1) {
     let query = searchQuery ? "name=" + searchQuery : null;
     let skip = (page - 1) * 10;
 
     setIsLoaded(false);
 
+    // Get the list of available agents
+    AgentList(0, 50, "status=Available", "name", "asc").then((data) => {
+        setAgentList(data.data);
+    })
+
+    // Get the list of queues
     QueueList(skip, 10, query, "name", "asc").then((data) => {
         const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
         const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -124,7 +195,7 @@ useEffect(() => {
                   </td>
                 </tr> 
                 : dataToDisplay.map(
-                ({ name, description, usage, averageWaitTime, maxContacts }, key) => {
+                ({ queueID, name, description, usage, averageWaitTime, maxContacts, routingProfiles }, key) => {
                   const className = `py-3 px-5 ${key === dataToDisplay.length
                       ? ""
                       : "border-t border-blue-gray-50"
@@ -132,9 +203,9 @@ useEffect(() => {
 
                   return (
                     <>
-                      <tr key={name} onClick={() => showDesc(name)} >
+                      <tr key={name} >
                         {/* Name */}
-                        <td className={className}>
+                        <td key="Name" className={className} onClick={() => showDesc(name)}>
                           <div className="flex items-center gap-4">
 
                             <div>
@@ -151,7 +222,7 @@ useEffect(() => {
                         </td>
 
                         {/* Ongoing Calls */}
-                        <td className={className}>
+                        <td key="Ongoing Calls" className={className} onClick={() => showDesc(name)}>
                           <Typography className={`text-[0.7rem] ${getTypography()} ${getTextColor('black')}`}>
                             {usage}
                           </Typography>
@@ -161,7 +232,7 @@ useEffect(() => {
                         </td>
 
                         {/* Average Wait Time */}
-                        <td className={className}>
+                        <td key="Average Wait Time" className={className} onClick={() => showDesc(name)}>
                           <Typography
                             className={`text-[0.7rem] ${getTypography()} ${averageWaitTime <= 1 ? "text-green-600" : averageWaitTime <= 2.30 ? "text-orange-600" : "text-red-600"
                               }`}
@@ -175,7 +246,7 @@ useEffect(() => {
                         </td>
 
                         {/* Usage */}
-                        <td className={className}>
+                        <td key="Usage" className={className} onClick={() => showDesc(name)}>
                           <div className="w-10/12">
                             <Typography
                               variant="small"
@@ -193,37 +264,57 @@ useEffect(() => {
                         </td>
 
                         {/* Status */}
-                        <td className={className}>
+                        <td key="Status" className={className} onClick={() => showDesc(name)}>
                           <Chip
                             variant="gradient"
                             color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"}
                             value={usage / maxContacts * 100 <= 80 ? "Free" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "Stressed" : "Exceeded"}
-                            className={`py-0.5 px-2 text-[8px] ${getTypography()}  w-fit`}
+                            className={`py-0.5 px-2 text-[0.8rem] ${getTypography()}  w-fit`}
                           />
                         </td>
 
                         {/* Move Agent to this Queue in case of not free usage */}
-                        { usage / maxContacts * 100 < 80 ? null :
-                          <td className="w-20" >
-                            <Select label="Move Agent" className="w-full">
-                              data
-                              <option value="Option 1">{getAgentList(name)}</option>
-                            </Select>
+                        { usage / maxContacts * 100 > 80 ? null :
+                          <td key="Move Agent" className="border-t border-blue-gray-50">
+                            <Menu allowHover>
+                            <MenuHandler>
+                              <Chip value="Move Agent" variant="gradient" color="red" className=" text-[0.8rem] w-fit"/>
+                            </MenuHandler>
+                            <MenuList className="w-20">
+                              {agents.map(({ name, queueList, agentID }) => getOptions(name, agentID, queueList, queueID, routingProfiles))}
+                            </MenuList>
+                            </Menu>
                           </td>
                         }
-
                       </tr>
-                      { !desc_queue[name] ? null :
 
+                      {/* Open More Info */}
+                      { !desc_queue[name] ? null :
+                      <>
                       <tr key={name + "desc"} className="border-b border-blue-gray-50">
-                          <td colSpan="10" className={getBgColor("gray") + " py-3 px-5"}>
-                          <Typography
-                            className={`text-[0.8rem] center ${getTypography()} ${getTextColor('black')}`}
-                          >
+                        {/* Description */}
+                        <td key="Description" colSpan="6" className={getBgColor("gray") + " py-3 px-5"}>
+                          <Typography className={`text-[0.8rem] center ${getTypography()} ${getTextColor('black')}`}>
                             {description}
                           </Typography>
                         </td>
                       </tr>
+                      {/* Routing Profiles Associated with this Queue */}
+                      <tr key={name + "routingProfiles"} className="border-b border-blue-gray-50">
+                        <td key="Routing Profiles" colSpan="1" className={getBgColor("gray") + " py-3 px-5 " + getTextColor('black')}>
+                          <Typography className={`text-[1rem] center ${getTypography()} ${getTextColor('black')}`}>
+                            {routingProfiles.length} routing profile{routingProfiles.length != 1 ? "s" : ""}:
+                          </Typography>
+                        </td>
+                        { routingProfiles.map((routingProfile) =>
+                          <td key={routingProfile} colSpan="1" className={getBgColor("gray") + " py-3 px-5 " + getTextColor('black')}>
+                            <Typography className={`text-[0.8rem] center ${getTypography()} ${getTextColor('black')}`}>
+                            {routingProfile}
+                            </Typography>
+                          </td>)}
+                        <td key="Padding" colSpan="6" className={getBgColor("gray")}></td>
+                      </tr>
+                      </>
                       }
                     </>
                   );

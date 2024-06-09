@@ -40,7 +40,7 @@ async def get_agentID(username: str) -> str:
 
     @param username: Username of the user.
     '''
-    return await cachedData.get('getListContactParsed', username=username)
+    return await cachedData.get('get_agent_id', username=username)
 
 async def get_SecurityProfileID(securityProfileName: str) -> str:
     '''
