@@ -12,14 +12,14 @@ import {
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
-import { AgentList, JoinCall, ChangeStatus, StatusList } from "@/data/agents-data";
+import { AgentList, JoinCall, ChangeStatus, StatusList, AgentCards } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
 import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
-
+import { getIcon } from "@/pages/dashboard/home";
 import { useAlert } from "@/context/alerts";
 
 function getColorOfStatus(status) {
@@ -49,7 +49,9 @@ export function Teams() {
     const { navColor} = controller;
 
     const [dataToDisplay, setData] = useState([]);
+    const [cards, setCards] = useState([]);
     const [status_list, setStatusList] = useState([]);
+
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchQuery_status, setSearchQuery_status] = useState('');
@@ -63,19 +65,12 @@ export function Teams() {
     const [pagination_itemsPerPage, pagination_setItemsPerPage] = useState(0);
     const [pagination_totalItems, pagination_setTotalItems] = useState(0);
 
-    // let isLoaded = false;
-    // let dataToDisplay = searchQuery ? filteredAgents : data;
-
     function handleSearch(event) {
         setSearchQuery(event.target.value.toLowerCase());
-        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
-        // setFilteredAgents(filtered);
     }
 
     function handleSearchStatus(event) {
         setSearchQuery_status(event.target.value.toLowerCase());
-        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
-        // setFilteredAgents(filtered);
     }
 
     function handleHelpFilter(event) {
@@ -96,7 +91,6 @@ export function Teams() {
             return;
 
         ChangeStatus(agentId, status).then(result => {
-            console.warn(result.message);
             setChanged(!changed);
             if (result.message == "Status changed")
                 showAlertWithMessage("green", "Status changed", 5000);
@@ -149,7 +143,13 @@ export function Teams() {
             for (let i = 0; i < data.length; i++) {
                 statuses.push(data[i].Name);
             }
+            statuses.sort();
             setStatusList(statuses);
+        })
+
+        // get cards
+        AgentCards().then((data) => {
+            setCards(data.cards);
         })
 
         // get agents
@@ -183,38 +183,33 @@ export function Teams() {
 
 
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-                <StatisticsCard
-                    key="Connected"
-                    title="Connected users"
-                    color="gray"
-                    // icon={React.createElement(UsersIcon, {
-                    //     className: "w-6 h-6 text-white",
-                    // })}
-                    value="10"
-                    icon={<UsersIcon className="h-6 w-6 text-white-500" />}
+                {!isLoaded ? (
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                    Cards are now loading...
+                </Typography>
+                </div>
+                ) : (
+                cards.map(({ icon, title, footer, ...rest }) => (
+                    <StatisticsCard
+                    key={title}
+                    {...rest}
+                    title={title}
+                    icon={React.createElement(getIcon(icon), {
+                        className: "w-6 h-6 text-white",
+                    })}
                     footer={
-                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
-                            <strong className="text-green-500">10</strong>
-                            &nbsp; connected
+                        <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                        <strong className={footer.color}>{footer.value}</strong>
+                        &nbsp;{footer.label}
                         </Typography>
                     }
-                />
-                <StatisticsCard
-                    key="Stress"
-                    title="Usage level"
-                    color="gray"
-                    // icon={React.createElement(UsersIcon, {
-                    //     className: "w-6 h-6 text-white",
-                    // })}
-                    value="30%"
-                    icon={<CogIcon className="h-6 w-6 text-white-500" />}
-                    footer={
-                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
-                            <strong className="text-green-500">3/5</strong>
-                            &nbsp; agents on call
-                        </Typography>
-                    }
-                />
+                    />
+                ))
+                )}
             </div>
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
@@ -285,7 +280,7 @@ export function Teams() {
                                         <tr key="loading">
                                             <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                 <span className="flex justify-center items-center">
-                                                    <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                                                    <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
                                                 </span>
                                             </td>
                                         </tr>
@@ -345,8 +340,8 @@ export function Teams() {
                                                                 className={` text-[0.8rem] py-0.5 px-2 ${getTypographybold()} ${status === "Offline" ? getTextColor('dark') : getTextColor('white2')} ${getBgColor(getColorOfStatus(status))}`}
                                                                 color={getColorOfStatus(status)}
                                                                 onChange={(val) => handleChangeStatus(agentID, val, status)}>
-                                                                    <Option value={status}>{status}</Option>
-                                                                    {status_list.map((status_option) => status_option == status ? <></> : <Option value={status_option}>{status_option}</Option>)}
+                                                                    <Option key={status} value={status}>{status}</Option>
+                                                                    {status_list.map((status_option) => status_option == status ? <></> : <Option key={status_option} value={status_option}>{status_option}</Option>)}
                                                                 </Select> 
                                                             </td>
                                                             {/* Needs help indicator*/}

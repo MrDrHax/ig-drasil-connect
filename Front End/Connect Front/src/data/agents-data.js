@@ -60,6 +60,23 @@ export async function StatusList() {
 }
 
 /**
+ * Retrieves a list of cards from the API.
+ *
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the list of agents.
+ * @throws {Error} If the API request fails.
+ */
+export async function AgentCards() {
+    let url = getApiPath() + 'agents/cards';
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+/**
  * Retrieves detailed information about a specific agent.
  *
  * @param {number} id - The unique identifier of the agent.
