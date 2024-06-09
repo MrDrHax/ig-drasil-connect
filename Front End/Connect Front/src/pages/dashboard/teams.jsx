@@ -6,11 +6,13 @@ import {
     Input,
     Chip,
     Button,
-    Checkbox
+    Checkbox, 
+    Select,
+    Option
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
-import { AgentList, JoinCall } from "@/data/agents-data";
+import { AgentList, JoinCall, ChangeStatus, StatusList } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
 import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
@@ -47,10 +49,13 @@ export function Teams() {
     const { navColor} = controller;
 
     const [dataToDisplay, setData] = useState([]);
+    const [status_list, setStatusList] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchQuery_status, setSearchQuery_status] = useState('');
     const [helpFilter, setHelpFilter] = useState(false);
+
+    const [changed, setChanged] = useState(false);
 
     // pagination vars
     const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
@@ -80,6 +85,27 @@ export function Teams() {
     const { showAlertWithMessage } = useAlert();
 
     /**
+     * A function to change the status of an agent.
+     *
+     * @param {type} agentId - The ID of the agent to change the status of.
+     * @param {type} status - The new status of the agent.
+     * @return {type} No return value.
+     */
+    function handleChangeStatus(agentId, status, current) {
+        if (current == status)
+            return;
+
+        ChangeStatus(agentId, status).then(result => {
+            console.warn(result.message);
+            setChanged(!changed);
+            if (result.message == "Status changed")
+                showAlertWithMessage("green", "Status changed", 5000);
+            else
+                showAlertWithMessage("red", "Failed to change status", 5000);
+        });
+    }
+
+    /**
      * A function to barge into a call with a specified agent ID.
      *
      * @param {type} agentId - The ID of the agent to barge in on.
@@ -88,6 +114,7 @@ export function Teams() {
     function bargeIn(agentId) {
         let result = JoinCall(agentId);
 
+        setChanged(!changed);
         if (result.status == 200)
             showAlertWithMessage("green", "Barging in to call with agent", 5000);
         else
@@ -95,6 +122,12 @@ export function Teams() {
         //console.log("Barging in to call with agent " + agentId);
     }
 
+    /**
+     * Updates the data on the page based on the provided page number.
+     *
+     * @param {number} [page=1] - The page number to fetch data for. Defaults to 1.
+     * @return {Promise<void>} A promise that resolves when the data has been updated.
+     */
     function updateData(page = 1) {
         // search by name
         let search = searchQuery ? `name=${searchQuery}` : '';
@@ -110,6 +143,16 @@ export function Teams() {
 
         setIsLoaded(false);
 
+        // get statuses
+        StatusList().then((data) => {
+            let statuses = [];
+            for (let i = 0; i < data.length; i++) {
+                statuses.push(data[i].Name);
+            }
+            setStatusList(statuses);
+        })
+
+        // get agents
         AgentList(skip, 10, search, "name", "asc").then((data) => {
             const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
             const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -133,7 +176,7 @@ export function Teams() {
 
     useEffect(() => {
         updateData();
-    }, [searchQuery, searchQuery_status, helpFilter]);
+    }, [searchQuery, searchQuery_status, helpFilter, changed]);
 
     return (
         <div>
@@ -268,6 +311,7 @@ export function Teams() {
 
                                                     return (
                                                         <tr key={agentID}>
+                                                            {/* Name indicator*/}
                                                             <td className={className}>
                                                                 <div className="flex items-center gap-4">
                                                                     {/* <Avatar src={avatar} alt={name} size="sm" variant="rounded" /> */}
@@ -281,19 +325,31 @@ export function Teams() {
                                                                     </div>
                                                                 </div>
                                                             </td>
+                                                            {/* Queue indicator*/}
                                                             <td className={className}>
                                                                 <Typography className={`text-xs ${getTypographybold()} ${getTextColor('dark')}`}>
                                                                     {queue}
                                                                 </Typography>
                                                             </td>
+                                                            {/* Status indicator*/}
                                                             <td className={className}>
+                                                                {/*
                                                                 <Chip
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
                                                                     className={`py-0.5 px-2 text-[0.8rem] font-medium w-fit ${getTypographybold()}`}
                                                                 />
+                                                                */}
+                                                                <Select value={status}
+                                                                className={` text-[0.8rem] py-0.5 px-2 ${getTypographybold()} ${status === "Offline" ? getTextColor('dark') : getTextColor('white2')} ${getBgColor(getColorOfStatus(status))}`}
+                                                                color={getColorOfStatus(status)}
+                                                                onChange={(val) => handleChangeStatus(agentID, val, status)}>
+                                                                    <Option value={status}>{status}</Option>
+                                                                    {status_list.map((status_option) => status_option == status ? <></> : <Option value={status_option}>{status_option}</Option>)}
+                                                                </Select> 
                                                             </td>
+                                                            {/* Needs help indicator*/}
                                                             <td className={className}>
                                                                 {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'yellow' ? <ExclamationCircleIcon className="h-6 w-6 text-yellow-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
@@ -310,7 +366,7 @@ export function Teams() {
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td> : null 
+                                                            </td> : null
                                                             }
                                                         </tr>
                                                     );

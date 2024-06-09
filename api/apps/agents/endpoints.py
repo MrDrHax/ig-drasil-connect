@@ -164,11 +164,12 @@ async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
 
 @router.get("/list/list-agent-statuses")
 async def list_agent_statuses():
-    
-    client = boto3.client('connect')
-    resp = client.list_agent_statuses(
-        InstanceId=Config.INSTANCE_ID
+    """
+    Returns a list of all agent statuses.
 
-    )
+    @return: list of agent statuses
+    """
+
+    resp = await cachedData.get('getListAgentStatuses')
 
     return resp

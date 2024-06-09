@@ -4,6 +4,7 @@ from config import Config
 from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
+from cache.cache_object import cachedData
 
 from apps.extras.endpoints import get_agentID
 
@@ -41,6 +42,7 @@ async def join_call(token: Annotated[str, Depends(requireToken)], agent_id: str)
 
     client = boto3.client('connect')
 
+    # Get the id for the call
     response = client.get_current_user_data(
         InstanceId=Config.INSTANCE_ID,
         Filters={
@@ -61,85 +63,35 @@ async def join_call(token: Annotated[str, Depends(requireToken)], agent_id: str)
     )
     return user_id
 
-@router.post("/start-call")
-async def start_call( phone_number: str):
+@router.post("/change_status")
+async def change_status(token: Annotated[str, Depends(requireToken)], agent_id: str, status: str):
     """
-    start of a phone call in Amazon Connect.
+    Change the status of an agent.
 
-    @param phone_number: Phone number to call.
+    @param agent_id: ID of the agent whose status to change.
+    @param status: New status of the agent.
 
-    @return: Confirmation message of the call starting.
+    @return: Confirmation message of the status change.
     """
-    return {"message": f"Call Started: {phone_number}"}
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
+    response = await cachedData.get('getListAgentStatuses')
+    
+    statusID = None
 
+    for statuses in response:
+        if statuses['Name'] == status:
+            statusID = statuses['Id']
 
-@router.post("/end-call")
-async def end_call(call_id: str):
-    """
-    end of a phone call in Amazon Connect.
-
-    @param call_id: ID of the call that has ended.
-
-    @return: Confirmation message of the call ending.
-    """
-    return {"message": f"Call Ended: {call_id}"}
-
-
-@router.post("/create-contact")
-async def create_contact(contact_name: str, phone_number: str):
-    """
-    Create a contact in Amazon Connect.
-
-    @param contact_name: Name of the contact.
-    @param phone_number: Phone number of the contact.
-
-    @return: Details of the created contact.
-    """
-    return {"contact_name": contact_name, "phone_number": phone_number}
-
-
-
-@router.get("/calls-details/{call_id}")
-async def get_call_details(call_id: str):
-    """
-    Get details of a call in Amazon Connect.
-
-    @param call_id: ID of the call to get details for.
-
-    @return: Details of the specified call.
-    """
-    return {
-        "call_id": call_id,
-        "name": "Jane Doe",
-        "number": "5521457834",
-        "call_subject": "product information"
-    }
-
-
-@router.get("/agent-availability", response_model=List[dict])
-async def check_agent_availability():
-    """
-    Verifies the availability of agents in Amazon Connect.
-
-    @return 
-        List containing the availability status of agents.
-    """
-
+    if statusID == None:
+        raise HTTPException(status_code=400, detail="Invalid status.")
+    
     client = boto3.client('connect')
-
-    # Get info for the first routing profile
-    response = client.get_current_user_data(
+    response = client.put_user_status(
         InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'RoutingProfiles': [
-                '69e4c000-1473-42aa-9596-2e99fbd890e7',
-            ]
-        }
+        AgentStatusId=statusID,
+        UserId=agent_id
     )
 
-    #agents_availability = [
-    #    {"agent_id": "123", "availability": "Available"},
-    #    {"agent_id": "456", "availability": "Unavailable"},
-    #    {"agent_id": "789", "availability": "Available"},
-    #]
-    return response['UserDataList']
+    return {"message": "Status changed"}
