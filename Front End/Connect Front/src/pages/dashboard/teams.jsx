@@ -254,7 +254,7 @@ export function Teams() {
                             </Button>
                         </div>
                     </CardHeader>
-                    <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+                    <CardBody classname = {`overflow-x-scroll px-0 pt-0 pb-2 ${getBgColor("background-cards")}`}>
                         {/* List */}
                         <table className="w-full min-w-[640px] table-auto">
                             <thead>
@@ -282,6 +282,9 @@ export function Teams() {
                                                 <span className="flex justify-center items-center">
                                                     <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
                                                 </span>
+                                                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                                                    Agents are now loading...
+                                                </Typography>
                                             </td>
                                         </tr>
                                     ) : (

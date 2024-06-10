@@ -12,6 +12,7 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Input,
 } from "@material-tailwind/react";
 import { AgentList, QueueList, ChangeRoutingProfile } from "@/data";
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
@@ -33,6 +34,7 @@ export function Queues() {
   const [routingProfiles, setRoutingProfileList] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
   const [desc_queue, setDesc_queue] = useState({});
@@ -44,6 +46,10 @@ export function Queues() {
   const [pagination_totalItems, pagination_setTotalItems] = useState(0);
 
   const { showAlertWithMessage } = useAlert();
+
+  function handleSearchStatus(event) {
+    setFilterStatus(event.target.value.toLowerCase());
+  }
 
   /**
    * Moves the agent to the given routing profile.
@@ -122,6 +128,9 @@ export function Queues() {
    */
   function updateData(page = 1) {
     let query = searchQuery ? "name=" + searchQuery : null;
+    if (filterStatus) {
+      query = query ? `${query}&status=${filterStatus}` : `status=${filterStatus}`;
+    }
     let skip = (page - 1) * 10;
 
     setIsLoaded(false);
@@ -155,15 +164,25 @@ export function Queues() {
 
 useEffect(() => {
     updateData();
-}, []);
+}, [filterStatus]);
 
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
-      <Card className={`w-full ${getBgColor("background-cards")}`}>
-        <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getTypography()} ${getBgColor("search-bar")}`}>
-          <Typography variant="h6" className={`text-[1.45rem] ${getTextColor("white3")} ${getTypographybold()}`}>
+      <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
+        <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getTypography()} ${getBgColor("search-bar")} flex justify-between items-center`}>
+          <Typography variant="h6" className={`text-[1.45rem] flex-none ${getTextColor("white3")} ${getTypographybold()}`}>
             Agent Queues
           </Typography>
+          <div className="mr-auto md:mr-4 md:w-56">
+            {/* Search bar by name*/}
+            <Input
+             color="white"
+             label="Search by status"
+             value={filterStatus}
+             onChange={handleSearchStatus}
+            />
+          </div>
+
         </CardHeader>
         <CardBody className={`overflow-x-scroll px-0 pt-0 pb-2 ${getBgColor("background-cards")}`}>
           <table className={`w-full min-w-[640px] table-auto ${getTypography()} `}>
@@ -192,10 +211,22 @@ useEffect(() => {
                       <span className="flex justify-center items-center">
                           <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
                       </span>
+                      <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                        Queues are now loading...
+                    </Typography>
                   </td>
                 </tr> 
+                : dataToDisplay.length === 0 ?
+                // No data
+                <tr key="no-data">
+                  <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                    <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                      No queues found
+                    </Typography>
+                  </td>
+                </tr>
                 : dataToDisplay.map(
-                ({ queueID, name, description, usage, averageWaitTime, maxContacts, routingProfiles }, key) => {
+                ({ queueID, name, description, usage, averageWaitTime, maxContacts, routingProfiles, status }, key) => {
                   const className = `py-3 px-5 ${key === dataToDisplay.length
                       ? ""
                       : "border-t border-blue-gray-50"
@@ -257,7 +288,7 @@ useEffect(() => {
                             <Progress
                               value={usage / maxContacts * 100}
                               variant="gradient"
-                              color={usage / maxContacts * 100 <= 50 ? "green" : usage / maxContacts * 100 > 50 && usage / maxContacts * 100 <= 80 ? "orange" : "red"}
+                              color={status === "Free" ? "green" : status === "Stressed" ? "orange" : "red"}
                               className="h-1"
                             />
                           </div>
@@ -267,8 +298,8 @@ useEffect(() => {
                         <td key="Status" className={className} onClick={() => showDesc(name)}>
                           <Chip
                             variant="gradient"
-                            color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"}
-                            value={usage / maxContacts * 100 <= 80 ? "Free" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "Stressed" : "Exceeded"}
+                            color={status === "Free" ? "green" : status === "Stressed" ? "orange" : "red"}
+                            value={status}
                             className={`py-0.5 px-2 text-[0.8rem] ${getTypography()}  w-fit`}
                           />
                         </td>
@@ -277,7 +308,7 @@ useEffect(() => {
                           <td key="Move Agent" className="border-t border-blue-gray-50">
                             <Menu allowHover>
                             <MenuHandler>
-                              <Chip value="Move Agent" variant="gradient" color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"} className=" text-[0.8rem] w-fit"/>
+                              <Chip value="Move Agent" variant="gradient" color={status === "Free" ? "green" : status === "Stressed" ? "orange" : "red"} className=" text-[0.8rem] w-fit"/>
                             </MenuHandler>
                             <MenuList className="w-20">
                               {agents.map(({ name, queueList, agentID }) => getOptions(name, agentID, queueList, queueID, routingProfiles))}
