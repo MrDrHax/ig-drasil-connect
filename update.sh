@@ -39,6 +39,7 @@ echo "Building back-end..."
 
 cd /home/ubuntu/ig-drasil-connect/api
 /home/ubuntu/ig-drasil-connect/api/venv/bin/pip install -r requirements.txt
+/home/ubuntu/ig-drasil-connect/api/venv/bin/pip install gunicorn
 
 sudo chmod -R 555 /home/ubuntu/ig-drasil-connect/api
 

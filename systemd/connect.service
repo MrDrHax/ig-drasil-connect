@@ -7,7 +7,7 @@ User=www-data
 WorkingDirectory=/home/ubuntu/ig-drasil-connect/api
 Environment="PATH=/home/ubuntu/ig-drasil-connect/api/venv/bin"
 Environment="PYTHONPATH=/home/ubuntu/ig-drasil-connect/api/venv/lib/python3.x/site-packages"
-ExecStart=/usr/bin/gunicorn -c /home/ubuntu/ig-drasil-connect/api/gunicorn.py -k uvicorn.workers.UvicornWorker main:app
+ExecStart=/home/ubuntu/ig-drasil-connect/api/venv/bin/gunicorn -c /home/ubuntu/ig-drasil-connect/api/gunicorn.py -k uvicorn.workers.UvicornWorker main:app
 Restart=always
 
 [Install]
