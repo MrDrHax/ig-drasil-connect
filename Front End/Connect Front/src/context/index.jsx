@@ -121,6 +121,12 @@ export function getBgColor(color) {
         return "bg-red-500";
       case "pink":
         return "bg-pink-500";
+      case "purple":
+        return "bg-purple-500";
+      case "blue":
+        return "bg-blue-500";
+      case "yellow":
+        return "bg-yellow-500";
       case "background":
         return "bg-white";
       case "background-cards":
@@ -144,6 +150,12 @@ export function getBgColor(color) {
         return "bg-red-500";
       case "pink":
         return "bg-pink-500";
+      case "purple":
+          return "bg-purple-500";
+      case "blue":
+          return "bg-blue-500";
+      case "yellow":
+          return "bg-yellow-500";
       case "background":
         return "bg-black";
       case "background-cards":
