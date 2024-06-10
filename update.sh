@@ -37,7 +37,7 @@ sudo systemctl daemon-reload
 
 echo "Building back-end..."
 
-cd api
+cd /home/ubuntu/ig-drasil-connect/api
 /home/ubuntu/ig-drasil-connect/api/venv/bin/pip install -r requirements.txt
 
 sudo systemctl restart connect
