@@ -29,6 +29,8 @@ echo "Copying configs..."
 sudo cp -r nginx/* /etc/nginx/sites-available/
 sudo cp -r systemd/* /etc/systemd/system/
 
+sudo systemctl daemon-reload
+
 # Build the back-end
 
 # restart systemd service
@@ -36,10 +38,7 @@ sudo cp -r systemd/* /etc/systemd/system/
 echo "Building back-end..."
 
 cd api
-(
-    source /home/ubuntu/ig-drasil-connect/api/venv/bin/activate
-    pip install -r requirements.txt
-)
+/home/ubuntu/ig-drasil-connect/api/venv/bin/pip install -r requirements.txt
 
 sudo systemctl restart connect
 
