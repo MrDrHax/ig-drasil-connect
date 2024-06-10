@@ -64,7 +64,8 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
     cards = [
         await read_avg_holds(token, agent_id),
         await read_People_to_answer(),
-        await read_capacity_agent(token, agent_id)
+        await read_capacity_agent(token, agent_id),
+        await get_agent_rating(agent_id, token)
     ]
 
     graphs = [
@@ -340,6 +341,37 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
         logger.error(f"Error in get_agent_profile: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+@router.get("/card/agent/AgentRatingAvg", tags=["card"])
+async def get_agent_rating(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
+
+    list = await cachedData.get('getListAgentRatings', agent_id=agent_id)
+
+    res = [0.0, 0.0]
+    for rating in list:
+        res[0] += rating.rating
+        res[1] += 1
+
+    # The first value is the avg of all the ratings and the second is the number of ratings
+    res[0] = res[0] / res[1]
+
+    cardFooter = models.CardFooter(
+        color="text-green-500",
+        value="",
+        label="The average rating of the agent",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Rating",
+        value=str(res[0]),
+        icon="StarIcon",
+        footer=cardFooter,
+        color="blue"
+    )
+
+    return card
 
 #------ Alerts endpoints
 
