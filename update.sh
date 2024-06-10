@@ -36,8 +36,10 @@ sudo cp -r systemd/* /etc/systemd/system/
 echo "Building back-end..."
 
 cd api
-source venv/bin/activate
-pip install -r requirements.txt
+(
+    source /home/ubuntu/ig-drasil-connect/api/venv/bin/activate
+    pip install -r requirements.txt
+)
 
 sudo systemctl restart connect
 
