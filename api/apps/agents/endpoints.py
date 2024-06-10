@@ -67,20 +67,7 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
 
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
-
-    users_data = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters = {
-            'Agents': userList
-        }
-    )
+    users_data = await cachedData.get("get_current_user_data")
 
     count = 0
     for user in users_data['UserDataList']:
@@ -118,20 +105,7 @@ async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
 
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
-
-    users_data = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'Agents': userList
-        }
-    )
+    users_data = await cachedData.get("get_current_user_data")
 
     count = 0
     assistanceCount = 0
@@ -140,8 +114,6 @@ async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
             count += 1
             if datetime.now(user['Status']['StatusStartTimestamp'].tzinfo) - user['Status']['StatusStartTimestamp'] >= timedelta(minutes=5):
                 assistanceCount += 1
-                
-
 
     if count >= 3:
         color = "text-red-500"
@@ -247,15 +219,6 @@ async def queues_agent_answer_rate(token: Annotated[str, Depends(requireToken)])
     # CONTACTS_QUEUED
 
     # MAX_QUEUED_TIME
-
-
-
-@router.get("/list/list-agent")
-async def list_agent():
-    
-    client = boto3.client('connect')
-    resp = client.list_users(
-        InstanceId=Config.INSTANCE_ID
 
 @router.get("/list/list-agent-statuses")
 async def list_agent_statuses():
