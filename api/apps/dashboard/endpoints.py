@@ -218,7 +218,7 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->m
         id=1,
         title="Average Call Time",
         value="{p:.2f}".format(p=data/60) + "m",
-        icon="ClockIcon",
+        icon="Clock",
         footer=cardFooter,
         color="blue"
     )
@@ -333,7 +333,7 @@ async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> m
         id=1,
         title="Agents in call.",
         value=f'{agentsInCall} out of {totalAgents} connected agents',
-        icon="UserIcon",
+        icon="PhoneArrow",
         footer=footer_info,
         color="pink",
     )
@@ -417,7 +417,7 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
         id = 1,
         title = "Average Handle Time",
         value =  "{:.2f}s".format(datares1[0]),
-        icon = "UserIcon",
+        icon = "Person",
         footer = cardFooter,
         warning = datares1[0] > 3,
         color = "orange"
@@ -493,7 +493,7 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
         id=1,
         title="Abandonment rate",
         value="{:.2f}%".format(card_value),
-        icon="PhoneXMarkIcon",
+        icon="Phone",
         footer=cardFooter,
     )
 
@@ -857,7 +857,7 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
     except:
         card = models.GenericCard(
             id = 0,
-            title = "Average Handle Time",
+            title = "porcentage of time active",
             value =  "No data",
             icon = "UserIcon",
             footer = models.CardFooter(
@@ -1103,6 +1103,7 @@ async def get_alert_agent_NonResponse(agent_id:str):
     sends back the alert of the agent that has not responded during the call with the client
     '''
     client = boto3.client('connect')
+    agent= await list_users_data()
 
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -1111,9 +1112,11 @@ async def get_alert_agent_NonResponse(agent_id:str):
         Filters = [
             {
             'FilterKey': 'AGENT',
-            'FilterValues' : [agent_id ],  
+            'FilterValues' : [i['Id'] for i in agent],  
             } 
         ], 
+
+        Groupings=['AGENT', ],
 
         Metrics = [
             {
@@ -1121,24 +1124,28 @@ async def get_alert_agent_NonResponse(agent_id:str):
             }
         ]
     )
-    data = response['MetricResults'][0] ['Collections'][0] ['Value']
-    if data > 0:
-        alert = models.GenericAlert(
-            Text="You have not responded during the call with the client.",
-            TextRecommendation="You could ask for help from a supervisor or ask the client if he has any questions.",
-            color="orange",
-        )   
-        return alert
-    else:
-        alert = models.GenericAlert(
-            Text="You have responded during the call with the client.",
-            TextRecommendation="You have done a good job.",
-            color="green",
-        )
-        return alert
+
+    for i in response['MetricResults']:
+        if i["Dimensions"]["AGENT"] == agent_id:
+            if i['Collections'][0]['Value'] > 0:
+                return models.GenericAlert(
+                    Text="You have a non response a call with the client",
+                    TextRecommendation=". You asked to respond to the client during the call or asker for help to the supervisor",
+                    color="red",
+                )
+            else:
+                return models.GenericAlert(
+                    Text="You have a non response a call with the client",
+                    TextRecommendation=". you good job, you have responded to the client during the call",
+                    color="green",
+                )
+    return models.GenericAlert(
+        Text="You have a non response a call with the client",
+        TextRecommendation=". you good job, you have responded to the client during the call",
+        color="green",
+    )
+
     
-
-
 
 @router.get("/alerts/get_alerts_agent", tags=["alerts"])
 async def get_alert_agent(agent_id:str):
@@ -1147,10 +1154,10 @@ async def get_alert_agent(agent_id:str):
     '''
     alerts=[]
 
-   # NR= await get_alert_agent_NonResponse(agent_id)
+    NR= await get_alert_agent_NonResponse(agent_id)
 
-    # if NR:
-    #     alerts.append(NR)
+    if NR:
+        alerts.append(NR)
     if str(agent_id) in dict_agent:
         alerts.append(models.GenericAlert(
             Text="You have "+ str(dict_agent[str(agent_id)]) + " messages from supervisor",

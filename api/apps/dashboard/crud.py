@@ -911,13 +911,13 @@ async def get_alert_supervisor_nonResponse():
     alert = []
 
     for i in response['MetricResults']:
-        for n in i['Collections']:
-            if n['Value'] > 0:
-                alert.append(models.GenericAlert(
-                    Text="Agent "+ await get_usename(i["Dimensions"]["AGENT"]) + " has not responded during the call with the client.",
-                    TextRecommendation="You could intervene in the call or send him a message as to why he is silent in front of the customer",
-                    color="red",
-                ))
+        if i['Collections'][0]['Value'] > 0:
+            alert.append(models.GenericAlert(
+                Text="Agent "+ await get_usename(i["Dimensions"]["AGENT"]) + " has not responded during the call with the client.",
+                TextRecommendation="You could intervene in the call or send him a message as to why he is silent in front of the customer",
+                color="red",
+            ))
+
     return alert
 cachedData.add("get_alert_supervisor_nonResponse", get_alert_supervisor_nonResponse, 60)
 
