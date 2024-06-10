@@ -1115,4 +1115,35 @@ async def get_alert_agent_NonResponse(agent_id:str):
         color="green",
     )
 
+    
 
+@router.get("/alerts/get_alerts_agent", tags=["alerts"])
+async def get_alert_agent(agent_id:str):
+    '''
+    sends back the alert of the agent
+    '''
+    alerts=[]
+
+    NR= await get_alert_agent_NonResponse(agent_id)
+
+    if NR:
+        alerts.append(NR)
+    if str(agent_id) in dict_agent:
+        alerts.append(models.GenericAlert(
+            Text="You have "+ str(dict_agent[str(agent_id)]) + " messages from supervisor",
+            TextRecommendation=". You should check your messages in the chat",
+            color="blue-gray",
+            )
+        )
+        dict_agent[str(agent_id)] = 0
+
+    alerts.append(models.GenericAlert(
+        Text="You have a message from supervisor",
+        TextRecommendation=". You should check your messages in the chat correspondant to the supervisor",
+        color="blue",
+        )
+    )
+
+
+
+    return alerts
