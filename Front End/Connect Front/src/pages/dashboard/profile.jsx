@@ -17,22 +17,20 @@ import {
 import {
   InformationCircleIcon,
   ChatBubbleLeftEllipsisIcon,
-  Cog6ToothIcon,
-  PencilIcon,
+  ClockIcon
 } from "@heroicons/react/24/solid";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
-import ChatBoxSupervisor from "@/widgets/chat/chatboxsuper";
+import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
-import { platformSettingsData, conversationsData, projectsData, statisticsChartsData } from "@/data";
 
-import { getBgColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
+import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 import { AgentDetails } from "@/data/agents-data";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
-import {getRolesFromToken} from '@/configs/api-tools';
-
 import {lexRecommendationData} from "@/data";
+
+import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/data/supervisor-home-data";
 
 /**
  * Renders the user profile page with tabs for app and chat views.
@@ -42,9 +40,18 @@ import {lexRecommendationData} from "@/data";
 export function Profile() {
 
   const controller = useMaterialTailwindController();
+  const { theme, navColor } = controller;
 
   const [view, setView] = useState('app');
   const [dataToDisplay, setData] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  const [ratingData, setRatingData] = useState([]);
+  const [avgRating, setAvgRating] = useState(-1);
+  const [numRatings, setNumRatings] = useState(0);
+  const [avgRatingFloat, setAvgRatingFloat] = useState(0.0);
+
+  const [conversations, setConversations] = useState([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   searchParams.get("profile")
@@ -53,8 +60,25 @@ export function Profile() {
   function updateData() {
 
     AgentDetails(searchParams.get("profile")).then((data) => {
+      data.id = searchParams.get("profile");
       setData(data);
     });
+
+    AgentRatingGraphData(searchParams.get("profile")).then((data) => {
+      setRatingData(data);
+    })
+
+    AgentRatingData(searchParams.get("profile")).then((data) => {
+      setAvgRatingFloat(data[0]);
+      setAvgRating(Math.round(data[0]));
+      setNumRatings(data[1]);
+    })
+
+    AgentConversations(searchParams.get("profile")).then((data) => {
+      setConversations(data);
+    })
+
+    setIsLoaded(true);
   }
 
   //Call the function just once
@@ -77,21 +101,28 @@ export function Profile() {
                 className="rounded-lg shadow-lg shadow-blue-gray-500/40"
               />
               <div>
-                <Typography variant="h5" color="blue-gray" className={`${getTypography()} ${getTextColor("white3")} mb-1`}>
+                <Typography variant="h5" color="blue-gray" className={`text-[1.2] ${getTypography()} ${getTextColor("white3")} mb-1`}>
                   {dataToDisplay.name}
                 </Typography>
-                <Typography variant="small" className={`${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
+                <Typography variant="small" className={`text-[0.8rem] ${getTypography()} ${getTextColor("white3")} mt-1 mb-1`}>
                 {/* Role List */}
-                  { getRolesFromToken().includes('manager') && getRolesFromToken().includes('agent') ? 'Agent / Supervisor' : 
-                  !getRolesFromToken().includes('manager') ? 'Agent' :
-                  !getRolesFromToken().includes('agent') ? 'Supervisor' : ''}
+                  { dataToDisplay.roles == null ? '' : 
+                  dataToDisplay.roles.includes('Admin') ? 'Agent / Supervisor' : 
+                  dataToDisplay.roles.includes('Agent') ? 'Agent' :
+                  dataToDisplay.roles.includes('CallCenterManager') ? 'Supervisor' : ''}
+
                 </Typography>
                 <div className="flex items-center gap-2 font-bold text-blue-gray-500">
-              <Rating value={5} readonly/>
-              <Typography color="blue-gray" className={`${getTypography()} ${getTextColor("white3")} text-[10px]`}>
-                Based on 12 customer Reviews.
-              </Typography>
-              </div>
+                  {/* Rating is not loaded until the data is loaded */}
+                  { avgRating == -1 ? null : <Rating value={avgRating} readonly /> }
+
+                  <Typography className={`${getTypography()} ${getTextColor("white3")} text-[16px]`}>
+                    {avgRatingFloat.toFixed(1)}
+                  </Typography>
+                  <Typography color="blue-gray" className={`text-[1rem] ${getTypography()} ${getTextColor("white3")} text-[10px]`}>
+                    Based on {numRatings} analysed call{ numRatings > 1 ? 's' : ''}.
+                  </Typography>
+                </div>
 
               </div>
             </div>
@@ -117,33 +148,33 @@ export function Profile() {
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
             <ProfileInfoCard
-              title="Agent AI/n Recommendations"
-              description= {"Al/n, your virtual assistant recommends: " + lexRecommendationData()[0].recomendation}
-              // "Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
+              title="Agent AI.n Recommendations"
+              description= {"Al.n is under maintenance, please check back later."}
               details={{
-                "name": dataToDisplay.name,
-                mobile: dataToDisplay.mobile,
-                email: dataToDisplay.email,
-
-                /* Change Social Media Icons to proficiencies */
-                "social media": (
-                  <div className="flex items-center gap-4">
-                    <i className="fa-brands fa-facebook text-blue-700" />
-                    <i className="fa-brands fa-twitter text-blue-400" />
-                    <i className="fa-brands fa-instagram text-purple-500" />
-                  </div>
-                ),
-                
+                "Name": dataToDisplay.name,
+                "Mobile Phone": dataToDisplay.mobile,
+                "Email": dataToDisplay.email,
               }}
             />
-            <div>
-              <Typography variant="small" className={`${getTypographybold()} ${getTextColor("dark")} pb-5`}>
+
+              {/* Add Last Customer Calls */}
+              <div>
+              <Typography variant="small" className={`text-[0.8rem] ${getTypographybold()} ${getTextColor("dark")} pb-5`}>
                   Last customer calls
                 </Typography>
                 <ul className={`flex flex-col gap-6`}>
-                  {conversationsData.map((props) => (
+                  { conversations.length == 0 ?
+                  <tr key="loading">
+                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                        <span className="flex justify-center items-center">
+                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                        </span>
+                    </td>
+                  </tr> :
+                  conversations.map((props) => (
                     <MessageCard
-                      key={props.name}
+                      key={props.timestamp}
+                      img="/img/favicon.png"
                       {...props}
                     />
                   ))}
@@ -152,10 +183,35 @@ export function Profile() {
 
             {/* Add Average Rating Over Months Chart */}
               <div>
-                <Typography variant="h6" color="blue-gray" className={`font-normal ${getTextColor("dark")}`}>
-                  Average rating over months
+                <Typography /*variant="h6"*/ color="blue-gray" className={`font-normal text-[1.3rem] ${getTextColor("dark")}`}>
+                  Average rating over time
                 </Typography>
-                <StatisticsChart chart={statisticsChartsData[3].chart} /> {/* Pass the chart object */}
+                { ratingData.length == 0 ?
+                /* Renders a loading indicator while the data is being fetched */
+                  <tr key="loading">
+                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
+                        <span className="flex justify-center items-center">
+                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                        </span>
+                    </td>
+                  </tr> : 
+                /* Renders the rating chart from the API call */
+                ratingData.map((props) => (
+                  //statisticsChartsData.map((props) => (
+                  <StatisticsChart
+                    key={props.title}
+                    {...props}
+                    footer={
+                      <Typography
+                        //variant="small"
+                        className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}
+                      >
+                        <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
+                        &nbsp;{props.footer}
+                      </Typography>
+                    }
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -164,7 +220,7 @@ export function Profile() {
           {
             view === 'chat' && (
             <div className="gird-cols-1 mb-12 grid gap-12 px-4" style={{ visibility: view === 'chat' ? 'visible' : 'hidden' }}>
-              <ChatBoxSupervisor/>
+              <ChatBox agent_id={dataToDisplay.id} is_supervisor={true}/>
             </div>
           )}
         </CardBody>

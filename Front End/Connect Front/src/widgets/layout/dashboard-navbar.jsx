@@ -13,6 +13,7 @@ import {
   MenuList,
   MenuItem,
   Avatar,
+  Tooltip
 } from "@material-tailwind/react";
 import {
   UserCircleIcon,
@@ -29,12 +30,10 @@ import {
   getBgColor,
   getTextColor,
   getTheme,
-  getTypography
+  getTypography,
+  getTypographybold,
 } from "@/context";
-import { getApiLoginPage, getNameFromToken } from "@/configs";
-
-
-import {getRolesFromToken} from '@/configs/api-tools';
+import { getApiLoginPage, getNameFromToken, getRolesFromToken } from "@/configs";
 
 function handleTabClick(tab) {
   history.push(`/${tab}`);
@@ -103,19 +102,25 @@ export function DashboardNavbar() {
                 <>
                 <Link
                   to="/dashboard/home"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'home' ? getBgColor(navColor) : ''}`}
+
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'home' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Home
                 </Link>
                 <Link
                   to="/dashboard/team"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'team' ? getBgColor(navColor) : ''}`}
+
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'team' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Agents
                 </Link>
                 <Link
                   to="/dashboard/queues"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'queues' ? getBgColor(navColor) : ''}`}
+
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'queues' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Queues
                 </Link>
@@ -126,7 +131,9 @@ export function DashboardNavbar() {
               { roles.includes('agent') && (
                 <Link
                   to="/dashboard/agent"
-                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypography()} ${page === 'agent' ? getBgColor(navColor) : ''}`}
+
+                  className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'agent' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Dashboard
                 </Link>
@@ -150,24 +157,35 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-          <Link to="https://igdrasilconnect.awsapps.com/start">
-            <Button
-              variant="text"
-              color="blue-gray"
-              className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
-            >
-              <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
-              {getNameFromToken()}
-            </Button>
-            <IconButton
-              variant="text"
-              color="blue-gray"
-              className="grid xl:hidden"
-            >
-              <UserCircleIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
-            </IconButton>
-          </Link>
-          <Menu>
+
+          {/* Profile dropdown */}
+          <Tooltip placement="bottom" className="border border-blue-gray-50 bg-white px-4 py-3 shadow-xl shadow-black/10"
+          content={ <div className="w-80">
+                      <Typography color="blue-gray" className="font-medium">
+                        {getNameFromToken()}
+                      </Typography>
+                      {getRolesFromToken().map((role, index) => (
+                        <Typography
+                          key={index}
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal opacity-80"
+                        >
+                          {role == "manager" ||  role == "agent" ? role : null}
+                        </Typography>
+                      ))}
+                    </div>}>
+              <Button
+                variant="text"
+                color="blue-gray"
+                className={`hidden items-center gap-1 px-4 xl:flex normal-case ${getTypography()} ${getTextColor("contrast")}`}
+              >
+                <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
+                {getNameFromToken()}
+              </Button>
+              
+          </Tooltip>
+          {/* <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
                 <BellIcon className={`h-10 w-5 ${getTextColor("contrast")}`} />
@@ -244,7 +262,7 @@ export function DashboardNavbar() {
                 </div>
               </MenuItem>
             </MenuList>
-          </Menu>
+          </Menu> */}
           <IconButton
             variant="text"
             color="blue-gray"

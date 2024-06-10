@@ -88,3 +88,11 @@ def isAgent(token):
         return 'agent' in roles
     except jwt.PyJWTError:
         return False
+    
+def getUserName(token):
+    try:
+        data = testToken(token)
+        return data['preferred_username']
+    except jwt.PyJWTError as e:
+        print(e)
+        return None

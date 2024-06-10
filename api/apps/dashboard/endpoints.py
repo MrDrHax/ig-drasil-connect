@@ -6,12 +6,19 @@ from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
 from cache.cache_object import cachedData
+from datetime import datetime , timedelta, date
+from tools.lazySquirrel import LazySquirrel
+from ..lists.endpoints import get_agents
+
+import random, math
 
 import boto3
 from config import Config
 
 import logging
 logger = logging.getLogger(__name__)
+
+Icons = ["UserGroupIcon", "UserCicleIcon", "ClockIcon", "ClockIcon", "StarIcon"]
 
 router = APIRouter(
     prefix="/dashboard", 
@@ -33,35 +40,310 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     Returns the cards that will be displayed on the dashboard.
     '''
     cards = [
-        await get_connected_users(token),
+        # await get_connected_users(token),
         await get_capacity(token),
         await get_average_call_time(token),
-        await get_connected_agents(token)
+        await get_connected_users(token),
+        # await get_avg_handle_time(),
+        await get_abandonment_rate(token),
+        # await get_avg_holds(token),
     ]
 
     graphs = [
-        await get_unfinished_calls_graph(token),
-        await get_average_call_rating_graph(token),
-        await get_queues_graph(token)
+        await graph_example(),
+        await get_avg_contact_duration(token),
+        await get_queues(token),  
     ]
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
 
     return toReturn
 
-@router.get("/connected-users" , tags=["cards"])
+@router.get("/agent_cards", tags=["agent_view"])
+async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id: str) -> models.DashboardData:
+    '''
+    Returns the cards that will be displayed on the agent dashboard.
+    '''
+    cards = [
+        await get_avg_holds(token, agent_id),
+        await get_People_to_answer(),
+        await get_capacity_agent(token, agent_id)
+
+    ]
+
+    graphs = [
+    ]
+
+    toReturn = models.DashboardData(cards=cards, graphs=graphs)
+
+    return toReturn
+
+@router.get("/graph_example", tags=["data"])
+async def graph_example() -> models.GenericGraph:
+    '''
+    Returns an example of a generic graph.
+    '''
+
+
+    series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
+
+    xaxis_example = models.XAxisData(
+        categories=["Jan", "Feb", "March", "Apr", "May"]
+    )
+
+    example_options = models.GraphOptions(
+        colors=["#3b82f6", "#f87171"],
+        xaxis=xaxis_example
+    )
+
+    example_chart = models.ChartData(
+        type="line",
+        series= series_example,
+        options=example_options
+    )
+
+    example_graph = models.GenericGraph(
+        title="Example Graph",
+        description="Graph showing number of calls per month",
+        footer="Updated 1st of June",
+        chart = example_chart
+    )
+
+    return example_graph
+
+
+
+@router.get("/list-queues")
+async def list_queues():
+
+    response =await cachedData.get("list_queue")
+
+    return response
+
+@router.get("/routing-profiles", response_model=List[dict])
+async def routing_profiles():
+    
+    response = await cachedData.get("list_routing_profile")
+
+    return response
+
+@router.get("/get-online-users-data")
+async def get_online_users_data():
+
+    client = boto3.client('connect')
+    users = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    userList = []
+    for user in users['UserSummaryList']:
+        userList.append(user['Id'])
+
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'Agents': userList
+        }
+    )
+    return response['UserDataList']
+
+@router.get("/get-not-connected-users-data")
+async def get_not_connected_users_data():
+
+    client = boto3.client('connect')
+    users = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    userList = []
+    for user in users['UserSummaryList']:
+        userList.append(user['Id'])
+
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'Agents': userList
+        }
+    )
+
+    for user in response['UserDataList']:
+        if user['User']['Id'] in userList:
+            userList.remove(user['User']['Id'])
+
+    for i in userList:
+        print(i)
+
+    return userList
+
+
+@router.get("/average-call-time-duration")
+async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->models.GenericCard:
+    
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    routing_profile_list = await cachedData.get("list_routing_profile")
+    client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ],
+        
+        Metrics = [
+            {
+                'Name': 'AVG_CONTACT_DURATION',
+            }
+        ]
+        
+    
+    )
+
+    data=response['MetricResults'][0]['Collections'][0]['Value']
+
+    extra = data/60 - 3
+
+    cardFooter = models.CardFooter(
+        color = "text-green-500" if extra < 3 else "text-red-500",
+        value = "{p:.2f}".format(p=extra) + "m",
+        label = ("less than max" if extra < 3 else "more than recommended") + ". The average duratino of a contact in minutes this month. Calls should be less than 3 minutes."
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Average Call Time",
+        value="{p:.2f}".format(p=data/60) + "m",
+        icon="ClockIcon",
+        footer=cardFooter,
+        color="blue"
+    )
+
+    return card
+
+@router.get("/graph/get-avg-contact-duration")
+async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])-> models.GenericGraph:
+    
+    '''
+    Returns the average contact duration.
+    
+    ''' 
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    client = boto3.client('connect')
+
+    routing_profile_list = await cachedData.get("list_routing_profile")
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            # Here we need to pass a list of routing profiles that we get from another endpoint
+            'FilterValues' : [i['Id'] for i in routing_profile_list],
+            } 
+        ],
+        
+        Metrics = [
+            {
+                'Name': 'AVG_CONTACT_DURATION'
+            },
+            {
+                'Name': 'ABANDONMENT_RATE'
+            }
+        ]
+        
+    
+    )
+
+    #We need to get the timestamps for the x axis
+    timestamps = []
+
+    #We need to get the data for the y axis points
+    data = []
+
+    for j in range(len(response['MetricResults'])):
+        # Save the timestamps in a list
+        timestamps.append(response['MetricResults'][j]['MetricInterval']['StartTime'].strftime('%Y-%m-%d'))
+        # Save the data in a list when the name is AVG_CONTACT_DURATION
+        data.append(response['MetricResults'][j]['Collections'][0]['Value']) 
+
+    # Create the graph points
+    series_example = [models.SeriesData(name=response['MetricResults'][0]['Collections'][0]['Metric']['Name'], data=data)]
+
+    # Create the x axis labels
+    xaxis_example = models.XAxisData(
+        categories=timestamps
+    )
+
+    # Create the graph options
+    example_options = models.GraphOptions(
+        xaxis=xaxis_example
+    )
+
+    # Create the graph type
+    example_chart = models.ChartData(
+        type="line",
+        series= series_example,
+        options=example_options
+    )
+
+    # Create the graph
+    example_graph = models.GenericGraph(
+        title="Average Contact Duration",
+        description="Graph showing average contact duration per day in seconds",
+        footer="Updated " + datetime.today().strftime('%Y-%m-%d'),
+        chart = example_chart
+    )
+
+    return example_graph
+
+
+@router.get("/connected/users" , tags=["cards"])
 async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
-    Returns the amount of connected users.
+    Returns the amount of connected agents.
     '''
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
-    
-    footer_info = models.CardFooter(color="text-green-500", value="+32", label="than today's average")
 
-    return models.GenericCard(id=1, title="Connected users", value="80", icon="Arrow", color="red", footer=footer_info)
+    data = await cachedData.get('routing_profiles_data')
+
+    totalAgents = len(data)
+    agentsInCall = len(LazySquirrel(data).filter_by('status', 'on call').get())
+    agentsWhoNeedHelp = len(LazySquirrel(data).filter_by('status', 'needs assistance').get())
     
-@router.get("/capacity", tags=["cards"])
+    footer_info = models.CardFooter(
+        color = "text-red-500" if agentsWhoNeedHelp > 0 else "text-green-500", 
+        value= f"{agentsWhoNeedHelp} agents", 
+        label= "need help. Get more details on the agents tab.")
+    
+    card= models.GenericCard(
+        id=1,
+        title="Agents in call.",
+        value=f'{agentsInCall} out of {totalAgents} connected agents',
+        icon="UserIcon",
+        footer=footer_info,
+        color="pink",
+    )
+    return card
+
+
+@router.get("/cards/capacity", tags=["cards"])
 async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the capacity
@@ -69,154 +351,529 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    footer_info = models.CardFooter(color="text-green-500", value="+30%", label="more expected in the next hour")
-    
-    return models.GenericCard(id=2, title="Percent of capacity", value="10%", icon="Book", color="yellow", footer=footer_info)
+    client = boto3.client('connect')
 
-@router.get("/average_call_time", tags=["cards"])
-async def get_average_call_time(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
-    '''
-    Returns the average call time.
-    '''
+    routing_profile_list = await cachedData.get("list_routing_profile") 
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    response2 = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    datares1 = []
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            datares1.append(n['Value'])
+            print(datares1)
+    
+    datares2 = []
+    for i in response2['MetricResults']:
+        for n in i['Collections']:
+            datares2.append(n['Value'])
+            print(datares2)
+
+
+    comp = datares1[0]-datares2[0]
+
+    # dat
+
+    cardFooter = models.CardFooter(
+        color = "text-red-500" if comp > 0 else "text-green-500",
+        value = "{:.2f}s".format(comp),
+        label = ("more than last month" if comp > 0 else "less than last month") + ". The handle times should be less than 3 seconds. Handle time is the time it takes for an agent to take a call from when it first rings."
+    )
+    
+    card = models.GenericCard(
+        id = 1,
+        title = "Average Handle Time",
+        value =  "{:.2f}s".format(datares1[0]),
+        icon = "UserIcon",
+        footer = cardFooter,
+        warning = datares1[0] > 3,
+        color = "orange"
+    )
+
+    return card
+
+@router.get("/cards/abandonment-rate", tags=["cards"])
+async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+
+    # TODO fix this hot trash
+
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    footer_info = models.CardFooter(color="text-red-500", value="+23s", label="more than expected")
-    
-    return models.GenericCard(id=3, title="Average call time", value="3m23s", icon="Clock", color="blue", footer=footer_info)
+    #routing_profile_list = await routing_profiles()
+    client = boto3.client('connect')
 
-@router.get("/connected_agents", tags=["cards"])
-async def get_connected_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+    queues_list = await cachedData.get("list_queue")
+
+    queues_id_list = []    
+    for i in queues_list['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_id_list.append(i['Id'])
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'QUEUE',
+            'FilterValues' : queues_id_list,  
+            } 
+        ],
+        Groupings=['QUEUE'],
+        Metrics = [
+            {
+                'Name': 'ABANDONMENT_RATE',
+            }
+        ]
+    )
+
+    card_values = [i['Collections'][0]['Value'] for i in response['MetricResults']]
+    card_value = sum(card_values) / len(card_values)
+
+    # print(card_value)
+
+    if (card_value > 80):
+        footerColor = "text-red-500"
+        footerSpecialText = f'{card_value - 80:.2f}%'
+        footerDesc = 'more than the max recommended rate.'
+    elif (card_value > 50):
+        footerColor = "text-orange-500"
+        footerSpecialText = f'{card_value - 50:.2f}%'
+        footerDesc = 'more than the recommended rate.'
+    else:
+        footerColor = "text-green-500"
+        footerSpecialText = f'{0}%'
+        footerDesc = 'more than the max recommended rate.'
+
+    cardFooter = models.CardFooter(
+        color=footerColor,
+        value=footerSpecialText,
+        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent.",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Abandonment rate",
+        value="{:.2f}%".format(card_value),
+        icon="PhoneXMarkIcon",
+        footer=cardFooter,
+    )
+
+    return card
+
+@router.get("/graph/get-queues")
+async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
+    
     '''
-    Returns the amount of connected agents.
+    Returns the number of people in each queue
+    
+    ''' 
+    client = boto3.client('connect')   
+
+    queues_raw = await cachedData.get("list_queue")
+
+    queues_list = []    
+    
+    for i in queues_raw['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_list.append([i['Id'], i['Name']])
+
+    response = client.get_current_metric_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Queues' : [i[0] for i in queues_list],
+        },
+        Groupings=['QUEUE',],
+        CurrentMetrics = [
+            {
+                'Name': 'CONTACTS_IN_QUEUE', 
+                'Unit': 'COUNT'
+            }
+        ],
+    )
+
+    data = []
+
+    for j in response['MetricResults']:
+        data.append(j['Collections'][0]['Value']) 
+    
+    series_example = [models.SeriesData(name=response['MetricResults'][0]['Collections'][0]['Metric']['Name'], data=data)]
+
+    # Create the x axis labels
+    xaxis_example = models.XAxisData(
+        categories=[i[1] for i in queues_list]
+    )
+
+    # Create the graph options
+    example_options = models.GraphOptions(
+        xaxis=xaxis_example
+    )
+
+    # Create the graph type
+    example_chart = models.ChartData(
+        type="bar",
+        series= series_example,
+        options=example_options
+    )
+
+    # Create the graph
+    example_graph = models.GenericGraph(
+        title="Queues",
+        description="Graph shows capacity the all queues",
+        footer="Updated " + datetime.today().strftime('%Y-%m-%d') ,
+        chart = example_chart
+    )
+
+    return example_graph   
+
+
+# aqui va parte del agente hasta que funcione el dashboard agent
+
+
+@router.get("/agent/avg-holds", tags=["agent"])
+async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:str)-> models.GenericCard:
     '''
+    The total count of cases existing in a given domain. 
+    '''
+
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    client = boto3.client('connect')
+
+    StartTime =  datetime((date.today() - timedelta(days=31)).year,
+                          (date.today() - timedelta(days=31)).month, 1)
+                                   
+    EndTime =  datetime((date.today() - timedelta(days=31)).year, 
+                                (date.today() - timedelta(days=31)).month, 
+                                (datetime(date.today().year, date.today().month, 1) - timedelta(days=1)).day,
+                                23, 59, 59)
+    
+    queues_list = await cachedData.get("list_queue")
+
+    queues_id_list = []    
+    for i in queues_list['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_id_list.append(i['Id'])    
+    
+    today_res = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime(datetime.now().year, datetime.now().month, datetime.now().day),
+        EndTime = datetime.now(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AVG_HOLDS',
+            }
+        ]
+    )
+
+    past_month_res = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = StartTime,
+        EndTime = EndTime,
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AVG_HOLDS',
+            }
+        ]
+    )
+
+    today_data = []
+    for i in today_res['MetricResults']:
+        for n in i['Collections']:
+            today_data.append(n['Value'])
+
+    past_month_data = []
+    for i in past_month_res['MetricResults']:
+        for n in i['Collections']:
+            past_month_data.append(n['Value'])
+
+
+    if len(today_data) == 0 or len(past_month_data) == 0:
+        #Return an empty card in case of no data
+        return models.GenericCard(
+            id=1,
+            title="Average Holds",
+            value="0",
+            icon="HandRaisedIcon",
+            footer= models.CardFooter(
+                color="text-red-500",
+                value="0",
+                label="The average number of times a voice contact was put on hold ",
+            )
+        )
+
+    cardFooter = models.CardFooter(
+        
+        color="text-red-500" if today_data[0] <= past_month_data[0] else "text-green-500",
+        value=(str(today_data[0] - past_month_data[0]) if  today_data[0] <= past_month_data[0] else ("+" + str(today_data[0] - past_month_data[0]))),
+        label="The average number of times a voice contact was put on hold ",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Average customer hold time",
+        value=str(today_data[0]),# Ensure this is a string
+        icon="HandRaisedIcon",
+        footer=cardFooter,
+    )
+
+    return card
+
+@router.get("/card/agent/People_to_answer", tags=["card"])
+async def get_People_to_answer(token: Annotated[str, Depends(requireToken)])-> models.GenericCard:
+    '''
+    Returns the number of people all queues
+    
+    ''' 
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
-    
-    footer_info = models.CardFooter(color="text-green-500", value="4", label="Online")
-    
-    return models.GenericCard(id=1, title="Connected agents", value="10", icon="Person", color="gray", footer=footer_info)
 
-@router.get("/graph/unfinished_calls", tags=["graph"])
-async def get_unfinished_calls_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
+    client = boto3.client('connect')
     
-    if not userType.isManager(token):
+    queues_raw = await cachedData.get("list_queue")
+
+    queues_list = []    
+    
+    for i in queues_raw['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_list.append([i['Id'], i['Name']])
+
+    response = client.get_current_metric_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Queues' : [i[0] for i in queues_list],
+        },
+        Groupings=['QUEUE',],
+        CurrentMetrics = [
+            {
+                'Name': 'CONTACTS_IN_QUEUE', 
+                'Unit': 'COUNT'
+            }
+        ],
+    )
+
+    data=0
+    
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            data += n['Value']
+    
+    cardFooter = models.CardFooter(
+        color="text-red-500",
+        value="",
+        label="There are currently this many people in all queues, waiting to be answered",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="People to answer",
+        value=str(data), 
+        icon="BriefcaseIcon",
+        footer=cardFooter,
+        color="green"
+    )
+
+    return card
+
+#---------------------------------------------------------------
+#----here schedule endpoints-----------------------------------
+#---------------------------------------------------------------
+
+@router.get("/card/agent/schedule", tags=["card"])
+async def get_schedule(agent_id:str):
+
+    client = boto3.client('connect')
+
+                                   
+    EndTime =  datetime.today()
+
+    today_res = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=31),
+        EndTime = EndTime,
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_ADHERENT_TIME',
+            }
+        ]
+    )
+
+    data=[]
+
+    for i in today_res['MetricResults']:
+        for n in i['Collections']:
+            data.append(n['Value'])
+    
+    return today_res
+    
+@router.get("/cards/capacity/agent", tags=["cards"])
+async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent_id) -> models.GenericCard:
+    '''
+    Returns the productive time of an agent
+    '''
+    if not userType.isAgent(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
-
-    return models.GenericGraph(title="Unfinished Calls" ,data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], description="Graph showing unfinished calls", footer="Updated 2 min ago")
-
-@router.get("/graph/average_call_rating", tags=["graph"])
-async def get_average_call_rating_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
     
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    client = boto3.client('connect')
     
-    return models.GenericGraph(title="Average Call Rating", data=[20,30,50,40,10], labels=["-1hr","-50m", "-30m", "-10m", "0m"], description="Graph showing average call rating", footer="Updated 2 min ago")
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
 
-@router.get("/graph/queues", tags=["graph"])
-async def get_queues_graph(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
-    '''
-    Returns a graph of what queues is being used and capacity of each queue.
+    response2 = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    try:
+        
+        datares1 = []
+        for i in response['MetricResults']:
+            for n in i['Collections']:
+                datares1.append(n['Value'])
+                print(datares1)
+        
+        datares2 = []
+        for i in response2['MetricResults']:
+            for n in i['Collections']:
+                datares2.append(n['Value'])
+                # print(datares2)
+
+        comp = datares1[0]-datares2[0]
+
+        cardFooter = models.CardFooter(
+            color = "text-red-500" if comp > 0 else "text-green-500",
+            value = "{p:.2f}".format(p=comp),
+            label ="more than last month" if comp > 0 else "less than last month"
+        )
+        
+        card = models.GenericCard(
+            id = 1,
+            title = "porcentage of time active",
+            value =  "{p:.2f}".format(p=datares1[0]),
+            icon = "UserIcon",
+            footer = cardFooter,
+            color="blue"
+        )
+
+    # If there is no data for the agent return no data
+    except:
+        card = models.GenericCard(
+            id = 0,
+            title = "Average Handle Time",
+            value =  "No data",
+            icon = "UserIcon",
+            footer = models.CardFooter(
+                color = "text-red-500",
+                value = "",
+                label ="No data"
+            ),
+            color="blue"
+        )
     
-    100 means the queue is full, 0 means the queue is empty.
-    Anything over a 100 is considered an overflow. (waiting users)
-    
-    '''
-    if not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    return card
 
-    return models.GenericGraph(data=[20,30,50,40,10], labels=["Starting call", "Queue", "Agent","Transfers", "Delivery"], description="Graph showing queue capacity", footer="Updated 2 min ago")
-
-@router.get("/queue_supervisors", tags=["data"])
-async def get_queue_supervisors() -> List[models.QueueSupervisor]:
-    '''
-    Returns the queue supervisors.
-    '''
-    return [
-        models.QueueSupervisor(id=1, name="Supervisor 1", calls=10, status="online", usage=10.0),
-        models.QueueSupervisor(id=2, name="Supervisor 2", calls=20, status="offline", usage=20.0),
-        models.QueueSupervisor(id=3, name="Supervisor 3", calls=30, status="online", usage=30.0)
-    ]
-
-@router.get("/agent_visualisation", tags=["data"])
-async def get_agent_visualisation() -> List[models.AgentVisualisation]:
-    '''
-    Returns the agent visualisation.
-    '''
-    return [
-        models.AgentVisualisation(agent_name="John Doe", routing_profile="Routing profile 1", status="Available"),
-        models.AgentVisualisation(agent_name="Jane Doe", routing_profile="Routing profile 2", status="Busy"),
-        models.AgentVisualisation(agent_name="John Smith", routing_profile="Routing profile 3", status="Away")
-    ]    
-
-@router.get("/graph/usage", tags=["graph"])
-async def get_usage_graph() -> models.UsageGraph:
-    '''
-    Returns a graph of what queues is being used and capacity of each queue.
-    
-    100 means the queue is full, 0 means the queue is empty.
-    Anything over a 100 is considered an overflow. (waiting users)
-
-    Will not consider the number of agents in break or disconnected.
-    '''
-
-    return models.UsageGraph(data=[20,30,50,40,10], labels=["1", "2", "3", "4", "5"])
-
-@router.get("/graph/connection_status", tags=["graph"])
-async def get_connection_status_graph() -> models.UsageGraph:
-    '''
-    Returns a pie graph of the connection status of the queues.
-
-    Sum will always be 100.
-    '''
-
-    return models.UsageGraph(data=[20,50,30], labels=["Starting call", "Queue", "Agent"])
-
-@router.get("/data/lex_users", tags=["data"])
-async def get_lex_users() -> int:
-    '''
-    Returns the number of users using the Lex service.
-    '''
-
-    return 5
-
-@router.get("/data/calls", tags=["data"])
-async def get_ongoing_call_data() -> models.OngoingCallData:
-    '''
-    Returns data about agents connected, and in breaks, to see how many agents are available for calls.
-    '''
-
-    return models.OngoingCallData(costumers=10, agents=5, agents_in_break=2, rating=5.5)
-
-@router.get("/data/reconnected", tags=["data"])
-async def get_reconnected_calls() -> int:
-    '''
-    Returns the number of ongoing calls that were reconnected.
-
-    To get the full list, go to /lists/reconnected
-    '''
-
-    return 5
-
-@router.get("/data/angry", tags=["data"])
-async def get_angry_calls() -> int:
-    '''
-    Returns the number of ongoing calls that have been flagged as having an angry client.
-
-    To get the full list, go to /lists/angry
-    '''
-
-    return 'a'
-
-
-@router.get("/data/rerouted", tags=["lists"])
-async def get_rerouted_calls() -> int:
-    '''
-    Returns the number of calls that have been rerouted more than 3 times.
-    '''
-
-    return 'a'
-
+# ------------------------------ Get list of users
 @router.get("/list-users-data", response_model=List[dict])
 async def list_users_data():
     """
@@ -231,77 +888,49 @@ async def list_users_data():
     @return 
         List containing the agents of an instance.
     """
-    
-    
+    response = await cachedData.get("list_users_data")
 
+    return response
+  
+@router.get("/agent-last-contact")
+async def agent_last_contact(agent_id: str):
     client = boto3.client('connect')
-
-    # Get info about the users of said instance
-    response = client.list_users(
+    
+    searchRes = client.search_contacts(
         InstanceId=Config.INSTANCE_ID,
+        TimeRange={
+            'Type': 'CONNECTED_TO_AGENT_TIMESTAMP',
+            'StartTime': datetime.now() - timedelta(days=30),
+            'EndTime': datetime.now()
+        },
+        SearchCriteria={
+            'AgentIds': [agent_id]
+        },
+        Sort={
+            'FieldName': 'CONNECTED_TO_AGENT_TIMESTAMP',
+            'Order': 'DESCENDING'
+        },
+        MaxResults=1
     )
-    return response['UserSummaryList']
 
+    if 'Contacts' in searchRes and len(searchRes['Contacts']) > 0:
+        contact_id = searchRes['Contacts'][0]['Id']
 
-@router.get("/get-current-metric-data")
-async def check_agent_availability() -> list[list[tuple]]:
-    """
-    Description:
-        Real-time information of the call.
-    Parameters:
-        * InstanceId [REQUIRED][string]: id of the Amazon Connect instance.
-        * Filters [REQUIRED][dictionary]:  
-            - 
-
-    Read the docs:
-    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/client/get_current_metric_data.html#
-
-    @return 
-        Metrics about an on-going call.
-    """    
-
-    data = await cachedData.get("check_agent_availability_data")
-
-    return data
-
-@router.get("/agent-status", response_model=List[dict])
-async def check_agent_availability():
-    """
-    Description:
-        Verifies the status of agents in Amazon Connect.
-        It can be one of four things:
-
-        * AVAILABLE: on-duty and not in call
-        * OFFLINE: not on-duty and disconnected
-        * BUSY: with an open thread or ongoing call
-        * NEEDS ASSISTANCE: needs help from supervisor
-
-    Parameters:
-        * InstanceId [REQUIRED][string]: amazon connect instance identified
-        * AgentStatusTypes [list]: The available agent status types
-        * PaginationConfig [dictionary]
-            * MaxItems [int]: total number of items to return
-            * PageSize [int]: the size of each page
-        
-    Read the docs:
-    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/connect/paginator/ListAgentStatuses.html
-
-    @return 
-        List containing the availability status of agents. (Not yet known)
-    """
-
-    client = boto3.client('connect')
-    paginator = client.get_paginator('list_agent_statuses')
-
-    # Get info for the first routing profile
-    response_iterator = paginator.paginate(
-        InstanceId = Config.INSTANCE_ID,
-        AgentStatusTypes = [
-            'AVAILABLE','OFFLINE','BUSY','ON BREAK','NEEDS ASSISTANCE',
-        ])
+        describeRes = client.describe_contact(
+            InstanceId=Config.INSTANCE_ID,
+            ContactId=contact_id
+        )
     
-    return response_iterator
+    return describeRes
 
+@router.get("/usename", tags=["data"])
+async def get_usename(agent_id:str):
+    response = await cachedData.get("get_usename", agent_id=agent_id)
+
+    return response
+        
+
+# DONT DELETE THIS ROUTE
 @router.get("/agent-profile", tags=["profile"])
 async def get_agent_profile(id: str) -> models.AgentProfileData:
     '''
@@ -310,30 +939,118 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
     To get the full list, go to /lists/agents
     '''
     try:
-        FullName, Agent_email, Agent_mobile = await cachedData.get("agent_profile_data", id=id)
+        client = boto3.client('connect')
+        response = client.describe_user(
+            InstanceId=Config.INSTANCE_ID,
+            UserId=id)
 
-        logger.info(f"{FullName}, {Agent_email}, {Agent_mobile}")
 
-        return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile)
+        FullName = f'{response["User"]["IdentityInfo"]["FirstName"]} {response["User"]["IdentityInfo"]["LastName"]}'
+        Agent_email = response["User"]["Username"]
+
+        try:
+            Agent_mobile = response["User"]["IdentityInfo"]["Mobile"]
+        except:
+            Agent_mobile = "Unknown"
+
+        roleids = response['User']['SecurityProfileIds']
+     
+        roles = []
+        for roleid in roleids:
+            role = client.describe_security_profile(
+                InstanceId=Config.INSTANCE_ID,
+                SecurityProfileId=roleid)
+            roles.append(role['SecurityProfile']['SecurityProfileName'])
+
+        return models.AgentProfileData(name=FullName, queue='Support', rating=4, email=Agent_email, mobile=Agent_mobile, roles=roles)
 
     except Exception as e:
         logger.error(f"Error in get_agent_profile: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-list_recommenders_cache = []
 
-@router.get("/list-recommenders", response_model=List[dict])
-async def list_recommenders():
-    try:
-        client = boto3.client('connect')
-        response = client.list_queues(
-            InstanceId='string',
-            MaxResults=10
-        )
-        
-        return response
-    except Exception as e: 
-        print(e.with_traceback)
-        print(e)
-        
+#------ Alerts endpoints
+
+@router.get("/alerts/supervisor/NA", tags=["alerts"])
+async def get_alert_supervisor_NA():
+    '''
+    Sends back the message of how many agent need help.
+    '''
+    res = await cachedData.get("get_alert_supervisor_NA")
+
+    return res
+
+
+alert_message= []
+
+@router.post("/alerts/supervisor/message", tags=["alerts"])
+async def post_alert_supervisor_message(agent_id:str):
+    '''
+    Sends an alert if supervisor has a message
+    '''
+
+    data = await list_users_data()
+
+    for i in data:
+        if i['Id'] == agent_id:
+            agent = i['Username']
+            break
+
+    alert= models.GenericAlert(
+        Text="You have a message from agent "+ agent ,
+        TextRecommendation=". You should check your messages in the chat correspondant to the agent",
+        color="blue",
+    )
+
+    alert_message.append(alert)
+
+    return None
+
+
+@router.get("/alerts/supervisor/available", tags=["alerts"])
+async def get_alert_supervisor_available()-> models.GenericAlert:
+    '''
+    returns the alert type log, if there is any available
+    '''
+    res = await cachedData.get("get_alert_supervisor_available")
+
+    return res
+
+
+@router.get("/alerts/supervisor/nonResponse", tags=["alerts"])
+async def get_alert_supervisor_nonResponse():
+    '''
+    sends back the alert of the agent that has not responded during the call with the client
+    '''
+    res = await cachedData.get("get_alert_supervisor_nonResponse")
+
+    return res
+
+
+@router.get("/alerts/get_alerts_supervisor", tags=["alerts"])
+async def get_alert_supervisor():
+    '''
+    sends bock the alert of the supervisor
+    '''
+    alerts=[]
+
+    NA= await get_alert_supervisor_NA()
+    AV= await get_alert_supervisor_available()
+    NR= await get_alert_supervisor_nonResponse()
+
+    if NA:
+        alerts.append(NA)
+    if AV:
+        alerts.append(AV)
+    if NR: 
+        for i in NR:
+            alerts.append(i)
+
+    if len(alert_message) > 0:
+        for i in alert_message:
+            alerts.append(i)
+        alert_message.clear()
+
+    return alerts
+
 

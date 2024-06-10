@@ -7,10 +7,10 @@ from AAA.requireToken import TokenRefreshMiddleware
 from AAA.loggerConfig import appendToLogger
 import logging
 import config
-
 from cache import cache_object
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+
 
 appendToLogger()
 logger = logging.getLogger(__name__)
@@ -22,21 +22,18 @@ try:
     from config import Config
     # Import routers
     from apps.dashboard.endpoints import router as dashboard_router
+    from apps.agents.endpoints import router as agents_router
+    from apps.queues.endpoints import router as queues_router
     from apps.lists.endpoints import router as lists_router
     from apps.summary.endpoints import router as summary_router
     from apps.actions.endpoints import router as actions_router
     from apps.extras.endpoints import router as extras_router
-except ImportError:
-    logger.critical("Error importing the required modules, please fun app in module mode.")
-    # Load environment variables
-    from .config import Config
+    from apps.dashboardAgent.endpoints import router as dashboardAgents_router
+    from MongoAtlas.DB_endpoints import router as database_router
 
-    # Import routers
-    from .apps.dashboard.endpoints import router as dashboard_router
-    from .apps.lists.endpoints import router as lists_router
-    from .apps.summary.endpoints import router as summary_router
-    from .apps.actions.endpoints import router as actions_router
-    from .apps.extras.endpoints import router as extras_router
+except Exception as e:
+    logger.error("Error loading environment variables: " + str(e))
+    sys.exit(1)
 
 scheduler = AsyncIOScheduler()
 
@@ -79,11 +76,15 @@ try:
     )
 
     # Include routers
+    app.include_router(agents_router)
+    app.include_router(queues_router)
     app.include_router(dashboard_router)
     app.include_router(lists_router)
     app.include_router(summary_router)
     app.include_router(actions_router)
     app.include_router(extras_router)
+    app.include_router(database_router)
+    app.include_router(dashboardAgents_router)
 
     @app.get("/")
     def read_root():

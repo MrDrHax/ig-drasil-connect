@@ -15,12 +15,37 @@ class GenericCard(BaseModel):
     icon: str = Field("Arrow", examples=["arrow"], description="The icon that will get added")
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
     footer: CardFooter
+    warning: bool = Field(False, examples=[True, False])
+
+class SeriesData(BaseModel):
+    name: str = Field("Series 1", examples=["Series 1", "Series 2", "Series 3"])
+    ''' The name of the series on the chart. '''
+    data: list[float] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
+    ''' The data to be displayed in the series. '''
+
+class XAxisData(BaseModel):
+    categories: list[str] = Field([], examples=[["sales","delivery"], ["transfers", "agents", "queue"]])
+    ''' The categories to be displayed on the x-axis. Has to be of the same length as the lenght of the series. '''
+
+class GraphOptions(BaseModel):
+    xaxis: XAxisData
+    ''' The x-axis to be displayed in the chart. '''
 
 class ChartData(BaseModel):
     type: str = Field("line", examples=["line", "bar"])
     ''' The type of chart.'''
-    height: int = Field(220, examples=[300, 400])
-    ''' The height of the chart. '''
+    series: list[SeriesData]
+    ''' The series to be displayed in the chart. '''
+    options: GraphOptions
+    ''' The options to be displayed in the chart. '''
+
+class OcupacyCard(BaseModel):
+    color: str 
+    icon: str
+    title: str
+    value: int
+    footer: dict[str, str] = Field({}, examples={"color": "text-green-500","value":"+3%", "label": "minutes ago"})
+      
 
 class GenericGraph(BaseModel):
     title: str = Field("Queues", examples=["Queues"])
@@ -29,15 +54,18 @@ class GenericGraph(BaseModel):
     '''The info of the graph.'''
     footer: str = Field("Updated 2 min ago", examples=["Updated 2 min ago", "Updated 5 min ago", "Updated 10 min ago"])
     """The footer of the graph of when it was last updated."""
-    data: list[int] = Field([], examples=[[20,30,50,40,10], [100, 120, 20, 50, 10]])
-    '''The data to be displayed in the graph.'''
-    labels: list[str] = Field([], examples=[["Starting call", "Queue", "Agent","Transfers", "Delivery"], ["Finance", "Support", "Sales","Transfers", "Delivery"]])
-    '''The labels for the data. Will be the same length as the data list.'''
+    chart: ChartData
+    '''The chart to be displayed in the graph. '''
    
-
 class DashboardData(BaseModel):
     cards: list[GenericCard] 
     graphs: list[GenericGraph]
+
+'''
+PREVIOUS EXAMPLES DISCONNECTED FROM THE FRONTEND
+
+IGNORE THIS SECTION
+'''
 
 class ConnectedUsers(BaseModel):
     id: int = Field(0, examples=[1, 2, 3])
@@ -146,7 +174,7 @@ class OngoingCallData(BaseModel):
     '''The average rating of a call. Range is 0 to 5'''
 
 class AgentProfileData(BaseModel):
-    name: str = Field(...)
+    name: str = Field('John Doe', examples=['John Doe', 'Jane Doe', 'John Smith'])
     '''The name of the agent.'''
     queue: str = Field('Support', examples=['Support', 'Finance', 'Sales'])
     '''The queue the agent is in.'''
@@ -156,3 +184,20 @@ class AgentProfileData(BaseModel):
     '''The email of the agent.'''  
     mobile: str = Field(...)
     '''The mobile of the agent.'''
+    roles: list[str] = Field([], examples=["Agent", "Supervisor", "Queue Supervisor"])
+    '''The roles of the agent.'''
+
+
+class LastContactCard(BaseModel):
+    title: str = Field("Last contact", examples=["Last contact"])
+    ''' The title of the card.'''
+    last_contact: str = Field("2 minutes ago", examples=["2 minutes ago", "5 minutes ago", "10 minutes ago"])
+    '''The last contact of the agent.'''
+    footer_txt: str = Field("That's today's average.", examples=["That's today's average."])
+    '''The footer text of the card.'''
+
+class GenericAlert(BaseModel):
+    Text: str = Field("Alert text", examples=["Alert text"])
+    TextRecommendation: str = Field("Alert recommendation", examples=["Alert recommendation"])
+    color: str = Field("red", examples=["red", "green", "yellow"])
+

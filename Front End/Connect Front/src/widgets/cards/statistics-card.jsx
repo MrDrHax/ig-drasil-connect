@@ -26,15 +26,15 @@ export function StatisticsCard({ color, icon, title, value, footer }) {
         color={color}
         floated={false}
         shadow={false}
-        className="absolute grid h-12 w-12 place-items-center"
+        className="absolute grid h-12 w-12 place-items-center mr-[1rem]"
       >
         {icon}
       </CardHeader>
       <CardBody className="p-4 text-right">
-        <Typography variant="small" className={`${getTypography()} ${getTextColor("dark")}`}>
+      <Typography className={`text-[1rem] ml-10 ${getTypography()} ${getTextColor("dark")}`}>
           {title}
         </Typography>
-        <Typography variant="h4" color="blue-gray" className={`${getTypography()} ${getTextColor("dark")}`}>
+         <Typography className={`text-[2rem] ml-10 ${getTypography()} ${getTextColor("dark")}`}>
           {value}
         </Typography>
       </CardBody>

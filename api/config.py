@@ -29,7 +29,19 @@ class Config:
     KEYCLOAK_SECRET = os.getenv('KEYCLOAK_SECRET', '>_<')
     '''The client_secret for keycloak.'''
     INSTANCE_ID = os.getenv('INSTANCE_ID', '>_<')
-    '''AWS Connect instance ID.'''
+    '''AWS Connect instance ID. '''
+    S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME', '>_<')
+    '''AWS S3 bucket name. '''
+    URI_MONGODB = os.getenv('URI_MONGODB','UwU')
+    '''The URI for the mongodb connection. '''
+    IDENTITY_STORE_ID = os.getenv('IDENTITY_STORE_ID', '>_<')
+    '''AWS SSO Instance ID. '''
+    KEYCLOAK_URI = os.getenv('KEYCLOAK_URI', 'https://localhost:8443/')
+    '''The URI for keycloak'''
+    GPT_URI = os.getenv('GPT_URI', 'http://localhost:8081/')
+    '''The URI for the GPT endpoint'''
+    GPT_Key = os.getenv('GPT_Key', '1234')
+    '''The key for the GPT endpoint'''
 
 
 def logConfig():

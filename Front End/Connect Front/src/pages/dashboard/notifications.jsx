@@ -1,24 +1,42 @@
-import React from "react";
+import React , { useState, useEffect } from "react";
 import {
   Typography,
-  Alert,
   Card,
   CardHeader,
   CardBody,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Alert
 } from "@material-tailwind/react";
-import{   useMaterialTailwindController,
-  setOpenConfigurator,
-  setOpenSidenav,
-  getBgColor,
-  getTextColor,
-  getTheme,
-  getTypography
-} from "@/context";
+import {EllipsisVerticalIcon} from "@heroicons/react/24/outline";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { MessageCard } from "@/widgets/cards";
+import {Alerts} from "@/data/supervisor-home-data.js"
+import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
+import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} from "@heroicons/react/24/solid";
+import { number } from "prop-types";
+
 
 export function Notifications() {
-  const [controller, dispatch] = useMaterialTailwindController();
+  const controller = useMaterialTailwindController();
+  const theme = controller;
+  const [info, setInfo] = useState([]);
+
+  function updateData() {
+
+    Alerts().then((data) => {
+      setInfo(data);
+    });
+  }
+
+  //Call the function to recieve data just once
+  useEffect(() => {
+    updateData();
+  }, []);
+
   const [showAlerts, setShowAlerts] = React.useState({
     blue: true,
     green: true,
@@ -38,75 +56,68 @@ export function Notifications() {
     my-5: margin vertical 5
 */}
   return (
-    <div className={'mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7'}>
-          {alerts.map((color) => (
+    <div className="mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7 ">
+          {info.map(({Text,TextRecommendation,color })=> (
+
             <Alert
               key={color}
               open={showAlerts[color]}
               color={color}
               onClose={() => setShowAlerts((current) => ({ ...current, [color]: false }))}
             >
-              {color === "gray" && (
-                <span>This is an information alert message.</span>
-              )}
-              {color === "green" && (
-                <span>This is a logs alert message.</span>
-              )}
-              {color === "orange" && (
-                <span>This is an agent alert message.</span>
-              )}
-              {color === "red" && (
-                <span>This is an issue call alert message.</span>
-              )}
-              
+              <span className={ `${getTypography()}  ${getTextColor("white")}` }>{Text}
+              <br /><span className={ `${getTypographybold()} ${getTextColor("white")}` }>Recommendation: </span>{TextRecommendation} </span>
             </Alert>
           ))}
-
-     {/*
-     |<Card>
-     <CardHeader
-       color="transparent"
-       floated={false}
-       shadow={false}
-       className="m-0 p-4"
-     >
-       <Typography variant="h5" color="blue-gray">
-         Alerts with Icon
-       </Typography>
-     </CardHeader>
-     <CardBody className="flex flex-col gap-4 p-4">
-       {alerts.map((color) => (
-         <Alert
-           key={color}
-           open={showAlertsWithIcon[color]}
-           color={color}
-           icon={
-             <InformationCircleIcon strokeWidth={2} className="h-6 w-6" />
-           }
-           onClose={() => setShowAlertsWithIcon((current) => ({
-             ...current,
-             [color]: false,
-           }))}
-         >
-           A simple {color} alert with an <a href="#">example link</a>. Give
-           it a click if you like.
-         </Alert>
-       ))}
-     </CardBody>
-   </Card>
-   <MessageCard>
-        <Typography variant="h5" color="blue-gray">
-          Message Card
-        </Typography>
-        <Typography variant="body" color="blue-gray">
-          This is a message card. It is used to display messages to the user.
-        </Typography>
-      </MessageCard>
-      */} 
-      
 
     </div>
   );
 }
 
-export default Notifications;
+export function NotificationsCard() {
+  const controller = useMaterialTailwindController();
+  const theme = controller;
+  const [numberalerts, setNumberAlerts] = useState(0);
+
+  function updateData() {
+    Alerts().then((data) => {
+      setInfo(data);
+      setNumberAlerts(data.length);
+    });
+  }
+
+  //Call the function to recieve data just once
+  useEffect(() => {
+    updateData();
+  }, []);
+
+  return (
+    <Card className={`overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm ${getTypography()} ${getBgColor("background-cards")}`}>
+          <CardHeader
+            floated={false}
+            shadow={false}
+            color="transparent"
+            className="m-0 flex items-center justify-between p-6"
+          >
+            <div>
+              <Typography variant="h6" color="blue-gray" className={`mb-1 text-xl ${getTypography()} ${getTextColor('dark')}`}>
+                Alerts
+              </Typography>
+              <Typography
+                //variant="small"
+                className={`flex items-center gap-1 text-base ${getTypography()}  text-blue-gray-600` }
+              >
+                <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
+                <strong>{numberalerts} alerts </strong>in this 30 minutes
+              </Typography>
+            </div>
+          </CardHeader>
+          <CardBody className="overflow-y-scroll px-0 pt-0 pb-2">
+            <Notifications />
+          </CardBody>
+        </Card>
+  );
+}
+
+
+export default NotificationsCard;

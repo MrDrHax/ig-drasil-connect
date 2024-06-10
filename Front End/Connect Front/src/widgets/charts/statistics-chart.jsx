@@ -4,6 +4,7 @@ import {
   CardBody,
   CardFooter,
   Typography,
+  tooltip,
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
@@ -15,11 +16,30 @@ import {
 } from "@/context";
 
 import { chartsConfig } from "@/configs";
+import { propTypesLabelProps } from "@material-tailwind/react/types/components/input";
 
 export function StatisticsChart({ color, chart, title, description, footer }) {
 
   const controller = useMaterialTailwindController();
   const theme = controller;
+
+  chart = {
+    ...chart,
+    options: {
+      ...chartsConfig.options,
+      ...chart.options,
+      xaxis: {
+        ...chartsConfig.options.xaxis,
+        ...chart.options.xaxis,
+        labels: {
+          ...chartsConfig.options.xaxis.labels,
+          style: {
+            colors: "#777777",
+          },
+        },
+      },
+    },
+  };
 
   return (
     <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} ${getTypography()} `}>

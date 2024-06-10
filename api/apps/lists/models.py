@@ -29,6 +29,7 @@ class ListData(BaseModel):
 class QueueDataListItem(BaseModel):
     queueID: str = Field("0", description="The id of the item. Use this to get the summary", examples=["a", "b", "c"])
     name: str = Field("No name", description="The name of the queue.", example="Support")
+    description: str = Field("No description", description="The description of the queue.", example="The queue for support.")
     maxContacts: int = Field(10, description="The max amount of contacts a queue can have before considered full.", example=10)
     usage: float = Field(0, description="The current usage of the queue. 100 means full, 0 means empty.", example=5)
     enabled: bool = Field(True, description="If the queue is enabled or not.", example=True)

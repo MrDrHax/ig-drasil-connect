@@ -25,7 +25,10 @@ class LazySquirrel:
         if isinstance(value, int):
             self.operations.append(lambda x: [item for item in x if value == item[key]])
         elif isinstance(value, str):
-            self.operations.append(lambda x: [item for item in x if str(value) in str(item[key])])
+            self.operations.append(
+                lambda x: [item for item in x if str(value).lower() in str(item[key]).lower()]
+                )
+            
         elif isinstance(value, list):
             self.operations.append(lambda x: [item for item in x if item[key] in value])
         else:
@@ -42,11 +45,16 @@ class LazySquirrel:
         return self
 
     def paginate(self, skip, limit):
+        result = self.get()
+        paginated_result = result[skip:skip + limit]
+        return pagination_string(result, skip, skip + limit), paginated_result
+    
+    def get(self):
         result = self.data
         for operation in self.operations:
             result = operation(result)
-        paginated_result = result[skip:skip + limit]
-        return pagination_string(result, skip, skip + limit), paginated_result
+        return result
+
     
 if __name__ == "__main__":
     testdata = [

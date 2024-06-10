@@ -1,4 +1,4 @@
-import { getApiPath, addTokenToHeader } from "@/configs/api-tools";
+import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-tools";
 
 /**
  * Retrieves a list of agents from the API.
@@ -12,18 +12,19 @@ import { getApiPath, addTokenToHeader } from "@/configs/api-tools";
  * @throws {Error} If the API request fails.
  */
 export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
-    let url = getApiPath() + `lists/agents?skip=${skip}&limit=${limit}&sortByDat=${sortbydat}&sortBy=${sortby}`;
+    let url = new URL(getApiPath() + 'lists/agents');
 
-    // fill in the query
-    let query = ""
+    console.log("seatch: " + search);
 
-    if (search) {
-        query += search;
-    }
+    let params = {
+        skip: skip,
+        limit: limit,
+        sortByDat: sortbydat,
+        sortBy: sortby,
+        q: search
+    };
 
-    if (query) {
-        url += `&q=${query}`;
-    }
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
     let request = new Request(url);
 
@@ -62,30 +63,47 @@ export async function AgentDetails(id) {
     }
 
     return await response.json();
-
-    /*
-    return {
-        avatar: "/img/team-2.jpeg",
-        name: "John Doe",
-        queue: "Support",
-        status: "on-call",
-        id: id
-    }
-    */
 }
 
-export function AgentsSummary() {
-    console.warn("AgentsSummary function is not implemented!!!");
+/**
+ * Retrieves the agent ID associated with the current user's token.
+ *
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the agent ID.
+ * @throws {Error} If the API request fails.
+ */
+export async function AgentId() {
+    let url = getApiPath() + `extras/agentID?username=${getNameFromToken()}`;
 
-    return {
-        agentCount: 10,
-        table: {
-            connected: 5,
-            disconnected: 3,
-            onCall: 2
-        },
-        usageLevel: 40,
+    let request = new Request(url);
+
+    addTokenToHeader(request);
+
+    let response = await fetch(request);
+
+    if (!response.ok) {
+        // raise error
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
     }
+
+    return await response.json();
 }
 
-export default AgentList;
+/**
+ * Joins a phone call in Amazon Connect for the specified agent.
+ *
+ * @param {string} agent_id - The ID of the agent whose call to join.
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the confirmation message of the call joining.
+ * @throws {Error} If the API request fails.
+ */
+export async function JoinCall(agent_id) {
+
+    let url = getApiPath() + `actions/join_call?agent_id=${agent_id}}`;
+    let request = new Request(url, {method: 'POST'});
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+
+}

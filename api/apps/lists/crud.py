@@ -25,7 +25,7 @@ async def get_routingProfilesArns():
     routingProfiles = await cachedData.get('get_routing_profile_list')
     return [profile['Arn'] for profile in routingProfiles]
 
-cachedData.add("get_routingProfilesArns", get_routingProfilesArns, 30) # 24 hours
+cachedData.add("get_routingProfilesArns", get_routingProfilesArns, 60*24) # 24 hours
 
 async def get_agent_name_data(id: str) -> str:
     client = boto3.client('connect')
@@ -73,8 +73,10 @@ async def routing_profiles_data() -> tuple:
                                 agentID=str(userData['User']['Id']), 
                                 name= await cachedData.get('get_agent_name_data', id=userData['User']['Id']),
                                 queue= await cachedData.get('get_routing_profile_name_data', id=userData['RoutingProfile']['Id']),
-                                status= userData['Status']['StatusName'], 
-                                requireHelp=userData['Status']['StatusName'] == "Needs Assistance", calls=5, rating=4.5) 
+                                # Get the current contact status if they have a contact and if they don't, get their status
+                                status= userData['Contacts'][0]['AgentContactState'] if len(userData['Contacts']) > 0 else userData['Status']['StatusName'],
+                                #status= len(userData['Contacts']) > 0 if userData['Contacts'][0]['AgentContactState'] : userData['Status']['StatusName'], 
+                                requireHelp=userData['Status']['StatusName'] == "Needs Assistance", calls=5, rating=4.5)
                                 for userData in list]
     return parsed
 
@@ -142,8 +144,12 @@ async def get_queues_data():
             # queue info/description
             queue_data = await cachedData.get('get_queue_description', queueID=q['Id'])
 
-            MaxContacts = int(queue_data.get('MaxContacts', 10) * 0.8) # 80% of the max contacts
+            MaxContacts = int(queue_data.get('MaxContacts', 10))
+            #MaxContacts = int(queue_data.get('MaxContacts', 10) * 0.8) # 80% of the max contacts
             status = queue_data.get('Status', 'DISABLED')
+            #status = queue_data['Status']
+
+            description = queue_data.get('Description', '')
 
         except (BotoCoreError, ClientError) as error:
             print(f"Error fetching current metric data: {error}")
@@ -153,15 +159,18 @@ async def get_queues_data():
             status = 'DISABLED'
             average_wait_time = 0
 
-        builtData.append(models.QueueDataListItem(
-            queueID=q['Id'],
-            name=q['Name'],
-            maxContacts=MaxContacts,
-            usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
-            enabled=status == "ENABLED",
-            waiting=contacts_in_queue, 
-            averageWaitTime=average_wait_time  
-        ))
+        # only add queues that are enabled
+        if status == "ENABLED":
+            builtData.append(models.QueueDataListItem(
+                queueID=q['Id'],
+                name=q['Name'],
+                description=description,
+                maxContacts=MaxContacts,
+                usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
+                enabled=status == "ENABLED",
+                waiting=contacts_in_queue, 
+                averageWaitTime=average_wait_time  
+            ))
 
     return builtData
 

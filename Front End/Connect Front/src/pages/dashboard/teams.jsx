@@ -4,44 +4,40 @@ import {
     CardBody,
     Typography,
     Input,
-    Avatar,
     Chip,
-    Tooltip,
-    Progress,
-    Alert,
     Button,
+    Checkbox
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
-import { AgentList, AgentsSummary } from "@/data/agents-data";
+import { AgentList, JoinCall } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
-import { StatisticsChart } from "@/widgets/charts";
-import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
-import { chartsConfig } from "@/configs";
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
 
 import { useAlert } from "@/context/alerts";
 
-// Sidenav changes
-import { Sidenav } from "@/widgets/layout";
-
 function getColorOfStatus(status) {
     switch (status) {
+        // Statuses while not in a call
         case "Available":
             return "green";
         case "Training":
             return "blue";
         case "On break":
-            return "yellow";
+            return "purple";
         case "Busy":
             return "orange";
         case "Needs Assistance":
             return "red";
-        default:
+        case "Offline":
             return "gray";
+        // Statuses while in a call are shown as yellow
+        default:
+            return "yellow";
     }
 }
 
@@ -53,6 +49,8 @@ export function Teams() {
     const [dataToDisplay, setData] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery_status, setSearchQuery_status] = useState('');
+    const [helpFilter, setHelpFilter] = useState(false);
 
     // pagination vars
     const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
@@ -64,10 +62,19 @@ export function Teams() {
     // let dataToDisplay = searchQuery ? filteredAgents : data;
 
     function handleSearch(event) {
-        let query = event.target.value.toLowerCase();
-        setSearchQuery(query);
+        setSearchQuery(event.target.value.toLowerCase());
         // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
         // setFilteredAgents(filtered);
+    }
+
+    function handleSearchStatus(event) {
+        setSearchQuery_status(event.target.value.toLowerCase());
+        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
+        // setFilteredAgents(filtered);
+    }
+
+    function handleHelpFilter(event) {
+        setHelpFilter(event.target.checked);
     }
 
     const { showAlertWithMessage } = useAlert();
@@ -79,17 +86,31 @@ export function Teams() {
      * @return {type} No return value.
      */
     function bargeIn(agentId) {
-        console.log("Barging in to call with agent " + agentId);
-        // TODO
+        let result = JoinCall(agentId);
+
+        if (result.status == 200)
+            showAlertWithMessage("green", "Barging in to call with agent", 5000);
+        else
+            showAlertWithMessage("red", "Failed to barge in to call with agent", 5000);
+        //console.log("Barging in to call with agent " + agentId);
     }
 
     function updateData(page = 1) {
-        let query = searchQuery ? "name=" + searchQuery : null;
+        // search by name
+        let search = searchQuery ? `name=${searchQuery}` : '';
+
+        // search by status
+        if (searchQuery_status) {
+            search += search ? `,status=${searchQuery_status}` : `status=${searchQuery_status}`;
+        }
+        if (helpFilter) {
+            search += search ? `,requireHelp=false` : `requireHelp=true`;
+        }
         let skip = (page - 1) * 10;
 
         setIsLoaded(false);
 
-        AgentList(skip, 10, query, "name", "asc").then((data) => {
+        AgentList(skip, 10, search, "name", "asc").then((data) => {
             const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
             const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -112,32 +133,7 @@ export function Teams() {
 
     useEffect(() => {
         updateData();
-    }, [searchQuery]);
-
-    // var theThingToDo = {
-    //     type: "pie",
-    //     height: 220,
-    //     series: [
-    //         {
-    //             name: "Views",
-    //             data: [50, 20, 10, 22, 50, 10, 40],
-    //         },
-    //     ],
-    //     options: {
-    //         ...chartsConfig,
-    //         colors: "#388e3c",
-    //         plotOptions: {
-    //             bar: {
-    //                 columnWidth: "16%",
-    //                 borderRadius: 5,
-    //             },
-    //         },
-    //         xaxis: {
-    //             ...chartsConfig.xaxis,
-    //             categories: ["M", "T", "W", "T", "F", "S", "S"],
-    //         },
-    //     },
-    // };
+    }, [searchQuery, searchQuery_status, helpFilter]);
 
     return (
         <div>
@@ -154,7 +150,7 @@ export function Teams() {
                     value="10"
                     icon={<UsersIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">10</strong>
                             &nbsp; connected
                         </Typography>
@@ -170,7 +166,7 @@ export function Teams() {
                     value="30%"
                     icon={<CogIcon className="h-6 w-6 text-white-500" />}
                     footer={
-                        <Typography className={`${getTypography()} ${getTextColor('black')}`}>
+                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
                             <strong className="text-green-500">3/5</strong>
                             &nbsp; agents on call
                         </Typography>
@@ -180,20 +176,44 @@ export function Teams() {
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
                     <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
-                        <Typography variant="h6" color="white" className={`flex-none ${getTypography()}`}>
+                        <Typography variant="h6" color="white" className={`text-[1.54rem] flex-none ${getTypography()}`}>
                             Agents
                         </Typography>
 
                         <div className="flex-grow"></div>
 
                         <div className="mr-auto md:mr-4 md:w-56">
-                            {/* Search bar */}
+                            {/* Search bar by name*/}
                             <Input
                                 color="white"
                                 label="Search by name"
                                 value={searchQuery}
                                 onChange={handleSearch}
                             />
+                        </div>
+
+                        <div className="mr-auto md:mr-4 md:w-56">
+                            {/* Search bar by status*/}
+                            <Input
+                                color="white"
+                                label="Search by status"
+                                value={searchQuery_status}
+                                onChange={handleSearchStatus}
+                            />
+                        </div>
+                        <div className="mr-auto md:mr-4 md:w-56 flex items-center space-x-2">
+                            {/* Needs help filter*/}
+                            <Checkbox
+                                color="white"
+                                label="Needs Help"
+                                labelProps={{ className: "text-white" }}
+                                checked={helpFilter}
+                                onChange={handleHelpFilter}
+                            />
+                            {/* Update agents list button*/}
+                            <Button onClick={() => updateData()} className="ml-2" color="gray" variant="gradient">
+                                <ArrowPathIcon className="h-5 w-5"/>
+                            </Button>
                         </div>
                     </CardHeader>
                     <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
@@ -208,7 +228,7 @@ export function Teams() {
                                         >
                                             <Typography
                                                 variant="small"
-                                                className={`text-[11px] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
+                                                className={`text-[0.6rem] font-bold uppercase ${getTypography()} ${getTextColor('dark')}`}
                                             >
                                                 {el}
                                             </Typography>
@@ -222,7 +242,7 @@ export function Teams() {
                                         <tr key="loading">
                                             <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                 <span className="flex justify-center items-center">
-                                                    <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 " + getBorderColor(navColor)}></span>
+                                                    <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
                                                 </span>
                                             </td>
                                         </tr>
@@ -232,7 +252,7 @@ export function Teams() {
                                                 <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                     <Typography
                                                         variant="small"
-                                                        className={`text-[1em] ${getTypographybold()} ${getTextColor('dark')}`}
+                                                        className={`text-[0.8em] ${getTypographybold()} ${getTextColor('dark')}`}
                                                     >
                                                         List is empty
                                                     </Typography>
@@ -254,7 +274,7 @@ export function Teams() {
                                                                     <div>
                                                                         <Typography
                                                                             variant="small"
-                                                                            className={`${getTypographybold()} ${getTextColor('dark')}`}
+                                                                            className={`text-[0.7rem]${getTypographybold()} ${getTextColor('dark')}`}
                                                                         >
                                                                             {name}
                                                                         </Typography>
@@ -271,11 +291,11 @@ export function Teams() {
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
-                                                                    className={`py-0.5 px-2 text-[11px] font-medium w-fit ${getTypographybold()}`}
+                                                                    className={`py-0.5 px-2 text-[0.8rem] font-medium w-fit ${getTypographybold()}`}
                                                                 />
                                                             </td>
                                                             <td className={className}>
-                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
+                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'yellow' ? <ExclamationCircleIcon className="h-6 w-6 text-yellow-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
@@ -284,13 +304,13 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { requireHelp ?
+                                                            { requireHelp || getColorOfStatus(status) == 'yellow' ?
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td> : null
+                                                            </td> : null 
                                                             }
                                                         </tr>
                                                     );

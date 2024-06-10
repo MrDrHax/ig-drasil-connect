@@ -1,14 +1,17 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from . import models, crud
 from typing import List
+from typing import Annotated
 from config import Config
-from models import AgentQueueData
+from datetime import datetime , timedelta, date
+from cache.cache_object import cachedData
+
 
 import boto3
 
 router = APIRouter(
-    prefix="/dashboard",
-    tags=["dashboard"],
+    prefix="/dashboardAgents",
+    tags=["dashboardAgents"],
     responses={
         200: {"description": "Success"},
         # 202: {"description": "Accepted, request is being processed. Applies for connect requests that might take a while."},
@@ -21,27 +24,19 @@ router = APIRouter(
 )
 
 
-@router.get("/client/queue", response_model=List[AgentQueueData], tags=["data"])
-async def list_queues() -> List[AgentQueueData]:
-    '''
-    Returns the number of clients waiting on the queue of an agent.
+@router.get("/routing-profiles", response_model=List[dict])
+async def routing_profiles():
+    
 
-    Standard queues: This is where contacts wait before they are routed 
-    to and accepted by agents.
+    client = boto3.client('connect')
 
-    Agent queues: These queues are created automatically when you add an 
-    agent to your contact center.
-    '''
-    agent_queue_data = [
-        AgentQueueData(agentID="agent123", queueID="queue456",
-                       queueName="Support Queue", numberOfPeopleInQueue=20),
-        AgentQueueData(agentID="agent456", queueID="queue789",
-                       queueName="Sales Queue", numberOfPeopleInQueue=30),
-        AgentQueueData(agentID="agent789", queueID="queue123",
-                       queueName="Technical Support Queue", numberOfPeopleInQueue=50)
-    ]
+    # Get a list of all routing profiles
+    response = client.list_routing_profiles(
+        InstanceId=Config.INSTANCE_ID
+    )
 
-    return agent_queue_data
+    return response['RoutingProfileSummaryList']
+
 
 
 @router.get("/data/connected", tags=["data"])
@@ -52,7 +47,6 @@ async def get_current_user_data() -> int:
     '''
 
     return 20
-
 
 async def get_agent_rating(agent_id: str) -> float:
     '''
@@ -87,3 +81,108 @@ async def get_agent_rating_by_id(agent_id: str):
     agent_rating = await get_agent_rating(agent_id)
 
     return agent_rating
+
+
+@router.get("/agent/current-cases", tags=["agent"])
+async def get_current_cases():
+    '''
+    The total count of cases existing in a given domain. 
+    '''
+    
+    routing_profile_list = await routing_profiles()
+    client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today() - timedelta(days=30),
+        EndTime = datetime.today(),
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'TOTAL',
+        },
+        Filters = [
+            {
+            'FilterKey': 'ROUTING_PROFILE',
+            'FilterValues' : [i['Id'] for i in routing_profile_list],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'CURRENT_CASES',
+            }
+        ]
+    )
+
+    data = []
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            data.append(str(n['Value']))
+    
+    cardFooter = models.CardFooter(
+        color="text-red-500",
+        value="",
+        label="The total count of cases existing this month",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="Current Cases",
+        value=data[0],  # Ensure this is a string
+        icon="BriefcaseIcon",
+        footer=cardFooter,
+    )
+
+    return card
+
+@router.get("/card/agent/People_to_answer", tags=["card"])
+async def get_People_to_answer():
+    '''
+    Returns the number of people all queues
+    
+    ''' 
+    
+    client = boto3.client('connect')
+    
+    queues_raw = await list_queues() 
+
+    queues_list = []    
+    
+    for i in queues_raw['QueueSummaryList']:
+        if i['QueueType'] == 'STANDARD':
+            queues_list.append([i['Id'], i['Name']])
+
+    response = client.get_current_metric_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Queues' : [i[0] for i in queues_list],
+        },
+        Groupings=['QUEUE',],
+        CurrentMetrics = [
+            {
+                'Name': 'CONTACTS_IN_QUEUE', 
+                'Unit': 'COUNT'
+            }
+        ],
+    )
+
+    data=0
+    
+    for i in response['MetricResults']:
+        for n in i['Collections']:
+            data += n['Value']
+    
+    cardFooter = models.CardFooter(
+        color="text-red-500",
+        value="",
+        label="There are currently this many people in all queues, waiting to be answered",
+    )
+
+    card = models.GenericCard(
+        id=1,
+        title="People to answer",
+        value=str(data), 
+        icon="BriefcaseIcon",
+        footer=cardFooter,
+    )
+
+    return card
