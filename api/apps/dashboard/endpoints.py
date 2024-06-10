@@ -1150,10 +1150,10 @@ async def get_alert_agent(agent_id:str):
     '''
     alerts=[]
 
-    NR= await get_alert_agent_NonResponse(agent_id)
+   # NR= await get_alert_agent_NonResponse(agent_id)
 
-    if NR:
-        alerts.append(NR)
+    # if NR:
+    #     alerts.append(NR)
     if str(agent_id) in dict_agent:
         alerts.append(models.GenericAlert(
             Text="You have "+ str(dict_agent[str(agent_id)]) + " messages from supervisor",
