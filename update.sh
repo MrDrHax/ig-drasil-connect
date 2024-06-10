@@ -41,7 +41,11 @@ cd /home/ubuntu/ig-drasil-connect/api
 /home/ubuntu/ig-drasil-connect/api/venv/bin/pip install -r requirements.txt
 /home/ubuntu/ig-drasil-connect/api/venv/bin/pip install gunicorn
 
+sudo chown www-data:www-data /home/ubuntu/ig-drasil-connect/api
 sudo chmod -R 555 /home/ubuntu/ig-drasil-connect/api
+
+sudo chown www-data:www-data /home/ubuntu/logs
+sudo chmod -R 555 /home/ubuntu/logs
 
 sudo systemctl restart connect
 

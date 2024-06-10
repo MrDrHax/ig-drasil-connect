@@ -3,7 +3,7 @@ Description=Ig-Drasil Connect Application
 After=network.target
 
 [Service]
-User=www-data
+User=ubuntu
 WorkingDirectory=/home/ubuntu/ig-drasil-connect/api
 Environment="PATH=/home/ubuntu/ig-drasil-connect/api/venv/bin"
 ExecStart=/home/ubuntu/ig-drasil-connect/api/venv/bin/gunicorn -c /home/ubuntu/ig-drasil-connect/api/gunicorn.py -k uvicorn.workers.UvicornWorker main:app
