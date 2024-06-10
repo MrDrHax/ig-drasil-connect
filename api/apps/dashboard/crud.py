@@ -4,6 +4,7 @@ import boto3
 from config import Config
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
+from tools.lazySquirrel import LazySquirrel
 
 import logging
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ async def list_routing_profile():
     return response['RoutingProfileSummaryList']
 cachedData.add("list_routing_profile", list_routing_profile, 120)
 
-async def get_online_users_data():
+async def online_users_data():
 
     client = boto3.client('connect')
     users = client.list_users(
@@ -91,7 +92,7 @@ async def get_online_users_data():
         }
     )
     return response['UserDataList']
-cachedData.add("get_online_users_data", get_online_users_data, 25)
+cachedData.add("online_users_data", online_users_data, 25)
 
 async def get_not_connected_users_data():
 
@@ -397,6 +398,7 @@ cachedData.add("get_capacity", get_capacity, 60)
 
 async def get_abandonment_rate():
     #routing_profile_list = await routing_profiles()
+    #routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
 
     queues_list = await cachedData.get("list_queue")
@@ -427,39 +429,65 @@ async def get_abandonment_rate():
             }
         ]
     )
-    
-    data = []
-    for i in response['MetricResults']:
-        for n in i['Collections']:
-            data.append(str(n['Value']))  # Correctly access the value
 
-    card_value = float(data[0])
+    card_values = [i['Collections'][0]['Value'] for i in response['MetricResults']]
+    card_value = sum(card_values) / len(card_values)
 
     # print(card_value)
 
-    if card_value > 50.0:
-        cardFooter_label = "percent higher than last months average"
-        cardFooter_value = str(card_value - 50.0)
+    if (card_value > 80):
+        footerColor = "text-red-500"
+        footerSpecialText = f'{card_value - 80:.2f}%'
+        footerDesc = 'more than the max recommended rate.'
+    elif (card_value > 50):
+        footerColor = "text-orange-500"
+        footerSpecialText = f'{card_value - 50:.2f}%'
+        footerDesc = 'more than the recommended rate.'
     else:
-        cardFooter_label = "The abandonment rate is stable"
-        cardFooter_value = "0.0"
+        footerColor = "text-green-500"
+        footerSpecialText = f'{0}%'
+        footerDesc = 'more than the max recommended rate.'
 
     cardFooter = models.CardFooter(
-        color="text-red-500",
-        value=cardFooter_value,
-        label=cardFooter_label,
+        color=footerColor,
+        value=footerSpecialText,
+        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent.",
     )
 
     card = models.GenericCard(
         id=1,
-        title="Abandoment rate",
-        value=data[0],  # Ensure this is a string
+        title="Abandonment rate",
+        value="{:.2f}%".format(card_value),
         icon="PhoneXMarkIcon",
         footer=cardFooter,
     )
-
+    
     return card
 cachedData.add("get_abandonment_rate", get_abandonment_rate, 60)
+
+async def get_connected_users():
+    
+    data = await cachedData.get('routing_profiles_data')
+
+    totalAgents = len(data)
+    agentsInCall = len(LazySquirrel(data).filter_by('status', 'on call').get())
+    agentsWhoNeedHelp = len(LazySquirrel(data).filter_by('status', 'needs assistance').get())
+    
+    footer_info = models.CardFooter(
+        color = "text-red-500" if agentsWhoNeedHelp > 0 else "text-green-500", 
+        value= f"{agentsWhoNeedHelp} agents", 
+        label= "need help. Get more details on the agents tab.")
+    
+    card= models.GenericCard(
+        id=1,
+        title="Agents in call.",
+        value=f'{agentsInCall} out of {totalAgents} connected agents',
+        icon="UserIcon",
+        footer=footer_info,
+        color="pink",
+    )
+    return card
+cachedData.add("get_connected_users", get_connected_users, 60)
 
 async def get_queues():
     client = boto3.client('connect')   
@@ -826,7 +854,7 @@ cachedData.add("get_usename", get_usename, 60)
 #------ Alerts endpoints
 
 async def get_alert_supervisor_NA():
-    data = await cachedData.get("routing_profiles_data")
+    data = await cachedData.get("routing_profiles_data") 
 
     agentNeedsAssistance = 0
     

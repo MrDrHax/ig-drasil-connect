@@ -22,3 +22,23 @@ async def getListAgentStatuses() -> dict:
     return resp['AgentStatusSummaryList']
 
 cachedData.add('getListAgentStatuses', getListAgentStatuses, 86400) # 24 hours
+
+async def get_current_user_data() -> dict:
+    client = boto3.client('connect')
+    users = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    userList = []
+    for user in users['UserSummaryList']:
+        userList.append(user['Id'])
+
+    users_data = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Agents': userList
+        }
+    )
+
+    return users_data
+
+cachedData.add('get_current_user_data', get_current_user_data, 30) # 30 seconds

@@ -2,8 +2,6 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 from config import Config
 
-#uri = 'mongodb+srv://a01783155:hfVp8BtX7R9VblzG@igdrasiltest.i4prhyj.mongodb.net/?retryWrites=true&w=majority&appName=IGDrasilTest'
-
 """
 Singleton pattern 
 """
