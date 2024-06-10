@@ -20,16 +20,16 @@ import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} f
 import { number } from "prop-types";
 
 
-export function Notifications() {
+export function Notifications({is_supervisor, agent_id}) {
   const controller = useMaterialTailwindController();
   const theme = controller;
   const [info, setInfo] = useState([]);
 
   function updateData() {
-
-    Alerts().then((data) => {
+    Alerts(is_supervisor,agent_id).then((data) => {
       setInfo(data);
-    });
+    }
+    );
   }
 
   //Call the function to recieve data just once
@@ -73,16 +73,16 @@ export function Notifications() {
   );
 }
 
-export function NotificationsCard() {
+export function NotificationsCard({is_supervisor, agent_id}) {
   const controller = useMaterialTailwindController();
   const theme = controller;
   const [numberalerts, setNumberAlerts] = useState(0);
 
   function updateData() {
-    Alerts().then((data) => {
-      setInfo(data);
+    Alerts(is_supervisor,agent_id).then((data) => {
       setNumberAlerts(data.length);
-    });
+    }
+    );
   }
 
   //Call the function to recieve data just once
@@ -112,7 +112,7 @@ export function NotificationsCard() {
             </div>
           </CardHeader>
           <CardBody className="overflow-y-scroll px-0 pt-0 pb-2">
-            <Notifications />
+            <Notifications is_supervisor={is_supervisor} agent_id={agent_id} />
           </CardBody>
         </Card>
   );
