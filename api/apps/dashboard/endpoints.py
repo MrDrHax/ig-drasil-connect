@@ -443,15 +443,69 @@ async def post_alert_agent_message():
 
     return "Ok"
 
+dict_agent = {}
+
+@router.post("/alerts/agent/message", tags=["alerts"])
+async def post_alert_agent_message(agent_id:int):
+    '''
+    Sends an alert if agent has a message
+    '''
+    if str(agent_id) not in dict_agent:
+        dict_agent[str(agent_id)] = 0
+    
+    dict_agent[str(agent_id)] += 1
+
+    return "Ok"
+
 @router.get("/alerts/agent/NonResponse", tags=["alerts"])
-async def get_alert_agent_NonResponse():
+async def get_alert_agent_NonResponse(agent_id:str):
     '''
     sends back the alert of the agent that has not responded during the call with the client
     '''
-    res = await cachedData.get("get_alert_agent_nonResponse")
+    client = boto3.client('connect')
+    agent= await list_users_data()
 
-    return res
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [i['Id'] for i in agent],  
+            } 
+        ], 
 
+        Groupings=['AGENT', ],
+
+        Metrics = [
+            {
+                'Name': 'AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS',
+            }
+        ]
+    )
+
+    for i in response['MetricResults']:
+        if i["Dimensions"]["AGENT"] == agent_id:
+            if i['Collections'][0]['Value'] > 0:
+                return models.GenericAlert(
+                    Text="You have a non response a call with the client",
+                    TextRecommendation=". You asked to respond to the client during the call or asker for help to the supervisor",
+                    color="red",
+                )
+            else:
+                return models.GenericAlert(
+                    Text="You have a non response a call with the client",
+                    TextRecommendation=". you good job, you have responded to the client during the call",
+                    color="green",
+                )
+    return models.GenericAlert(
+        Text="You have a non response a call with the client",
+        TextRecommendation=". you good job, you have responded to the client during the call",
+        color="green",
+    )
+
+    
 
 @router.get("/alerts/get_alerts_agent", tags=["alerts"])
 async def get_alert_agent(agent_id:str):
@@ -459,6 +513,19 @@ async def get_alert_agent(agent_id:str):
     sends back the alert of the agent
     '''
     alerts=[]
+
+    NR= await get_alert_agent_NonResponse(agent_id)
+
+    if NR:
+        alerts.append(NR)
+    if str(agent_id) in dict_agent:
+        alerts.append(models.GenericAlert(
+            Text="You have "+ str(dict_agent[str(agent_id)]) + " messages from supervisor",
+            TextRecommendation=". You should check your messages in the chat",
+            color="blue-gray",
+            )
+        )
+        dict_agent[str(agent_id)] = 0
 
     alerts.append(models.GenericAlert(
         Text="You have a message from supervisor",
