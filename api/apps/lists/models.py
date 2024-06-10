@@ -35,6 +35,7 @@ class QueueDataListItem(BaseModel):
     enabled: bool = Field(True, description="If the queue is enabled or not.", example=True)
     waiting: int = Field(0, description="The amount of clients waiting in the queue.", example=5)
     averageWaitTime: float = Field(0, description="The average wait time for the clients in the queue.", example=5)
+    routingProfiles: list[str] = Field([], description="The list of routing profiles associated with the queue.", example=["a", "b", "c"])
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -50,10 +51,9 @@ class AgentsDataListItem(BaseModel):
     agentID: str = Field("0", description="The id of the item. Use this to get the summary", examples=["a", "b", "c"])
     name: str = Field("No name", description="The name of the agent.", example="Ron")
     status: str = Field("No status", description="The current status of the agent.", example="Available")
-    calls: int = Field(0, description="The amount of calls the agent has taken today.", example=5)
-    rating: float = Field(0, description="The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going", example=4.5)
     queue: str = Field("No routing profile", description="The queue the agent is currently in.", example="Support")
     requireHelp: bool = Field(False, description="If the agent requires help or not.", example=False)
+    queueList: list[str] = Field([], description="The list of queues the agent is currently available in.", example=["Support", "Support 2"])
 
     def __getitem__(self, item):
         return getattr(self, item)

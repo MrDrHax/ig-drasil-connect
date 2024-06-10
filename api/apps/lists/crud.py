@@ -10,6 +10,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 async def get_routing_profile_list():
+    """
+    Returns a list of all routing profiles.
+    """
     client = boto3.client('connect')
 
     # Get a list of all routing profiles
@@ -19,15 +22,21 @@ async def get_routing_profile_list():
 
     return response['RoutingProfileSummaryList']
 
-cachedData.add("get_routing_profile_list", get_routing_profile_list, 30) # 24 hours
+cachedData.add("get_routing_profile_list", get_routing_profile_list, 60*60*24) # 24 hours
 
 async def get_routingProfilesArns():
+    """
+    Returns a list of all routing profiles ARNs.
+    """
     routingProfiles = await cachedData.get('get_routing_profile_list')
     return [profile['Arn'] for profile in routingProfiles]
 
-cachedData.add("get_routingProfilesArns", get_routingProfilesArns, 60*24) # 24 hours
+cachedData.add("get_routingProfilesArns", get_routingProfilesArns, 60*60*24) # 24 hours
 
 async def get_agent_name_data(id: str) -> str:
+    """
+    Returns the name of the agent with the given ID.
+    """
     client = boto3.client('connect')
     response = client.describe_user(
         InstanceId=Config.INSTANCE_ID,
@@ -35,9 +44,12 @@ async def get_agent_name_data(id: str) -> str:
     )
     return f"{response['User']['IdentityInfo']['FirstName']} {response['User']['IdentityInfo']['LastName']}"
 
-cachedData.add("get_agent_name_data", get_agent_name_data, 60*24) # 24 hours
+cachedData.add("get_agent_name_data", get_agent_name_data, 60*60*24) # 24 hours
 
 async def get_routing_profile_name_data(id: str):
+    """
+    Returns the name of the routing profile with the given ID.
+    """
     routing_profile_list = await cachedData.get('get_routing_profile_list')
 
     for profile in routing_profile_list:
@@ -45,6 +57,55 @@ async def get_routing_profile_name_data(id: str):
             return profile['Name']
 
 cachedData.add("get_routing_profile_name_data", get_routing_profile_name_data, 60*24) # 24 hours
+
+async def get_queues_for_routing_profile(id: str):
+    """
+    Retrieves a list of queue IDs for a given routing profile ID.
+
+    Args:
+        id (str): The ID of the routing profile.
+
+    Returns:
+        List[str]: A list of queue IDs associated with the routing profile.
+    """
+    client = boto3.client('connect')
+
+    response = client.list_routing_profile_queues(
+        InstanceId=Config.INSTANCE_ID,
+        RoutingProfileId=id
+    )
+
+    # Return just a list of the queue Ids
+    return [queue['QueueId'] for queue in response['RoutingProfileQueueConfigSummaryList']]
+
+cachedData.add("get_queues_for_routing_profile", get_queues_for_routing_profile, 60*60*24) # 24 hours
+
+async def get_routing_profiles_for_queue(id: str):
+    """
+    Retrieves a list of routing profile IDs for a given queue ID.
+
+    Args:
+        id (str): The ID of the queue.
+
+    Returns:
+        List[str]: A list of routing profile IDs associated with the queue.
+    """
+    # Get a list of all routing profiles
+    all_routing_profiles = await cachedData.get('get_routing_profile_list')
+
+    profile_ids = []
+
+    # Check each routing profile in the list
+    for profile in all_routing_profiles:
+        # Get each queue_id for the routing profile
+        for queue in await cachedData.get('get_queues_for_routing_profile', id=profile['Id']):
+            # Check if the routing profile has the queue in their list
+            if queue == id and profile['Name'] not in profile_ids:
+                profile_ids.append(profile['Name'])
+
+    return profile_ids
+
+cachedData.add("get_routing_profiles_for_queue", get_routing_profiles_for_queue, 60*60*24) # 24 hours
 
 async def routing_profiles_data() -> tuple:
     client = boto3.client('connect')
@@ -76,11 +137,12 @@ async def routing_profiles_data() -> tuple:
                                 # Get the current contact status if they have a contact and if they don't, get their status
                                 status= userData['Contacts'][0]['AgentContactState'] if len(userData['Contacts']) > 0 else userData['Status']['StatusName'],
                                 #status= len(userData['Contacts']) > 0 if userData['Contacts'][0]['AgentContactState'] : userData['Status']['StatusName'], 
-                                requireHelp=userData['Status']['StatusName'] == "Needs Assistance", calls=5, rating=4.5)
+                                requireHelp=userData['Status']['StatusName'] == "Needs Assistance",
+                                queueList= await cachedData.get('get_queues_for_routing_profile', id=userData['RoutingProfile']['Id']))
                                 for userData in list]
     return parsed
 
-cachedData.add("routing_profiles_data", routing_profiles_data, 20)
+cachedData.add("routing_profiles_data", routing_profiles_data, 10) # 10 seconds
 
 async def get_queue_description(queueID: str):
     client = boto3.client('connect')
@@ -90,7 +152,7 @@ async def get_queue_description(queueID: str):
     )
     return response['Queue']
 
-cachedData.add("get_queue_description", get_queue_description, 60*24) # 24 hours
+cachedData.add("get_queue_description", get_queue_description, 60*60*24) # 24 hours
 
 async def get_queues_data():
     client = boto3.client('connect')
@@ -169,9 +231,10 @@ async def get_queues_data():
                 usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
                 enabled=status == "ENABLED",
                 waiting=contacts_in_queue, 
-                averageWaitTime=average_wait_time  
+                averageWaitTime=average_wait_time,
+                routingProfiles= await cachedData.get('get_routing_profiles_for_queue', id=q['Id'])
             ))
 
     return builtData
 
-cachedData.add("get_queues_data", get_queues_data, 20)
+cachedData.add("get_queues_data", get_queues_data, 10) # 10 seconds
