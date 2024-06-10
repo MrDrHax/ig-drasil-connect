@@ -36,7 +36,7 @@ echo "Installing certbot..."
 
 sudo apt-get install -y certbot python3-certbot-nginx
 
-sudo cp -r nginx/* /etc/nginx/sites-available/
+sudo cp -r nginx/* /etc/nginx/sites-enabled/
 
 # get the ssl certificate
 

@@ -27,7 +27,7 @@ cd ../../
 
 echo "Copying configs..."
 
-sudo cp -r nginx/* /etc/nginx/sites-available/
+sudo cp -r nginx/* /etc/nginx/sites-enabled/
 sudo cp -r systemd/* /etc/systemd/system/
 
 sudo systemctl daemon-reload
@@ -54,7 +54,8 @@ sudo systemctl restart connect
 
 echo "Restarting nginx..."
 
-sudo systemctl restart nginx
+sudo certbot install --nginx -d connect.igdrasil.com
+sudo systemctl reload nginx
 
 # Done
 
