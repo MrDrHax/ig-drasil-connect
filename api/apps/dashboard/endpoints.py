@@ -66,7 +66,7 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
     '''
     cards = [
         await get_avg_holds(token, agent_id),
-        await get_People_to_answer(),
+        await get_People_to_answer(token),
         await get_capacity_agent(token, agent_id)
 
     ]
