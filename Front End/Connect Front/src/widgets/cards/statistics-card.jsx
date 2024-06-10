@@ -34,7 +34,7 @@ export function StatisticsCard({ color, icon, title, value, footer }) {
       <Typography className={`text-[1rem] ml-10 ${getTypography()} ${getTextColor("dark")}`}>
           {title}
         </Typography>
-         <Typography className={`text-[2rem] ml-10 ${getTypography()} ${getTextColor("dark")}`}>
+         <Typography className={`text-[1.5rem] ml-20 ${getTypography()} ${getTextColor("dark")}`}>
           {value}
         </Typography>
       </CardBody>
