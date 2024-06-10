@@ -45,7 +45,7 @@ sudo chown www-data:www-data /home/ubuntu/ig-drasil-connect/api
 sudo chmod -R 555 /home/ubuntu/ig-drasil-connect/api
 
 sudo chown www-data:www-data /home/ubuntu/logs
-sudo chmod -R 660 /home/ubuntu/logs
+sudo chmod -R 777 /home/ubuntu/logs
 
 sudo systemctl restart connect
 
