@@ -2,6 +2,7 @@
 
 echo "Updating server..."
 
+sudo chmod -R 777 /home/ubuntu/ig-drasil-connect/api
 git pull
 
 echo "Pull complete"
