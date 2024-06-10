@@ -232,7 +232,8 @@ async def get_queues_data():
                 enabled=status == "ENABLED",
                 waiting=contacts_in_queue, 
                 averageWaitTime=average_wait_time,
-                routingProfiles= await cachedData.get('get_routing_profiles_for_queue', id=q['Id'])
+                routingProfiles= await cachedData.get('get_routing_profiles_for_queue', id=q['Id']),
+                status= "Free" if contacts_in_queue / MaxContacts * 100 <= 60 else "Stressed" if contacts_in_queue / MaxContacts * 100 <= 100 else "Exceeded"
             ))
 
     return builtData
