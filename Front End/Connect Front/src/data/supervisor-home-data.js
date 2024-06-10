@@ -80,8 +80,14 @@ export async function AgentRatingData(agent_id) {
   return await response.json();
 }
 
-export async function Alerts() {
-  let url = getApiPath() + `dashboard/alerts/get_alerts_supervisor`;
+export async function Alerts(is_supervisor, agent_id) {
+  let url ;
+  if (is_supervisor) {
+    url = getApiPath() + `dashboard/alerts/get_alerts_supervisor`;
+  }
+  else {
+    url = getApiPath() + `dashboard/alerts/get_alerts_agent?agent_id=` + agent_id;
+  }
   let request = new Request(url);
   addTokenToHeader(request);
   let response = await fetch(request);
