@@ -35,8 +35,12 @@ router = APIRouter(
 @router.get("/cards", tags=["cards"])
 async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.DashboardData:
     '''
-    Returns the cards that will be displayed on the dashboard.
+    Returns the cards that will be displayed on the agent dashboard.
     '''
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     cards = [
         await online_agents(token),
         await need_assistance_agents(token),
@@ -51,10 +55,6 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 
     return toReturn
 
-# list_users
-# describe_agent_status
-# list_agent_statuses
-
 @router.get("/get/connected/agents", tags=["cards"])
 async def online_agents():
 
@@ -62,15 +62,12 @@ async def online_agents():
     
     return response
 
-
-
 @router.get("/get/need-assistance/agents", tags=["cards"])
 async def need_assistance_agents():
 
     response = await cachedData.get("need_assistance_agents")
 
     return response
-
 
 @router.get("/queues/agent-answer-rate", tags=["cards"])
 async def queues_agent_answer_rate():

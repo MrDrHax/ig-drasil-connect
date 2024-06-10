@@ -1,12 +1,4 @@
 import PropTypes from "prop-types";
-import { Link, NavLink } from "react-router-dom";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  Avatar,
-  Button,
-  IconButton,
-  Typography,
-} from "@material-tailwind/react";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
 
 import React, { useState, useEffect } from 'react';
@@ -23,10 +15,10 @@ export function Sidenav({ brandImg, brandName, routes }) {
   
   
   useEffect(() => {
-    let ccp_link = "https://igdrasilcallcenter.my.connect.aws/ccp-v2"
+    let ccp_link = "https://igdrasilcallcenter.my.connect.aws/ccp-v2?visual-refresh=true"
     let container_div = document.getElementById("container-div");
-  
-    connect.core.initCCP(container_div, {ccpUrl: ccp_link, softphone : {allowFramedSoftphone: true}, debug: true});
+
+    connect.core.initCCP(container_div, {ccpUrl: ccp_link, softphone : {allowFramedSoftphone: true, allowFramedVideoCall: true, } });
   }, []);
 
   return (
@@ -35,7 +27,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
         openSidenav ? "translate-x-0" : "-translate-x-80"
       } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
     >
-      <div id="container-div" className="w-full h-full"></div>
+      <div id="container-div" className={`w-full h-full`}></div>
       
        {/*  <iframe src={ccp_link} id="iframe" allow="microphone; camera; autoplay; clipboard-write; identity-credentials-get"
         sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-downloads"

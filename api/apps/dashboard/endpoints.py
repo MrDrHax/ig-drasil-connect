@@ -8,9 +8,6 @@ import AAA.userType as userType
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
 from tools.lazySquirrel import LazySquirrel
-from ..lists.endpoints import get_agents
-
-import random, math
 
 import boto3
 from config import Config
