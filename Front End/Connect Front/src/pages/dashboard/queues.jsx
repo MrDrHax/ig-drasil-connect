@@ -274,18 +274,16 @@ useEffect(() => {
                         </td>
 
                         {/* Move Agent to this Queue in case of not free usage */}
-                        { usage / maxContacts * 100 > 80 ? null :
                           <td key="Move Agent" className="border-t border-blue-gray-50">
                             <Menu allowHover>
                             <MenuHandler>
-                              <Chip value="Move Agent" variant="gradient" color="red" className=" text-[0.8rem] w-fit"/>
+                              <Chip value="Move Agent" variant="gradient" color={usage / maxContacts * 100 <= 80 ? "green" : usage / maxContacts * 100 > 80 && usage / maxContacts * 100 <= 100 ? "orange" : "red"} className=" text-[0.8rem] w-fit"/>
                             </MenuHandler>
                             <MenuList className="w-20">
                               {agents.map(({ name, queueList, agentID }) => getOptions(name, agentID, queueList, queueID, routingProfiles))}
                             </MenuList>
                             </Menu>
                           </td>
-                        }
                       </tr>
 
                       {/* Open More Info */}
