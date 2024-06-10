@@ -35,8 +35,12 @@ router = APIRouter(
 @router.get("/cards", tags=["cards"])
 async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.DashboardData:
     '''
-    Returns the cards that will be displayed on the dashboard.
+    Returns the cards that will be displayed on the agent dashboard.
     '''
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     cards = [
         await online_agents(token),
         await need_assistance_agents(token),
@@ -52,10 +56,6 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
 
     return toReturn
-
-# list_users
-# describe_agent_status
-# list_agent_statuses
 
 @router.get("/get/connected/agents", tags=["cards"])
 async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -100,7 +100,7 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
 
     card = models.GenericCard(
         id=1,
-        title="online agents",
+        title="Online agents",
         value= str(users_data['ApproximateTotalCount']),
         icon="HandRaisedIcon",
         footer=cardFooter,
@@ -108,12 +108,10 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
 
     return card
 
-
-
 @router.get("/get/need-assistance/agents", tags=["cards"])
 async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
     '''
-    Returns the number of people that are currently online.
+    Returns the number of people that need assistance and are currently online.
     
     ''' 
     if not userType.isManager(token):
@@ -165,7 +163,6 @@ async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
     )
 
     return card
-
 
 @router.get("/queues/agent-answer-rate", tags=["cards"])
 async def queues_agent_answer_rate(token: Annotated[str, Depends(requireToken)]):
@@ -260,6 +257,14 @@ async def list_agent():
     resp = client.list_users(
         InstanceId=Config.INSTANCE_ID
 
-    )
+@router.get("/list/list-agent-statuses")
+async def list_agent_statuses():
+    """
+    Returns a list of all agent statuses.
+
+    @return: list of agent statuses
+    """
+
+    resp = await cachedData.get('getListAgentStatuses')
 
     return resp

@@ -43,6 +43,40 @@ export async function AgentList(skip = 0, limit = 10, search = null, sortbydat =
 }
 
 /**
+ * Retrieves a list of statuses from the API.
+ *
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the list of statuses.
+ * @throws {Error} If the API request fails.
+ */
+export async function StatusList() {
+    let url = getApiPath() + 'agents/list/list-agent-statuses';
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+/**
+ * Retrieves a list of cards from the API.
+ *
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the list of agents.
+ * @throws {Error} If the API request fails.
+ */
+export async function AgentCards() {
+    let url = getApiPath() + 'agents/cards';
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+/**
  * Retrieves detailed information about a specific agent.
  *
  * @param {number} id - The unique identifier of the agent.
@@ -106,4 +140,23 @@ export async function JoinCall(agent_id) {
     }
     return await response.json();
 
+}
+
+/**
+ * Changes the status of an agent.
+ * 
+ * @param {string} agent_id - The ID of the agent whose status to change.
+ * @param {string} status - The new status of the agent.
+ * @return {Promise<Object>} A promise that resolves to the JSON response containing the confirmation message of the status change.
+ * @throws {Error} If the API request fails.
+ */
+export async function ChangeStatus(agent_id, status) {
+    let url = getApiPath() + `actions/change_status?agent_id=${agent_id}&status=${status}`;
+    let request = new Request(url, {method: 'POST'});
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
 }

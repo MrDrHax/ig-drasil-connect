@@ -8,9 +8,6 @@ import AAA.userType as userType
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
 from tools.lazySquirrel import LazySquirrel
-from ..lists.endpoints import get_agents
-
-import random, math
 
 import boto3
 from config import Config
@@ -68,7 +65,6 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
         await read_avg_holds(token, agent_id),
         await read_People_to_answer(),
         await read_capacity_agent(token, agent_id)
-
     ]
 
     graphs = [
@@ -429,4 +425,48 @@ async def get_alert_supervisor():
 
     return alerts
 
+alert_message_agent= []
 
+@router.post("/alerts/agent/message", tags=["alerts"])
+async def post_alert_agent_message():
+    '''
+    Sends an alert if agent has a message
+    '''
+
+    alert= models.GenericAlert(
+        Text="You have a message from supervisor",
+        TextRecommendation=". You should check your messages in the chat correspondant to the supervisor",
+        color="blue-gray",
+    )
+
+    alert_message_agent.append(alert)
+
+    return "Ok"
+
+@router.get("/alerts/agent/NonResponse", tags=["alerts"])
+async def get_alert_agent_NonResponse():
+    '''
+    sends back the alert of the agent that has not responded during the call with the client
+    '''
+    res = await cachedData.get("get_alert_agent_nonResponse")
+
+    return res
+
+
+@router.get("/alerts/get_alerts_agent", tags=["alerts"])
+async def get_alert_agent(agent_id:str):
+    '''
+    sends back the alert of the agent
+    '''
+    alerts=[]
+
+    alerts.append(models.GenericAlert(
+        Text="You have a message from supervisor",
+        TextRecommendation=". You should check your messages in the chat correspondant to the supervisor",
+        color="blue",
+        )
+    )
+
+
+
+    return alerts
