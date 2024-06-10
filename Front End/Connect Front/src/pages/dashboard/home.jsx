@@ -31,6 +31,7 @@ export function Home() {
   const [graphs, setGraphs] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const agent_id = localStorage.getItem("USER_ID");
 
   function getIcon(icon) {
     switch (icon) {
@@ -123,7 +124,7 @@ export function Home() {
 
       {/*Aqui es sobre el sistema de alerta del home page */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <NotificationsCard/>
+       <NotificationsCard is_supervisor={true} agent_id={ }/>
 
         {/* Aquí esta para cambiar el Card de recomendaciones*/}
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
