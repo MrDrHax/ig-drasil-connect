@@ -156,12 +156,8 @@ cachedData.add("get_queue_description", get_queue_description, 60*60*24) # 24 ho
 
 async def get_queues_data():
     client = boto3.client('connect')
-    response = client.list_queues(
-        InstanceId=Config.INSTANCE_ID,
-        QueueTypes=[
-            'STANDARD',
-        ]
-    ) # get active queues
+
+    response = await cachedData.get("list_queue")
 
     builtData = []
 
@@ -208,8 +204,6 @@ async def get_queues_data():
 
             MaxContacts = int(queue_data.get('MaxContacts', 10))
             #MaxContacts = int(queue_data.get('MaxContacts', 10) * 0.8) # 80% of the max contacts
-            status = queue_data.get('Status', 'DISABLED')
-            #status = queue_data['Status']
 
             description = queue_data.get('Description', '')
 
@@ -218,23 +212,20 @@ async def get_queues_data():
             contacts_in_queue = 0  # Default/fallback value in case of error
             contact_age_average = 0  # Default/fallback value in case of error
             MaxContacts = 0
-            status = 'DISABLED'
             average_wait_time = 0
 
-        # only add queues that are enabled
-        if status == "ENABLED":
-            builtData.append(models.QueueDataListItem(
-                queueID=q['Id'],
-                name=q['Name'],
-                description=description,
-                maxContacts=MaxContacts,
-                usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
-                enabled=status == "ENABLED",
-                waiting=contacts_in_queue, 
-                averageWaitTime=average_wait_time,
-                routingProfiles= await cachedData.get('get_routing_profiles_for_queue', id=q['Id']),
-                status= "Free" if contacts_in_queue / MaxContacts * 100 <= 60 else "Stressed" if contacts_in_queue / MaxContacts * 100 <= 100 else "Exceeded"
-            ))
+        builtData.append(models.QueueDataListItem(
+            queueID=q['Id'],
+            name=q['Name'],
+            description=description,
+            maxContacts=MaxContacts,
+            usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
+            enabled= True,
+            waiting=contacts_in_queue, 
+            averageWaitTime=average_wait_time,
+            routingProfiles= await cachedData.get('get_routing_profiles_for_queue', id=q['Id']),
+            status= "Free" if contacts_in_queue / MaxContacts * 100 <= 60 else "Stressed" if contacts_in_queue / MaxContacts * 100 <= 100 else "Exceeded"
+        ))
 
     return builtData
 

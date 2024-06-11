@@ -1,8 +1,11 @@
-import { AgentId } from '@/data';
 import { v4 as uuidv4 } from 'uuid';
 
 export function getApiPath() {
-    return "http://localhost:8080/";
+
+    if (process.env.NODE_ENV === 'development')
+        return "http://localhost:8080/";
+    else
+        return "https://connect.igdrasilteam.com/api/";
 }
 
 export function validateToken() {

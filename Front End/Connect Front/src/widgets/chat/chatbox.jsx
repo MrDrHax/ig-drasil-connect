@@ -12,7 +12,7 @@ import {
 import { getBgColor, getTextColor, getBorderColor,getTypography, useMaterialTailwindController,getTypographybold } from "@/context";
 import {TwitterChatboxTextarea ,ChatMessage} from "@/widgets/chat";
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 
 /**
  * Renders a chat box component.
@@ -26,6 +26,7 @@ export function ChatBox({agent_id, is_supervisor}) {
     const [dataToDisplay, setData] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
+    const containerRef = useRef(null);
 
     function updateData() {
         setIsLoaded(false);
@@ -34,10 +35,16 @@ export function ChatBox({agent_id, is_supervisor}) {
           setIsLoaded(true);
         });
       }
+
+    const scrollToBottom = () => {
+      if (containerRef.current)
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    };
     
       //Call the function just once
       useEffect(() => {
         updateData();
+        scrollToBottom();
       }, [agent_id]);
 
     return (
@@ -54,7 +61,7 @@ export function ChatBox({agent_id, is_supervisor}) {
                     </Typography>
                 </div>
             </CardHeader>
-            <CardBody className={`overflow-y-scroll border border-${getTextColor("dark")} px-0 pt-0 pb-2 ` } style={{ maxHeight: '400px'}} >
+            <CardBody ref={containerRef} className={`overflow-y-auto border border-${getTextColor("dark")} px-0 pt-0 pb-2 ` } style={{ maxHeight: '400px'}} >
             
                 {!isLoaded || agent_id === null ?
                 /* Renders a loading indicator while the data is being fetched */
@@ -70,7 +77,6 @@ export function ChatBox({agent_id, is_supervisor}) {
                 : dataToDisplay.map(({ content, supervisor_sender, timestamp }) => (
                     <ChatMessage message={content} rol={supervisor_sender} hour={timestamp} is_supervisor={is_supervisor}/>
                 ))}
-
 
             </CardBody>
             <CardBody className="p-4">

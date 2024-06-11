@@ -14,15 +14,18 @@ import {
   MenuItem,
   Input,
 } from "@material-tailwind/react";
-import { AgentList, QueueList, ChangeRoutingProfile } from "@/data";
+import { AgentList, QueueList, ChangeRoutingProfile, QueueCards } from "@/data";
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 import React, { useEffect, useState } from 'react';
 import { useAlert } from "@/context/alerts";
 
+import { StatisticsCard } from "@/widgets/cards";
+import { StatisticsChart } from "@/widgets/charts";
+
 // Pagination imports
 import { parsePaginationString } from "@/configs/api-tools";
-import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ClockIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 
 export function Queues() {
@@ -30,8 +33,9 @@ export function Queues() {
   const { navColor } = controller;
 
   const [dataToDisplay, setData] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [graphs, setGraphs] = useState([]);
   const [agents, setAgentList] = useState([]);
-  const [routingProfiles, setRoutingProfileList] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
@@ -140,6 +144,12 @@ export function Queues() {
         setAgentList(data.data);
     })
 
+    // Get the list of cards
+    QueueCards().then((data) => {
+        setCards(data.cards);
+        setGraphs(data.graphs);
+    })
+
     // Get the list of queues
     QueueList(skip, 10, query, "name", "asc").then((data) => {
         const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
@@ -167,6 +177,41 @@ useEffect(() => {
 }, [filterStatus]);
 
   return (
+    <div>
+    {/*<!-- Cards -->
+    <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+        {!isLoaded ? (
+        <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+        <span className="flex justify-center items-center">
+        <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+        </span>
+        <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+            Cards are now loading...
+        </Typography>
+        </div>
+        ) : (
+        cards.map(({ icon, title, footer, ...rest }) => (
+            <StatisticsCard
+            key={title}
+            {...rest}
+            title={title}
+            icon={React.createElement(getIcon(icon), {
+                className: "w-6 h-6 text-white",
+            })}
+            footer={
+                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                <strong className={footer.color}>{footer.value}</strong>
+                &nbsp;{footer.label}
+                </Typography>
+            }
+            />
+        ))
+        )}
+      </div>
+    */
+    }
+
+    {/*<!-- Table -->*/}
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
         <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 ${getTypography()} ${getBgColor("search-bar")} flex justify-between items-center`}>
@@ -424,6 +469,35 @@ useEffect(() => {
           </div>
         </CardBody>
       </Card>
+    </div>
+
+    {/*<!-- Graphs -->*/}
+      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2">
+        {!isLoaded ? (
+        <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+        <span className="flex justify-center items-center">
+        <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+        </span>
+        <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+            Graphs are now loading...
+        </Typography>
+        </div>
+        ) : (
+        graphs.map((props) => (
+            <StatisticsChart
+                key={props.title}
+                {...props}
+                footer={
+                <Typography className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                    <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
+                    &nbsp;{props.footer}
+                </Typography>
+                }
+            />
+            ))
+        )}
+      </div>
+
     </div>
   );
 }

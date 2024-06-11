@@ -16,6 +16,7 @@ class GenericCard(BaseModel):
     color: str = Field("purple", examples=["black", "green"], description="The color of the icon")
     footer: CardFooter
 
+# This Series Data is used in the line chart
 class SeriesData(BaseModel):
     name: str = Field("Series 1", examples=["Series 1", "Series 2", "Series 3"])
     ''' The name of the series on the chart. '''
