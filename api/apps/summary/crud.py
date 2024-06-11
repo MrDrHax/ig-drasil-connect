@@ -254,7 +254,7 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
                                         recommendationTitle="Recommendation based of last call",
                                         recommendation= recommendation)
 
-cachedData.add('getSentimentRating', getSentimentRating, 0.5)
+cachedData.add('getSentimentRating', getSentimentRating, 60)
 
 async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile]:
     contactData = await cachedData.get('getAllAgentContact', agent_id=agent_id)
