@@ -108,3 +108,58 @@ async def post_chat(token: Annotated[str, Depends(requireToken)], message: str, 
     db['chats'].update_one({"agent_id": agent_id}, {"$push": {"messages": {"content": encoded_message, "supervisor_sender": supervisor, "timestamp": datetime.now(tz=timezone.utc)}}}, upsert=True)
 
     return "success"
+
+
+# Notes Endpoints
+@router.post("/new_note", tags=["DB"])
+async def new_note(request: models.CreateNoteRequest, token: str = Depends(requireToken)):
+    """
+    Create a new note.
+    """
+    if not (userType.isManager(token) or userType.isAgent(token)):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager or an agent to access this resource.")
+    
+    try:
+        notes = []
+        for note in request.notes:
+            salted_message = note.message + Config.BASE64AUTH + request.id_creator
+            encoded_message = b64encode(salted_message.encode('utf-8'))
+            note_data = {
+                "message": encoded_message,
+                "timestamp": note.timestamp, 
+                "created_by": request.creator_role
+            }
+            notes.append(note_data)
+
+        note_document = {
+            "id_creator": request.id_creator,
+            "creator_role": request.creator_role,
+            "notes": notes
+        }
+        db["notes"].insert_one(note_document)
+        return "Success"
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.get("/mynotes/{creator_id}", tags=["DB"])
+async def get_notes_by_creator(creator_id: str, token: str = Depends(requireToken)):
+    """
+    Get notes created by a specific creator.
+    """
+    if not (userType.isManager(token) or userType.isAgent(token)):
+         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager or an agent to access this resource.")
+        
+    try:
+        notes_cursor = db["notes"].find({"id_creator": creator_id})
+        notes_list = list(notes_cursor)
+        
+        for note in notes_list:
+            for n in note["notes"]:
+                decoded_message = b64decode(n["message"]).decode("utf-8")
+                n["message"] = decoded_message
+        
+        return notes_list
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal server error")
