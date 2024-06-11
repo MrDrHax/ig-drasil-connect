@@ -33,7 +33,7 @@ def appendToLogger(filePath = ''):
 
     # Create a console handler
     console_handler = colorlog.StreamHandler()
-    console_handler.setLevel(logLevel if Config.DEBUG else logging.WARNING)
+    console_handler.setLevel(logLevel)
     console_handler.setFormatter(color_formatter)
     handlers.append(console_handler)
 
