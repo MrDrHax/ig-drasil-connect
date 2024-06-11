@@ -15,12 +15,13 @@ echo "Building front-end..."
 
 # build
 export NODE_ENV=production
-npm install
-npm run build
+sudo npm install
+sudo npm run build
 
 # move the build to /var/www/html
 
 sudo cp -r dist/* /var/www/html/
+sudo rm -r dist
 
 cd ../../
 
