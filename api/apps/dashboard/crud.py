@@ -3,7 +3,8 @@ from . import models
 import boto3
 from config import Config
 from cache.cache_object import cachedData
-from datetime import datetime , timedelta, date
+from datetime import datetime , timedelta, date, timezone
+from tools.lazySquirrel import LazySquirrel
 
 import logging
 logger = logging.getLogger(__name__)
@@ -24,44 +25,29 @@ async def agent_profile_data(id) -> tuple:
         Agent_mobile = "Unknown"
 
     return FullName, Agent_email, Agent_mobile
-
-cachedData.add("agent_profile_data", agent_profile_data, 60*24) # 24 hours
-
-async def check_agent_availability_data():
-    client = boto3.client('connect')
-
-    # Get info for the first routing profile
-    response = client.get_current_metric_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'RoutingProfiles': [
-                '69e4c000-1473-42aa-9596-2e99fbd890e7',
-            ]
-        },
-        CurrentMetrics=[
-            {
-                'Name': 'AGENTS_ONLINE',
-                'Unit': 'COUNT'
-            },
-        ]
-    )
-
-    toIterate = response['MetricResults'][0]['Collections']
-    # return toIterate
-    toReturn = [(i['Metric']['Name'], i['Value']) for i in toIterate]
-
-    return toReturn
-
-cachedData.add("check_agent_availability_data", check_agent_availability_data, 10)
-
+cachedData.add("agent_profile_data", agent_profile_data, 60*60*24) # 24 hours
 
 async def list_queue():
+    """
+    Returns a list of all queues that have the status "ENABLED".
+    """
     client = boto3.client('connect')
     response = client.list_queues(
     InstanceId = Config.INSTANCE_ID,
     )
-    return response
-cachedData.add("list_queue", list_queue, 24) 
+
+    ret = {'QueueSummaryList': []}
+    for q in response['QueueSummaryList']:
+        try:
+            queue_data = await cachedData.get('get_queue_description', queueID=q['Id'])
+
+            if queue_data['Status'] == 'ENABLED':
+                ret['QueueSummaryList'].append(q)
+        except:
+            pass
+
+    return ret
+cachedData.add("list_queue", list_queue, 60 * 60 * 24) # 24 hours
 
 async def list_routing_profile():
     client = boto3.client('connect')
@@ -72,14 +58,23 @@ async def list_routing_profile():
     )
 
     return response['RoutingProfileSummaryList']
-cachedData.add("list_routing_profile", list_routing_profile, 120)
+cachedData.add("list_routing_profile", list_routing_profile, 60 * 60 * 24) # 24 hours
 
-async def get_online_users_data():
-
+async def list_users():
+    """
+    Gets a list of all users that are active in the Connect instance.
+    """
     client = boto3.client('connect')
     users = client.list_users(
         InstanceId=Config.INSTANCE_ID,
     )
+
+    return users
+cachedData.add("list_users", list_users, 30) # 30 seconds
+
+async def online_users_data():
+    client = boto3.client('connect')
+    users = await cachedData.get("list_users")
     userList = []
     for user in users['UserSummaryList']:
         userList.append(user['Id'])
@@ -91,14 +86,13 @@ async def get_online_users_data():
         }
     )
     return response['UserDataList']
-cachedData.add("get_online_users_data", get_online_users_data, 25)
+cachedData.add("online_users_data", online_users_data, 30)
 
 async def get_not_connected_users_data():
 
     client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
+    users = await cachedData.get("list_users")
+
     userList = []
     for user in users['UserSummaryList']:
         userList.append(user['Id'])
@@ -118,7 +112,7 @@ async def get_not_connected_users_data():
         print(i)
 
     return userList
-cachedData.add("get_not_connected_users_data", get_not_connected_users_data, 25)
+cachedData.add("get_not_connected_users_data", get_not_connected_users_data, 30)
 
 async def get_avg_call_time():
     routing_profile_list = await cachedData.get("list_routing_profile")
@@ -160,14 +154,14 @@ async def get_avg_call_time():
         id=1,
         title="Average Call Time",
         value="{p:.2f}".format(p=data/60),
-        icon="ClockIcon",
+        icon="Clock",
         footer=cardFooter,
         color="blue"
     )
 
     return card
-cachedData.add("get_avg_call_time", get_avg_call_time, 60)
-
+cachedData.add("get_avg_call_time", get_avg_call_time, 60 * 60 * 24) # 24 hours
+ 
 async def get_avg_contact_duration():
     client = boto3.client('connect')
 
@@ -242,8 +236,9 @@ async def get_avg_contact_duration():
     )
 
     return example_graph
-cachedData.add("get_avg_contact_duration", get_avg_contact_duration, 60)
+cachedData.add("get_avg_contact_duration", get_avg_contact_duration, 60 * 60 * 24) # 24 hours
 
+# THIS FUNCTION IS NOT BEING CALLED
 async def get_connected_agents():
     client = boto3.client('connect')
 
@@ -374,8 +369,6 @@ async def get_capacity():
 
     comp = datares1[0]-datares2[0]
 
-    # dat
-
     cardFooter = models.CardFooter(
         color = "text-red-500" if comp > 0 else "text-green-500",
         value = "{p:.2f}".format(p=comp),
@@ -386,7 +379,7 @@ async def get_capacity():
         id = 1,
         title = "Percentage of time \t  active agents",
         value = "{p:.2f}".format(p=datares1[0]),
-        icon = "UserIcon",
+        icon = "Person",
         footer = cardFooter
     )
 
@@ -396,6 +389,7 @@ async def get_capacity():
 cachedData.add("get_capacity", get_capacity, 60)
 
 async def get_abandonment_rate():
+    #routing_profile_list = await routing_profiles()
     #routing_profile_list = await routing_profiles()
     client = boto3.client('connect')
 
@@ -427,39 +421,65 @@ async def get_abandonment_rate():
             }
         ]
     )
-    
-    data = []
-    for i in response['MetricResults']:
-        for n in i['Collections']:
-            data.append(str(n['Value']))  # Correctly access the value
 
-    card_value = float(data[0])
+    card_values = [i['Collections'][0]['Value'] for i in response['MetricResults']]
+    card_value = sum(card_values) / len(card_values)
 
     # print(card_value)
 
-    if card_value > 50.0:
-        cardFooter_label = "percent higher than last months average"
-        cardFooter_value = str(card_value - 50.0)
+    if (card_value > 80):
+        footerColor = "text-red-500"
+        footerSpecialText = f'{card_value - 80:.2f}%'
+        footerDesc = 'more than the max recommended rate.'
+    elif (card_value > 50):
+        footerColor = "text-orange-500"
+        footerSpecialText = f'{card_value - 50:.2f}%'
+        footerDesc = 'more than the recommended rate.'
     else:
-        cardFooter_label = "The abandonment rate is stable"
-        cardFooter_value = "0.0"
+        footerColor = "text-green-500"
+        footerSpecialText = f'{0}%'
+        footerDesc = 'more than the max recommended rate.'
 
     cardFooter = models.CardFooter(
-        color="text-red-500",
-        value=cardFooter_value,
-        label=cardFooter_label,
+        color=footerColor,
+        value=footerSpecialText,
+        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent.",
     )
 
     card = models.GenericCard(
         id=1,
-        title="Abandoment rate",
-        value=data[0],  # Ensure this is a string
-        icon="PhoneXMarkIcon",
+        title="Abandonment rate",
+        value="{:.2f}%".format(card_value),
+        icon="Phone",
         footer=cardFooter,
     )
-
+    
     return card
 cachedData.add("get_abandonment_rate", get_abandonment_rate, 60)
+
+async def get_connected_users():
+    
+    data = await cachedData.get('routing_profiles_data')
+
+    totalAgents = len(data)
+    agentsInCall = len(LazySquirrel(data).filter_by('status', 'on call').get())
+    agentsWhoNeedHelp = len(LazySquirrel(data).filter_by('status', 'needs assistance').get())
+    
+    footer_info = models.CardFooter(
+        color = "text-red-500" if agentsWhoNeedHelp > 0 else "text-green-500", 
+        value= f"{agentsWhoNeedHelp} agents", 
+        label= "need help. Get more details on the agents tab.")
+    
+    card= models.GenericCard(
+        id=1,
+        title="Agents in call.",
+        value=f'{agentsInCall} out of {totalAgents} connected agents',
+        icon="PhoneArrow",
+        footer=footer_info,
+        color="pink",
+    )
+    return card
+cachedData.add("get_connected_users", get_connected_users, 60)
 
 async def get_queues():
     client = boto3.client('connect')   
@@ -521,7 +541,7 @@ async def get_queues():
     return example_graph
 cachedData.add("get_queues", get_queues, 60)
 
-# aqui va parte del agente hasta que funcione el dashboard agent
+# Agent Dashboard
 
 async def get_avg_holds(agent_id):
     client = boto3.client('connect')
@@ -600,7 +620,7 @@ async def get_avg_holds(agent_id):
             id=1,
             title="Average Holds",
             value="0",
-            icon="HandRaisedIcon",
+            icon="Clock",
             footer= models.CardFooter(
                 color="text-red-500",
                 value="0",
@@ -619,7 +639,7 @@ async def get_avg_holds(agent_id):
         id=1,
         title="Average customer hold time",
         value=str(today_data[0]),# Ensure this is a string
-        icon="HandRaisedIcon",
+        icon="Clock",
         footer=cardFooter,
     )
 
@@ -667,7 +687,7 @@ async def get_People_to_answer():
         id=1,
         title="People to answer",
         value=str(data), 
-        icon="BriefcaseIcon",
+        icon="Person",
         footer=cardFooter,
         color="green"
     )
@@ -778,7 +798,7 @@ async def get_capacity_agent(agent_id):
             id = 1,
             title = "porcentage of time active",
             value =  "{p:.2f}".format(p=datares1[0]),
-            icon = "UserIcon",
+            icon = "Chart",
             footer = cardFooter,
             color="blue"
         )
@@ -787,9 +807,9 @@ async def get_capacity_agent(agent_id):
     except:
         card = models.GenericCard(
             id = 0,
-            title = "Average Handle Time",
+            title = "porcentage of time active",
             value =  "No data",
-            icon = "UserIcon",
+            icon = "Chart",
             footer = models.CardFooter(
                 color = "text-red-500",
                 value = "",
@@ -826,7 +846,7 @@ cachedData.add("get_usename", get_usename, 60)
 #------ Alerts endpoints
 
 async def get_alert_supervisor_NA():
-    data = await cachedData.get("routing_profiles_data")
+    data = await cachedData.get("routing_profiles_data") 
 
     agentNeedsAssistance = 0
     
@@ -839,6 +859,7 @@ async def get_alert_supervisor_NA():
             Text="You have "+str(agentNeedsAssistance) +  " agents who need your help. ",
             TextRecommendation="You should go a Queue and see who needs help and go to the agent who needs help.",
             color="red",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
         )
         return alert
     return None
@@ -873,6 +894,7 @@ async def get_alert_supervisor_available():
             Text="There are no agents available.",
             TextRecommendation=" You should check first to see if your agents are busy or offline to see if any of them might be available again.",
             color="red",
+            timestamp= datetime.now(tz=timezone.utc)
         )
         return alert
     else:
@@ -880,6 +902,7 @@ async def get_alert_supervisor_available():
             Text="There are "+ str(round(data)) + " agents available.",
             TextRecommendation="You should check first to see if your agents are busy or offline to see if any of them might be available again.",
             color="green",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
         )
         return alert
 cachedData.add("get_alert_supervisor_available", get_alert_supervisor_available, 60)
@@ -917,6 +940,42 @@ async def get_alert_supervisor_nonResponse():
                     Text="Agent "+ await get_usename(i["Dimensions"]["AGENT"]) + " has not responded during the call with the client.",
                     TextRecommendation="You could intervene in the call or send him a message as to why he is silent in front of the customer",
                     color="red",
+                    timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
                 ))
     return alert
 cachedData.add("get_alert_supervisor_nonResponse", get_alert_supervisor_nonResponse, 60)
+
+async def get_alert_agent_nonResponse(agent_id):
+    client = boto3.client('connect')
+    agent= await list_users_data()
+
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : agent_id,  
+            } 
+        ], 
+
+        Groupings=['AGENT', ],
+
+        Metrics = [
+            {
+                'Name': 'AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS',
+            }
+        ]
+    )
+    data = response['MetricResults'][0]['Collections'][0]['Value']
+    if data > 0:
+        alert = models.GenericAlert(
+            Text="You have not responded during the call with the client.",
+            TextRecommendation="You could ask for help from a supervisor or ask the client if he has any questions.",
+            color="orange",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
+        )
+        
+    return alert
+cachedData.add("get_alert_agent_nonResponse", get_alert_agent_nonResponse, 60)

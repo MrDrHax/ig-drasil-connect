@@ -12,40 +12,49 @@ import {
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { RecomendationCard } from "@/widgets/cards";
-import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon} from "@heroicons/react/24/solid";
+import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon, FaceSmileIcon, ScissorsIcon, PhoneArrowDownLeftIcon, PhoneXMarkIcon} from "@heroicons/react/24/solid";
 import {NotificationsCard} from "../dashboard/notifications.jsx";
-import { getBgColor, getTextColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
+import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
 import React, { useState, useEffect } from 'react';
 import { SupervisorHomeData } from "@/data/supervisor-home-data";
+
+export function getIcon(icon) {
+  switch (icon) {
+    case "Arrow":
+      return ArrowUpIcon;
+    case "Book":
+      return BookOpenIcon;
+    case "Clock":
+      return ClockIcon;
+    case "Person":
+      return UserGroupIcon;
+    case "Face":
+      return FaceSmileIcon;
+    case "Scissors":
+      return ScissorsIcon;
+    case "Phone":
+      return PhoneXMarkIcon;
+    case "PhoneArrow":
+      return PhoneArrowDownLeftIcon;
+    default:
+      return CheckCircleIcon;
+  }
+}
 
 export function Home() {
   const [open, setOpen] = React.useState(1);
  
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
-  const controller = useMaterialTailwindController();
-  const theme = controller;
+  const [controller, dispatch] = useMaterialTailwindController();
+  const { navColor} = controller;
 
   const [cards, setCards] = useState([]);
   const [graphs, setGraphs] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-
-  function getIcon(icon) {
-    switch (icon) {
-      case "Arrow":
-        return ArrowUpIcon;
-      case "Book":
-        return BookOpenIcon;
-      case "Clock":
-        return ClockIcon;
-      case "Person":
-        return UserGroupIcon;
-      default:
-        return CheckCircleIcon;
-    }
-  }
+  let agent_id = localStorage.getItem("userID");
 
   function updateData() {
 
@@ -54,6 +63,9 @@ export function Home() {
       setGraphs(data.graphs);
       setIsLoaded(true);
       //console.log(data);
+    }).catch((error) => {
+      console.log(error);
+      setIsLoaded(true);
     });
   }
 
@@ -68,7 +80,7 @@ export function Home() {
         {!isLoaded ? (
         <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
           <span className="flex justify-center items-center">
-          <span className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></span>
+          <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
           </span>
           <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
             Cards are now loading...
@@ -98,9 +110,9 @@ export function Home() {
         {!isLoaded ? (
           <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
             <span className="flex justify-center items-center">
-            <span className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></span>
+            <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
             </span>
-            <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+            <Typography className={`text-base ${getTypography()} ${getTextColor('dark')}`}>
             Graphs are now loading...
           </Typography>
           </div>
@@ -121,11 +133,11 @@ export function Home() {
       </div>
 
 
-      {/*Aqui es sobre el sistema de alerta del home page */}
+      {/* Notifications */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <NotificationsCard/>
+        <NotificationsCard is_supervisor={true} agent_id={agent_id}/>
 
-        {/* Aquí esta para cambiar el Card de recomendaciones*/}
+        {/* Recomendations */}
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}

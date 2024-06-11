@@ -6,18 +6,21 @@ import {
     Input,
     Chip,
     Button,
-    Checkbox
+    Checkbox, 
+    Select,
+    Option
 } from "@material-tailwind/react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 // import { authorsTableData, projectsTableData } from "@/data";
-import { AgentList, JoinCall } from "@/data/agents-data";
+import { AgentList, JoinCall, ChangeStatus, StatusList, AgentCards } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
-import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
+import { StatisticsChart } from "@/widgets/charts";
+import { UsersIcon, CogIcon, ClockIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
 import { getBgColor, getBorderColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold} from "@/context";
-
+import { getIcon } from "@/pages/dashboard/home";
 import { useAlert } from "@/context/alerts";
 
 function getColorOfStatus(status) {
@@ -47,10 +50,16 @@ export function Teams() {
     const { navColor} = controller;
 
     const [dataToDisplay, setData] = useState([]);
+    const [cards, setCards] = useState([]);
+    const [graphs, setGraphs] = useState([]);
+    const [status_list, setStatusList] = useState([]);
+
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchQuery_status, setSearchQuery_status] = useState('');
     const [helpFilter, setHelpFilter] = useState(false);
+
+    const [changed, setChanged] = useState(false);
 
     // pagination vars
     const [pagination_currentPage, pagination_setCurrentPage] = useState(0);
@@ -58,19 +67,12 @@ export function Teams() {
     const [pagination_itemsPerPage, pagination_setItemsPerPage] = useState(0);
     const [pagination_totalItems, pagination_setTotalItems] = useState(0);
 
-    // let isLoaded = false;
-    // let dataToDisplay = searchQuery ? filteredAgents : data;
-
     function handleSearch(event) {
         setSearchQuery(event.target.value.toLowerCase());
-        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
-        // setFilteredAgents(filtered);
     }
 
     function handleSearchStatus(event) {
         setSearchQuery_status(event.target.value.toLowerCase());
-        // let filtered = data.filter(agent => agent.name.toLowerCase().includes(query));
-        // setFilteredAgents(filtered);
     }
 
     function handleHelpFilter(event) {
@@ -78,6 +80,26 @@ export function Teams() {
     }
 
     const { showAlertWithMessage } = useAlert();
+
+    /**
+     * A function to change the status of an agent.
+     *
+     * @param {type} agentId - The ID of the agent to change the status of.
+     * @param {type} status - The new status of the agent.
+     * @return {type} No return value.
+     */
+    function handleChangeStatus(agentId, status, current) {
+        if (current == status)
+            return;
+
+        ChangeStatus(agentId, status).then(result => {
+            setChanged(!changed);
+            if (result && result.message == "Status changed")
+                showAlertWithMessage("green", "Status changed", 5000);
+            else
+                showAlertWithMessage("red", "Failed to change status", 5000);
+        });
+    }
 
     /**
      * A function to barge into a call with a specified agent ID.
@@ -88,6 +110,7 @@ export function Teams() {
     function bargeIn(agentId) {
         let result = JoinCall(agentId);
 
+        setChanged(!changed);
         if (result.status == 200)
             showAlertWithMessage("green", "Barging in to call with agent", 5000);
         else
@@ -95,6 +118,12 @@ export function Teams() {
         //console.log("Barging in to call with agent " + agentId);
     }
 
+    /**
+     * Updates the data on the page based on the provided page number.
+     *
+     * @param {number} [page=1] - The page number to fetch data for. Defaults to 1.
+     * @return {Promise<void>} A promise that resolves when the data has been updated.
+     */
     function updateData(page = 1) {
         // search by name
         let search = searchQuery ? `name=${searchQuery}` : '';
@@ -110,6 +139,23 @@ export function Teams() {
 
         setIsLoaded(false);
 
+        // get statuses
+        StatusList().then((data) => {
+            let statuses = [];
+            for (let i = 0; i < data.length; i++) {
+                statuses.push(data[i].Name);
+            }
+            statuses.sort();
+            setStatusList(statuses);
+        })
+
+        // get cards
+        AgentCards().then((data) => {
+            setCards(data.cards);
+            setGraphs(data.graphs);
+        })
+
+        // get agents
         AgentList(skip, 10, search, "name", "asc").then((data) => {
             const { currentPage, itemsPerPage, totalItems } = parsePaginationString(data.pagination);
             const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -133,46 +179,42 @@ export function Teams() {
 
     useEffect(() => {
         updateData();
-    }, [searchQuery, searchQuery_status, helpFilter]);
+    }, [searchQuery, searchQuery_status, helpFilter, changed]);
 
     return (
         <div>
-
-
+            {/*<!-- Cards -->*/}
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-                <StatisticsCard
-                    key="Connected"
-                    title="Connected users"
-                    color="gray"
-                    // icon={React.createElement(UsersIcon, {
-                    //     className: "w-6 h-6 text-white",
-                    // })}
-                    value="10"
-                    icon={<UsersIcon className="h-6 w-6 text-white-500" />}
+                {!isLoaded ? (
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                    Cards are now loading...
+                </Typography>
+                </div>
+                ) : (
+                cards.map(({ icon, title, footer, ...rest }) => (
+                    <StatisticsCard
+                    key={title}
+                    {...rest}
+                    title={title}
+                    icon={React.createElement(getIcon(icon), {
+                        className: "w-6 h-6 text-white",
+                    })}
                     footer={
-                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
-                            <strong className="text-green-500">10</strong>
-                            &nbsp; connected
+                        <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                        <strong className={footer.color}>{footer.value}</strong>
+                        &nbsp;{footer.label}
                         </Typography>
                     }
-                />
-                <StatisticsCard
-                    key="Stress"
-                    title="Usage level"
-                    color="gray"
-                    // icon={React.createElement(UsersIcon, {
-                    //     className: "w-6 h-6 text-white",
-                    // })}
-                    value="30%"
-                    icon={<CogIcon className="h-6 w-6 text-white-500" />}
-                    footer={
-                        <Typography className={`text-[1.1rem] ${getTypography()} ${getTextColor('black')}`}>
-                            <strong className="text-green-500">3/5</strong>
-                            &nbsp; agents on call
-                        </Typography>
-                    }
-                />
+                    />
+                ))
+                )}
             </div>
+
+            {/*<!-- Table -->*/}
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
                     <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
@@ -216,7 +258,7 @@ export function Teams() {
                             </Button>
                         </div>
                     </CardHeader>
-                    <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+                    <CardBody classname = {`overflow-x-scroll px-0 pt-0 pb-2 ${getBgColor("background-cards")}`}>
                         {/* List */}
                         <table className="w-full min-w-[640px] table-auto">
                             <thead>
@@ -242,8 +284,11 @@ export function Teams() {
                                         <tr key="loading">
                                             <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
                                                 <span className="flex justify-center items-center">
-                                                    <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
+                                                    <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
                                                 </span>
+                                                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                                                    Agents are now loading...
+                                                </Typography>
                                             </td>
                                         </tr>
                                     ) : (
@@ -268,6 +313,7 @@ export function Teams() {
 
                                                     return (
                                                         <tr key={agentID}>
+                                                            {/* Name indicator*/}
                                                             <td className={className}>
                                                                 <div className="flex items-center gap-4">
                                                                     {/* <Avatar src={avatar} alt={name} size="sm" variant="rounded" /> */}
@@ -281,19 +327,31 @@ export function Teams() {
                                                                     </div>
                                                                 </div>
                                                             </td>
+                                                            {/* Queue indicator*/}
                                                             <td className={className}>
                                                                 <Typography className={`text-xs ${getTypographybold()} ${getTextColor('dark')}`}>
                                                                     {queue}
                                                                 </Typography>
                                                             </td>
+                                                            {/* Status indicator*/}
                                                             <td className={className}>
+                                                                {/*
                                                                 <Chip
                                                                     variant="gradient"
                                                                     color={getColorOfStatus(status)}
                                                                     value={status}
                                                                     className={`py-0.5 px-2 text-[0.8rem] font-medium w-fit ${getTypographybold()}`}
                                                                 />
+                                                                */}
+                                                                <Select value={status}
+                                                                className={` text-[0.8rem] py-0.5 px-2 ${getTypographybold()} ${status === "Offline" ? getTextColor('dark') : getTextColor('white2')} ${getBgColor(getColorOfStatus(status))}`}
+                                                                color={getColorOfStatus(status)}
+                                                                onChange={(val) => handleChangeStatus(agentID, val, status)}>
+                                                                    <Option key={status} value={status}>{status}</Option>
+                                                                    {status_list.map((status_option) => status_option == status ? <></> : <Option key={status_option} value={status_option}>{status_option}</Option>)}
+                                                                </Select> 
                                                             </td>
+                                                            {/* Needs help indicator*/}
                                                             <td className={className}>
                                                                 {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'yellow' ? <ExclamationCircleIcon className="h-6 w-6 text-yellow-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
@@ -310,7 +368,7 @@ export function Teams() {
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
                                                                     Monitor Call
                                                                 </Button>
-                                                            </td> : null 
+                                                            </td> : null
                                                             }
                                                         </tr>
                                                     );
@@ -394,6 +452,32 @@ export function Teams() {
                         </div>
                     </CardBody>
                 </Card>
+            </div>
+            {/*<!-- Graphs -->*/}
+            <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2">
+                {!isLoaded ? (
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                    Graphs are now loading...
+                </Typography>
+                </div>
+                ) : (
+                graphs.map((props) => (
+                    <StatisticsChart
+                        key={props.title}
+                        {...props}
+                        footer={
+                        <Typography className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                            <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
+                            &nbsp;{props.footer}
+                        </Typography>
+                        }
+                    />
+                    ))
+                )}
             </div>
         </div>
     );

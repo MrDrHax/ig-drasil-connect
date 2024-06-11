@@ -35,28 +35,28 @@ router = APIRouter(
 @router.get("/cards", tags=["cards"])
 async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.DashboardData:
     '''
-    Returns the cards that will be displayed on the dashboard.
+    Returns the cards that will be displayed on the list of agents dashboard.
     '''
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     cards = [
         await online_agents(token),
         await need_assistance_agents(token),
     ]
 
     graphs = [
-        # await graph_example(),
-        # await get_avg_contact_duration(token),
-        # await get_queues(token),  
+        await queues_agent_answer_rate(token),
+        await queues_agent_occupancy(token),
     ]
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
 
     return toReturn
 
-# list_users
-# describe_agent_status
-# list_agent_statuses
+@router.get("/connected", tags=["cards"])
 
-@router.get("/get/connected/agents", tags=["cards"])
 async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
     Returns the number of people that are currently online.
@@ -65,110 +65,33 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
-
-    users_data = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-    )
-
-    count = 0
-    for user in users_data['UserDataList']:
-        if user['Status']['StatusName'] == "Available":
-            count += 1
-
-    if count <= 5:
-        color = "text-red-500"
-    else:
-        color = "text-green-500"
-
-    cardFooter = models.CardFooter(
-        color = color,
-        value= str(count),
-        label="Available agents",
-    )
-
-    card = models.GenericCard(
-        id=1,
-        title="online agents",
-        value= str(users_data['ApproximateTotalCount']),
-        icon="HandRaisedIcon",
-        footer=cardFooter,
-    )
-
-    return card
-
-
-
-@router.get("/get/need-assistance/agents", tags=["cards"])
-async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]):
-    '''
-    Returns the number of people that are currently online.
+    response = await cachedData.get("online_agents")
     
-    ''' 
+    return response
+
+@router.get("/need-assistance", tags=["cards"])
+async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
-
-    users_data = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'Agents': userList
-        }
-    )
-
-    count = 0
-    assistanceCount = 0
-    for user in users_data['UserDataList']:
-        if user['Status']['StatusName'] == "Needs Assistance":
-            count += 1
-            if datetime.now(user['Status']['StatusStartTimestamp'].tzinfo) - user['Status']['StatusStartTimestamp'] >= timedelta(minutes=5):
-                assistanceCount += 1
-                
-
-
-    if count >= 3:
-        color = "text-red-500"
-    else:
-        color = "text-green-500"
-
-    cardFooter = models.CardFooter(
-        color = color,
-        value= str(assistanceCount),
-        label="have passed over 5 minutes wating for assistance",
-    )
-
-    card = models.GenericCard(
-        id=1,
-        title="Agents that need assistance",
-        value= str(count),
-        icon="HandRaisedIcon",
-        footer=cardFooter,
-    )
-
-    return card
-
-@router.get("/list/list-agent-statuses")
-async def list_agent_statuses():
+    response = await cachedData.get("need_assistance_agents")
     
-    client = boto3.client('connect')
-    resp = client.list_agent_statuses(
-        InstanceId=Config.INSTANCE_ID
+    return response
 
-    )
+@router.get("/queues/answer-rate", tags=["graphs"])
+async def queues_agent_answer_rate(token: Annotated[str, Depends(requireToken)]):
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
-    return resp
+    response = await cachedData.get("queues_agent_answer_rate")
+    
+    return response
+
+@router.get("/queues/occupancy", tags=["graphs"])
+async def queues_agent_occupancy(token: Annotated[str, Depends(requireToken)]):
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    response = await cachedData.get("queues_agent_occupancy")
+    
+    return response

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 import logging
 logger = logging.getLogger(__name__)
@@ -187,7 +188,6 @@ class AgentProfileData(BaseModel):
     roles: list[str] = Field([], examples=["Agent", "Supervisor", "Queue Supervisor"])
     '''The roles of the agent.'''
 
-
 class LastContactCard(BaseModel):
     title: str = Field("Last contact", examples=["Last contact"])
     ''' The title of the card.'''
@@ -200,4 +200,5 @@ class GenericAlert(BaseModel):
     Text: str = Field("Alert text", examples=["Alert text"])
     TextRecommendation: str = Field("Alert recommendation", examples=["Alert recommendation"])
     color: str = Field("red", examples=["red", "green", "yellow"])
+    timestamp: datetime = Field(datetime.now(), examples=[datetime.now()])
 
