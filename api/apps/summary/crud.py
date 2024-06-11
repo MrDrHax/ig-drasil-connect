@@ -246,12 +246,8 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
         else:
             recommendation = "No recommendation found at the moment."
     
-    return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating",
-                                        sentimentTitle="Customer sentiment rating", 
-                                        sentiment=sentiment, 
-                                        ratingTitle="Agent rating based of metrics", 
+    return models.AgentSentimentRatin(  sentiment=sentiment, 
                                         rating=calculateRating(transcript_json),
-                                        recommendationTitle="Recommendation based of last call",
                                         recommendation= recommendation)
 
 cachedData.add('getSentimentRating', getSentimentRating, 60)

@@ -37,12 +37,9 @@ class AgentRating(BaseModel):
 
 class AgentSentimentRating(BaseModel):
     
-    title : str = Field("Last Contact Sentiment rating and Agent rating", example="Last Contact Sentiment rating and Agent rating", description="Last Contact Sentiment rating and Agent rating. In JSON format.")
-    sentimentTitle: str = Field("Customer sentiment rating", example="Agent sentiment rating", description="Agent sentiment rating. In JSON format.")
+    
     sentiment : float = Field(0.0, example=0.0, description="The sentiment of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=1)
-    ratingTitle: str = Field("Agent rating", example="Agent rating", description="Agent rating. In JSON format.")
     rating: float = Field(5, example=5, description="The rating of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
-    recommendationTitle: str = Field("No recommendation", example="No recommendation", description="The recommendation for the agent.")
     recommendation: str = Field("You should try to have a nicer tone", example="You should try to have a nicer tone", description="The recommendation for the agent.")
 
 class AgentContactProfile(BaseModel):

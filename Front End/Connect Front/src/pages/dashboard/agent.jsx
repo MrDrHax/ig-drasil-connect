@@ -16,7 +16,7 @@ import {
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { BookOpenIcon, UserGroupIcon,StarIcon,ClockIcon, ChartBarIcon, } from "@heroicons/react/24/solid";
-import { StatisticsCard, CustomerCard, Lexcard } from "@/widgets/cards";
+import { StatisticsCard, CustomerCard, Lexcard, CustomerSentimentCard } from "@/widgets/cards";
 import { RecomendationCard } from "@/widgets/cards";
 // import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
 import {
@@ -30,6 +30,7 @@ import { NotificationsCard } from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold, getBorderColor } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
 import { AgentHomeData } from "@/data/supervisor-home-data.js";
+import {AgentSentimentRatingData} from "@/data/agents-data.js";
 
 
 export function Agent() {
@@ -41,8 +42,22 @@ export function Agent() {
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
+  const [sentiment, setSentiment] = useState([]);
 
   const [isLoaded, setIsLoaded] = useState(false);
+
+  let agent_id = localStorage.getItem("userID");
+
+   function updateData() {
+    AgentSentimentRatingData().then((data) => {
+      setSentiment(data.sentiment);
+      setIsLoaded(true);
+      //console.log(data);
+    }).catch((error) => {
+      console.log(error);
+      setIsLoaded(true);
+    });
+  }
 
   function getIcon(icon) {
     switch (icon) {
@@ -119,17 +134,15 @@ export function Agent() {
       {/*Client Data*/}
       <div className="p-4 mb-10">
         <div className="grid grid-cols-2 gap-4">
-          {customerDataAgent().map(({ name, descripcion, footer, ...rest }) => (
-            <CustomerCard
-              key={name}
+          
+          {sentiment.map(({ sentiment, rating, recomendation, ...rest }) => (
+            <CustomerSentimentCard
+              key={sentiment}
               {...rest}
-              name={name}
-              descripcion={descripcion}
+              sentiment={sentiment}
+              rating={rating}
               footer={
-                <Typography className={`text-base ${getTypography()} ${getTextColor('dark')}`}>
-                  <strong className={footer.color}>{footer.value}</strong>
-                  &nbsp;{footer.label}
-                </Typography>
+                recomendation
               }
               className="p-4 rounded-lg bg-white shadow-md"
             />
