@@ -41,3 +41,14 @@ export async function ChangeRoutingProfile(agentID, routingProfileName) {
   }
   return await response.json();
 }
+
+export async function QueueCards() {
+  let url = getApiPath() + 'queues/cards';
+  let request = new Request(url);
+  addTokenToHeader(request);
+  let response = await fetch(request);
+  if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+  }
+  return await response.json();
+}

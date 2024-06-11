@@ -47,7 +47,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
-        await graph_example(),
+        # await graph_example(),
         await get_avg_contact_duration(token),
         await get_queues(token),  
     ]
@@ -56,15 +56,15 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 
     return toReturn
 
-@router.get("/agent_cards", tags=["agent_view"])
+@router.get("/agent_cards", tags=["agent_view", "cards"])
 async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id: str) -> models.DashboardData:
     '''
     Returns the cards that will be displayed on the agent dashboard.
     '''
     cards = [
-        await read_avg_holds(token, agent_id),
-        await read_People_to_answer(token),
-        await read_capacity_agent(token, agent_id),
+        await get_avg_holds(token, agent_id),
+        await get_People_to_answer(token),
+        await get_capacity_agent(token, agent_id),
         await get_agent_rating(agent_id, token)
     ]
 
@@ -74,6 +74,8 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
     toReturn = models.DashboardData(cards=cards, graphs=graphs)
 
     return toReturn
+
+# Supervisor Dashboard
 
 @router.get("/graph_example", tags=["data"])
 async def graph_example() -> models.GenericGraph:
@@ -107,8 +109,6 @@ async def graph_example() -> models.GenericGraph:
     )
 
     return example_graph
-
-
 
 @router.get("/list-queues")
 async def list_queues():
@@ -170,7 +170,6 @@ async def get_not_connected_users_data():
 
     return userList
 
-
 @router.get("/average-call-time-duration")
 async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->models.GenericCard:
     
@@ -210,14 +209,14 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->m
 
     cardFooter = models.CardFooter(
         color = "text-green-500" if extra < 3 else "text-red-500",
-        value = "{p:.2f}".format(p=extra) + "m",
-        label = ("less than max" if extra < 3 else "more than recommended") + ". The average duratino of a contact in minutes this month. Calls should be less than 3 minutes."
+        value = "{p:.2f}".format(p=extra) + " min",
+        label = ("less than recommended" if extra < 3 else "more than recommended") + ". The average duration of a contact in minutes this month. Calls should be less than 3 minutes."
     )
 
     card = models.GenericCard(
         id=1,
         title="Average Call Time",
-        value="{p:.2f}".format(p=data/60) + "m",
+        value="{p:.2f}".format(p=data/60) + "min",
         icon="ClockIcon",
         footer=cardFooter,
         color="blue"
@@ -309,7 +308,6 @@ async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])
 
     return example_graph
 
-
 @router.get("/connected/users" , tags=["cards"])
 async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
     '''
@@ -338,7 +336,6 @@ async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> m
         color="pink",
     )
     return card
-
 
 @router.get("/cards/capacity", tags=["cards"])
 async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -471,21 +468,21 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
 
     if (card_value > 80):
         footerColor = "text-red-500"
-        footerSpecialText = f'{card_value - 80:.2f}%'
-        footerDesc = 'more than the max recommended rate.'
+        footerSpecialText = f'{(card_value - 80):.2f}%'
+        footerDesc = 'more than the recommended rate.'
     elif (card_value > 50):
         footerColor = "text-orange-500"
-        footerSpecialText = f'{card_value - 50:.2f}%'
+        footerSpecialText = f'{(card_value - 50):.2f}%'
         footerDesc = 'more than the recommended rate.'
     else:
         footerColor = "text-green-500"
-        footerSpecialText = f'{0}%'
-        footerDesc = 'more than the max recommended rate.'
+        footerSpecialText = f'{(50 - card_value):.2f}%'
+        footerDesc = 'less than the recommended rate.'
 
     cardFooter = models.CardFooter(
         color=footerColor,
         value=footerSpecialText,
-        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent.",
+        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent. The recommended rate is 50%.",
     )
 
     card = models.GenericCard(
@@ -509,7 +506,7 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
 
     queues_raw = await cachedData.get("list_queue")
 
-    queues_list = []    
+    queues_list = []
     
     for i in queues_raw['QueueSummaryList']:
         if i['QueueType'] == 'STANDARD':
@@ -556,19 +553,17 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
     # Create the graph
     example_graph = models.GenericGraph(
         title="Queues",
-        description="Graph shows capacity the all queues",
+        description="Graph shows the number of people in all queues",
         footer="Updated " + datetime.today().strftime('%Y-%m-%d') ,
         chart = example_chart
     )
 
     return example_graph   
 
-
-# aqui va parte del agente hasta que funcione el dashboard agent
-
+# Agent Dashboard
 
 @router.get("/agent/avg-holds", tags=["agent"])
-async def get_avg_holds(token: Annotated[str, Depends(requireToken)],agent_id:str)-> models.GenericCard:
+async def get_avg_holds(token: Annotated[str, Depends(requireToken)], agent_id:str)-> models.GenericCard:
     '''
     The total count of cases existing in a given domain. 
     '''
@@ -724,7 +719,7 @@ async def get_People_to_answer(token: Annotated[str, Depends(requireToken)])-> m
     card = models.GenericCard(
         id=1,
         title="People to answer",
-        value=str(data), 
+        value="{p:.2f}%".format(p=data), 
         icon="BriefcaseIcon",
         footer=cardFooter,
         color="green"
@@ -732,47 +727,38 @@ async def get_People_to_answer(token: Annotated[str, Depends(requireToken)])-> m
 
     return card
 
-#---------------------------------------------------------------
-#----here schedule endpoints-----------------------------------
-#---------------------------------------------------------------
+@router.get("/card/agent/AgentRatingAvg", tags=["card"])
+async def get_agent_rating(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
 
-@router.get("/card/agent/schedule", tags=["card"])
-async def get_schedule(agent_id:str):
+    list = await cachedData.get('getListAgentRatings', agent_id=agent_id)
 
-    client = boto3.client('connect')
+    res = [0.0, 0.0]
+    for rating in list:
+        res[0] += rating.rating
+        res[1] += 1
 
-                                   
-    EndTime =  datetime.today()
+    # The first value is the avg of all the ratings and the second is the number of ratings
+    res[0] = res[0] / res[1]
 
-    today_res = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = datetime.today()-timedelta(days=31),
-        EndTime = EndTime,
-        Interval = {
-            'TimeZone': 'UTC',
-            'IntervalPeriod': 'DAY',
-        },
-        Filters = [
-            {
-            'FilterKey': 'AGENT',
-            'FilterValues' : [agent_id],  
-            } 
-        ], 
-        Metrics = [
-            {
-                'Name': 'AGENT_ADHERENT_TIME',
-            }
-        ]
+    cardFooter = models.CardFooter(
+        color="text-green-500",
+        value="",
+        label="The average rating of the agent",
     )
 
-    data=[]
+    card = models.GenericCard(
+        id=1,
+        title="Rating",
+        value=str(res[0]),
+        icon="Star",
+        footer=cardFooter,
+        color="blue"
+    )
 
-    for i in today_res['MetricResults']:
-        for n in i['Collections']:
-            data.append(n['Value'])
-    
-    return today_res
-    
+    return card
+
 @router.get("/cards/capacity/agent", tags=["cards"])
 async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent_id) -> models.GenericCard:
     '''
@@ -845,8 +831,8 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
         
         card = models.GenericCard(
             id = 1,
-            title = "porcentage of time active",
-            value =  "{p:.2f}".format(p=datares1[0]),
+            title = "Active time Percentage",
+            value =  "{p:.2f}%".format(p=datares1[0]),
             icon = "UserIcon",
             footer = cardFooter,
             color="blue"
@@ -868,6 +854,48 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
         )
     
     return card
+
+#---------------------------------------------------------------
+#----here schedule endpoints-----------------------------------
+#---------------------------------------------------------------
+
+@router.get("/card/agent/schedule", tags=["card"])
+async def get_schedule(agent_id:str):
+
+    client = boto3.client('connect')
+
+                                   
+    EndTime =  datetime.today()
+
+    today_res = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=31),
+        EndTime = EndTime,
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_ADHERENT_TIME',
+            }
+        ]
+    )
+
+    data=[]
+
+    for i in today_res['MetricResults']:
+        for n in i['Collections']:
+            data.append(n['Value'])
+    
+    return today_res
+    
 
 # ------------------------------ Get list of users
 @router.get("/list-users-data", response_model=List[dict])
@@ -925,7 +953,6 @@ async def get_usename(agent_id:str):
 
     return response
         
-
 # DONT DELETE THIS ROUTE
 @router.get("/agent-profile", tags=["profile"])
 async def get_agent_profile(id: str) -> models.AgentProfileData:
@@ -964,38 +991,6 @@ async def get_agent_profile(id: str) -> models.AgentProfileData:
         logger.error(f"Error in get_agent_profile: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.get("/card/agent/AgentRatingAvg", tags=["card"])
-async def get_agent_rating(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
-    if not userType.isAgent(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
-
-    list = await cachedData.get('getListAgentRatings', agent_id=agent_id)
-
-    res = [0.0, 0.0]
-    for rating in list:
-        res[0] += rating.rating
-        res[1] += 1
-
-    # The first value is the avg of all the ratings and the second is the number of ratings
-    res[0] = res[0] / res[1]
-
-    cardFooter = models.CardFooter(
-        color="text-green-500",
-        value="",
-        label="The average rating of the agent",
-    )
-
-    card = models.GenericCard(
-        id=1,
-        title="Rating",
-        value=str(res[0]),
-        icon="Star",
-        footer=cardFooter,
-        color="blue"
-    )
-
-    return card
-
 #------ Alerts endpoints
 
 @router.get("/alerts/supervisor/NA", tags=["alerts"])
@@ -1009,7 +1004,6 @@ async def get_alert_supervisor_NA(token: Annotated[str, Depends(requireToken)]):
     res = await cachedData.get("get_alert_supervisor_NA")
 
     return res
-
 
 alert_message= []
 
@@ -1052,7 +1046,6 @@ async def get_alert_supervisor_available( token: Annotated[str, Depends(requireT
 
     return res
 
-
 @router.get("/alerts/supervisor/nonResponse", tags=["alerts"])
 async def get_alert_supervisor_nonResponse(token: Annotated[str, Depends(requireToken)]):
     '''
@@ -1063,7 +1056,6 @@ async def get_alert_supervisor_nonResponse(token: Annotated[str, Depends(require
     res = await cachedData.get("get_alert_supervisor_nonResponse")
 
     return res
-
 
 @router.get("/alerts/get_alerts_supervisor", tags=["alerts"])
 async def get_alert_supervisor(token: Annotated[str, Depends(requireToken)]):
@@ -1132,7 +1124,6 @@ async def post_alert_agent_message(agent_id:int, token: Annotated[str, Depends(r
 
     return "Ok"
 
-
 @router.get("/alerts/agent/NonResponse", tags=["alerts"])
 async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depends(requireToken)]):
     '''
@@ -1186,8 +1177,6 @@ async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depend
         color="green",
         timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
     )
-
-    
 
 @router.get("/alerts/get_alerts_agent", tags=["alerts"])
 async def get_alert_agent(agent_id:str, token: Annotated[str, Depends(requireToken)]):
