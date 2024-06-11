@@ -70,4 +70,15 @@ async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.
     return response
 
 @router.get("/get/need-assistance/agents", tags=["cards"])
-async def need_assistance_agents():
+async def need_assistance_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+    '''
+    Returns the people that require assistance.
+    
+    ''' 
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
+    response = await cachedData.get("need_assistance_agents")
+    
+    return response
+
