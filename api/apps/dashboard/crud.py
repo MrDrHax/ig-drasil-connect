@@ -387,7 +387,7 @@ async def get_capacity():
         id = 1,
         title = "Percentage of time \t  active agents",
         value = "{p:.2f}".format(p=datares1[0]),
-        icon = "UserIcon",
+        icon = "Person",
         footer = cardFooter
     )
 

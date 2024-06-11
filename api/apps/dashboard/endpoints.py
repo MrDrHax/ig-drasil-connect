@@ -376,10 +376,13 @@ async def get_agent_rating(agent_id: str, token: Annotated[str, Depends(requireT
 #------ Alerts endpoints
 
 @router.get("/alerts/supervisor/NA", tags=["alerts"])
-async def get_alert_supervisor_NA():
+async def get_alert_supervisor_NA(token: Annotated[str, Depends(requireToken)]):
     '''
     Sends back the message of how many agent need help.
     '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     res = await cachedData.get("get_alert_supervisor_NA")
 
     return res
@@ -388,10 +391,12 @@ async def get_alert_supervisor_NA():
 alert_message= []
 
 @router.post("/alerts/supervisor/message", tags=["alerts"])
-async def post_alert_supervisor_message(agent_id:str):
+async def post_alert_supervisor_message(agent_id:str, token: Annotated[str, Depends(requireToken)]):
     '''
     Sends an alert if supervisor has a message
     '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     data = await list_users_data()
 
@@ -412,30 +417,38 @@ async def post_alert_supervisor_message(agent_id:str):
 
 
 @router.get("/alerts/supervisor/available", tags=["alerts"])
-async def get_alert_supervisor_available()-> models.GenericAlert:
+async def get_alert_supervisor_available( token: Annotated[str, Depends(requireToken)])-> models.GenericAlert:
     '''
     returns the alert type log, if there is any available
     '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     res = await cachedData.get("get_alert_supervisor_available")
 
     return res
 
 
 @router.get("/alerts/supervisor/nonResponse", tags=["alerts"])
-async def get_alert_supervisor_nonResponse():
+async def get_alert_supervisor_nonResponse(token: Annotated[str, Depends(requireToken)]):
     '''
     sends back the alert of the agent that has not responded during the call with the client
     '''
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     res = await cachedData.get("get_alert_supervisor_nonResponse")
 
     return res
 
 
 @router.get("/alerts/get_alerts_supervisor", tags=["alerts"])
-async def get_alert_supervisor():
+async def get_alert_supervisor(token: Annotated[str, Depends(requireToken)]):
     '''
     sends bock the alert of the supervisor
     '''
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     alerts=[]
 
     NA= await get_alert_supervisor_NA()
@@ -460,10 +473,12 @@ async def get_alert_supervisor():
 alert_message_agent= []
 
 @router.post("/alerts/agent/message", tags=["alerts"])
-async def post_alert_agent_message():
+async def post_alert_agent_message(token: Annotated[str, Depends(requireToken)]):
     '''
     Sends an alert if agent has a message
     '''
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     alert= models.GenericAlert(
         Text="You have a message from supervisor",
@@ -478,10 +493,13 @@ async def post_alert_agent_message():
 dict_agent = {}
 
 @router.post("/alerts/agent/message", tags=["alerts"])
-async def post_alert_agent_message(agent_id:int):
+async def post_alert_agent_message(agent_id:int, token: Annotated[str, Depends(requireToken)]):
     '''
     Sends an alert if agent has a message
     '''
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     if str(agent_id) not in dict_agent:
         dict_agent[str(agent_id)] = 0
     
@@ -489,11 +507,15 @@ async def post_alert_agent_message(agent_id:int):
 
     return "Ok"
 
+
 @router.get("/alerts/agent/NonResponse", tags=["alerts"])
-async def get_alert_agent_NonResponse(agent_id:str):
+async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depends(requireToken)]):
     '''
     sends back the alert of the agent that has not responded during the call with the client
     '''
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     client = boto3.client('connect')
     agent= await list_users_data()
 
@@ -540,17 +562,20 @@ async def get_alert_agent_NonResponse(agent_id:str):
     
 
 @router.get("/alerts/get_alerts_agent", tags=["alerts"])
-async def get_alert_agent(agent_id:str):
+async def get_alert_agent(agent_id:str, token: Annotated[str, Depends(requireToken)]):
     '''
     sends back the alert of the agent
     '''
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     alerts=[]
 
     NR= await get_alert_agent_NonResponse(agent_id)
 
     if NR:
         alerts.append(NR)
-    if str(agent_id) in dict_agent:
+    if str(agent_id) in dict_agent and dict_agent[str(agent_id)] > 0:
         alerts.append(models.GenericAlert(
             Text="You have "+ str(dict_agent[str(agent_id)]) + " messages from supervisor",
             TextRecommendation=". You should check your messages in the chat",
@@ -558,14 +583,6 @@ async def get_alert_agent(agent_id:str):
             )
         )
         dict_agent[str(agent_id)] = 0
-
-    alerts.append(models.GenericAlert(
-        Text="You have a message from supervisor",
-        TextRecommendation=". You should check your messages in the chat correspondant to the supervisor",
-        color="blue",
-        )
-    )
-
 
 
     return alerts
