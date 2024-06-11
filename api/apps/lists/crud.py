@@ -212,7 +212,6 @@ async def get_queues_data():
             contacts_in_queue = 0  # Default/fallback value in case of error
             contact_age_average = 0  # Default/fallback value in case of error
             MaxContacts = 0
-            status = 'DISABLED'
             average_wait_time = 0
 
         builtData.append(models.QueueDataListItem(
@@ -221,7 +220,7 @@ async def get_queues_data():
             description=description,
             maxContacts=MaxContacts,
             usage=contacts_in_queue / MaxContacts * 100 if MaxContacts > 0 else 0,
-            enabled=status == "ENABLED",
+            enabled= True,
             waiting=contacts_in_queue, 
             averageWaitTime=average_wait_time,
             routingProfiles= await cachedData.get('get_routing_profiles_for_queue', id=q['Id']),

@@ -75,7 +75,7 @@ export function Agent() {
       setCards(data.cards);
       setIsLoaded(true);
     });
-  }
+  } 
 
   //Call the function just once
   useEffect(() => {

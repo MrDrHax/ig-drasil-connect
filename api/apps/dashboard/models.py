@@ -188,7 +188,6 @@ class AgentProfileData(BaseModel):
     roles: list[str] = Field([], examples=["Agent", "Supervisor", "Queue Supervisor"])
     '''The roles of the agent.'''
 
-
 class LastContactCard(BaseModel):
     title: str = Field("Last contact", examples=["Last contact"])
     ''' The title of the card.'''

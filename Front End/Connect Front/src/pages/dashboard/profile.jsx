@@ -162,7 +162,7 @@ export function Profile() {
               <Typography variant="small" className={`text-[0.8rem] ${getTypographybold()} ${getTextColor("dark")} pb-5`}>
                   Last customer calls
                 </Typography>
-                <ul className={`flex flex-col gap-6`}>
+                <ul className={`flex flex-col gap-6 max-h-[20rem] overflow-auto`}>
                   { conversations.length == 0 ?
                   <tr key="loading">
                     <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">

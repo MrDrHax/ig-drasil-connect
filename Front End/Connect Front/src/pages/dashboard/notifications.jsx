@@ -112,7 +112,7 @@ export function NotificationsCard({is_supervisor, agent_id}) {
               </Typography>
             </div>
           </CardHeader>
-          <CardBody className="overflow-y-scroll px-0 pt-0 pb-2">
+          <CardBody className="overflow-y-auto px-0 pt-0 pb-2 max-h-[20rem]">
             <Notifications is_supervisor={is_supervisor} agent_id={agent_id} />
           </CardBody>
         </Card>

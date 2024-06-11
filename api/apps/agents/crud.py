@@ -169,7 +169,6 @@ async def queues_agent_answer_rate():
     return user_graph
 cachedData.add("queues_agent_answer_rate", queues_agent_answer_rate, 60*60*24) # 24 hours
 
-
 async def queues_agent_occupancy():
     userNT = ["94c89e21-3aac-44b5-8ffa-c898061fddfd"]
 

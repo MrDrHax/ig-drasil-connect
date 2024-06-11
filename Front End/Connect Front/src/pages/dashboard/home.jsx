@@ -63,6 +63,9 @@ export function Home() {
       setGraphs(data.graphs);
       setIsLoaded(true);
       //console.log(data);
+    }).catch((error) => {
+      console.log(error);
+      setIsLoaded(true);
     });
   }
 
@@ -130,11 +133,11 @@ export function Home() {
       </div>
 
 
-      {/*Aqui es sobre el sistema de alerta del home page */}
+      {/* Notifications */}
        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <NotificationsCard is_supervisor={true} agent_id={agent_id}/>
 
-        {/* Aquí esta para cambiar el Card de recomendaciones*/}
+        {/* Recomendations */}
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
