@@ -35,7 +35,7 @@ router = APIRouter(
 @router.get("/cards", tags=["cards"])
 async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.DashboardData:
     '''
-    Returns the cards that will be displayed on the agent dashboard.
+    Returns the cards that will be displayed on the list of agents dashboard.
     '''
 
     if not userType.isManager(token):

@@ -454,7 +454,7 @@ export function Teams() {
                 </Card>
             </div>
             {/*<!-- Graphs -->*/}
-            <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2">
                 {!isLoaded ? (
                 <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
                 <span className="flex justify-center items-center">

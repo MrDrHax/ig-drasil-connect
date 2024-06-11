@@ -151,7 +151,7 @@ async def queues_contact_duration():
 
     queue_graph = models.GenericGraph(
         title = "Queue average contact duration",
-        description = "The average time it takes for a call to be accomplished by queue.",
+        description = "The average time it takes for a call to be finished by queue.",
         footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
         chart = queue_chart
     )

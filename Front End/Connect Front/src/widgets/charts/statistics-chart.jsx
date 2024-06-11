@@ -23,6 +23,18 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
   const controller = useMaterialTailwindController();
   const theme = controller;
 
+  // Fix the bar chart
+  if (chart.type === 'bar' && chart.series.length > 1) {
+    // Fix the series data to be a single dictionary named data
+    let data = chart.series.map((item) => item.data[0])
+    console.error(data)
+    chart.series = []
+    chart.series[0] = {
+      data : data,
+      name : title,
+    } 
+  }
+
   chart = {
     ...chart,
     options: {
@@ -44,7 +56,7 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
   return (
     <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} ${getTypography()} `}>
       <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
-        <Chart {...chart} width={"100%"} height={"100%"} className={`   ${getBgColor("background-cards")} ${getTextColor("dark")}`}/>
+        <Chart {...chart} className={` ${getBgColor("background-cards")} ${getTextColor("dark")}`}/>
       </CardHeader>
       <CardBody className="px-6 pt-0">
         <Typography variant="h6" color="blue-gray" className={`${getTypography()} ${getTextColor("dark")}`}>

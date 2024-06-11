@@ -119,7 +119,7 @@ async def queues_agent_answer_rate():
     user_data = client.get_metric_data_v2(
         # InstanceId = Config.INSTANCE_ID,
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e',
-        StartTime = datetime.now() - timedelta(days=34),
+        StartTime = datetime.now() - timedelta(days=30),
         EndTime = datetime.now(),
         Interval = {
             'TimeZone': 'UTC',
@@ -161,13 +161,13 @@ async def queues_agent_answer_rate():
 
     user_graph = models.GenericGraph(
         title = "Agent Answer Rate",
-        description = "This graph shows the answer rate of each agent.",
+        description = "This graph shows the answer rate of each agent in the last 30 days.",
         footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
         chart = user_chart
     )
 
     return user_graph
-cachedData.add("queues_agent_answer_rate", queues_agent_answer_rate, 30)
+cachedData.add("queues_agent_answer_rate", queues_agent_answer_rate, 60*60*24) # 24 hours
 
 
 async def queues_agent_occupancy():
@@ -231,7 +231,7 @@ async def queues_agent_occupancy():
 
     agent_occupancy_graph = models.GenericGraph(
         title = "Agent Occupancy of today",
-        description = "This graph shows the answer rate of each agent.",
+        description = "The occupancy of each agent on the current day.",
         footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
         chart = agent_chart
     )

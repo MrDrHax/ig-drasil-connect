@@ -57,12 +57,27 @@ cachedData.add("check_agent_availability_data", check_agent_availability_data, 1
 
 
 async def list_queue():
+    """
+    Returns a list of all queues that have the status "ENABLED".
+    """
     client = boto3.client('connect')
     response = client.list_queues(
     InstanceId = Config.INSTANCE_ID,
     )
-    return response
-cachedData.add("list_queue", list_queue, 24) 
+
+    ret = {'QueueSummaryList': []}
+    for q in response['QueueSummaryList']:
+        try:
+            queue_data = await cachedData.get('get_queue_description', queueID=q['Id'])
+
+            if queue_data['Status'] == 'ENABLED':
+                ret['QueueSummaryList'].append(q)
+        except:
+            pass
+
+    return ret
+
+cachedData.add("list_queue", list_queue, 60 * 60 * 24) # 24 hours
 
 async def list_routing_profile():
     client = boto3.client('connect')

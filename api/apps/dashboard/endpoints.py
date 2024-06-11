@@ -47,7 +47,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
-        await graph_example(),
+        # await graph_example(),
         await get_avg_contact_duration(token),
         await get_queues(token),  
     ]
@@ -56,7 +56,7 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 
     return toReturn
 
-@router.get("/agent_cards", tags=["agent_view"])
+@router.get("/agent_cards", tags=["agent_view", "cards"])
 async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id: str) -> models.DashboardData:
     '''
     Returns the cards that will be displayed on the agent dashboard.
@@ -209,14 +209,14 @@ async def get_average_call_time(token: Annotated[str, Depends(requireToken)])->m
 
     cardFooter = models.CardFooter(
         color = "text-green-500" if extra < 3 else "text-red-500",
-        value = "{p:.2f}".format(p=extra) + "m",
-        label = ("less than max" if extra < 3 else "more than recommended") + ". The average duratino of a contact in minutes this month. Calls should be less than 3 minutes."
+        value = "{p:.2f}".format(p=extra) + " min",
+        label = ("less than recommended" if extra < 3 else "more than recommended") + ". The average duration of a contact in minutes this month. Calls should be less than 3 minutes."
     )
 
     card = models.GenericCard(
         id=1,
         title="Average Call Time",
-        value="{p:.2f}".format(p=data/60) + "m",
+        value="{p:.2f}".format(p=data/60) + "min",
         icon="ClockIcon",
         footer=cardFooter,
         color="blue"
@@ -307,7 +307,6 @@ async def get_avg_contact_duration(token: Annotated[str, Depends(requireToken)])
     )
 
     return example_graph
-
 
 @router.get("/connected/users" , tags=["cards"])
 async def get_connected_users(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
@@ -469,21 +468,21 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
 
     if (card_value > 80):
         footerColor = "text-red-500"
-        footerSpecialText = f'{card_value - 80:.2f}%'
-        footerDesc = 'more than the max recommended rate.'
+        footerSpecialText = f'{(card_value - 80):.2f}%'
+        footerDesc = 'more than the recommended rate.'
     elif (card_value > 50):
         footerColor = "text-orange-500"
-        footerSpecialText = f'{card_value - 50:.2f}%'
+        footerSpecialText = f'{(card_value - 50):.2f}%'
         footerDesc = 'more than the recommended rate.'
     else:
         footerColor = "text-green-500"
-        footerSpecialText = f'{0}%'
-        footerDesc = 'more than the max recommended rate.'
+        footerSpecialText = f'{(50 - card_value):.2f}%'
+        footerDesc = 'less than the recommended rate.'
 
     cardFooter = models.CardFooter(
         color=footerColor,
         value=footerSpecialText,
-        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent.",
+        label=footerDesc + " The abandonment rate is the amount of calls that where ended by the user before having contact with an agent. The recommended rate is 50%.",
     )
 
     card = models.GenericCard(
@@ -507,7 +506,7 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
 
     queues_raw = await cachedData.get("list_queue")
 
-    queues_list = []    
+    queues_list = []
     
     for i in queues_raw['QueueSummaryList']:
         if i['QueueType'] == 'STANDARD':
@@ -554,7 +553,7 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
     # Create the graph
     example_graph = models.GenericGraph(
         title="Queues",
-        description="Graph shows capacity the all queues",
+        description="Graph shows the number of people in all queues",
         footer="Updated " + datetime.today().strftime('%Y-%m-%d') ,
         chart = example_chart
     )
