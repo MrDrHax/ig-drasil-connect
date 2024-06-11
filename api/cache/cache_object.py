@@ -67,7 +67,7 @@ class Caches:
     def add(self, key, update_function, updateInterval=60, autoUpdate=False):
         '''Add a function to be cached. The function must be async and return a value. The value will be cached for the updateInterval in seconds.'''
         if autoUpdate:
-            self.cache[key] = CacheObject(update_function, updateInterval + 10) # do not invalidate the cache before the auto update
+            self.cache[key] = CacheObject(update_function, updateInterval + 20) # do not invalidate the cache before the auto update
             self.autoUpdated.append(AutoUpdateCacheObject(updateInterval, key))
             return
 
@@ -115,7 +115,7 @@ async def startup(app: FastAPI, scheduler: AsyncIOScheduler):
     await cachedData.forceAutoUpdates()
     # Start async job
     scheduler.add_job(invalidate_cache, trigger=IntervalTrigger(seconds=60*5)) # clean cache every 5 minutes
-    scheduler.add_job(trigger_auto_updates, trigger=IntervalTrigger(seconds=25)) # trigger auto updates every 20 seconds
+    scheduler.add_job(trigger_auto_updates, trigger=IntervalTrigger(seconds=15)) # trigger auto updates every 15 seconds
 
 async def shutdown(app: FastAPI, scheduler: AsyncIOScheduler):
     global cachedData
