@@ -25,36 +25,7 @@ async def agent_profile_data(id) -> tuple:
         Agent_mobile = "Unknown"
 
     return FullName, Agent_email, Agent_mobile
-
-cachedData.add("agent_profile_data", agent_profile_data, 60*24) # 24 hours
-
-async def check_agent_availability_data():
-    client = boto3.client('connect')
-
-    # Get info for the first routing profile
-    response = client.get_current_metric_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'RoutingProfiles': [
-                '69e4c000-1473-42aa-9596-2e99fbd890e7',
-            ]
-        },
-        CurrentMetrics=[
-            {
-                'Name': 'AGENTS_ONLINE',
-                'Unit': 'COUNT'
-            },
-        ]
-    )
-
-    toIterate = response['MetricResults'][0]['Collections']
-    # return toIterate
-    toReturn = [(i['Metric']['Name'], i['Value']) for i in toIterate]
-
-    return toReturn
-
-cachedData.add("check_agent_availability_data", check_agent_availability_data, 10)
-
+cachedData.add("agent_profile_data", agent_profile_data, 60*60*24) # 24 hours
 
 async def list_queue():
     """
@@ -76,7 +47,6 @@ async def list_queue():
             pass
 
     return ret
-
 cachedData.add("list_queue", list_queue, 60 * 60 * 24) # 24 hours
 
 async def list_routing_profile():
@@ -88,14 +58,23 @@ async def list_routing_profile():
     )
 
     return response['RoutingProfileSummaryList']
-cachedData.add("list_routing_profile", list_routing_profile, 120)
+cachedData.add("list_routing_profile", list_routing_profile, 60 * 60 * 24) # 24 hours
 
-async def online_users_data():
-
+async def list_users():
+    """
+    Gets a list of all users that are active in the Connect instance.
+    """
     client = boto3.client('connect')
     users = client.list_users(
         InstanceId=Config.INSTANCE_ID,
     )
+
+    return users
+cachedData.add("list_users", list_users, 30) # 30 seconds
+
+async def online_users_data():
+    client = boto3.client('connect')
+    users = await cachedData.get("list_users")
     userList = []
     for user in users['UserSummaryList']:
         userList.append(user['Id'])
@@ -107,14 +86,13 @@ async def online_users_data():
         }
     )
     return response['UserDataList']
-cachedData.add("online_users_data", online_users_data, 25)
+cachedData.add("online_users_data", online_users_data, 30)
 
 async def get_not_connected_users_data():
 
     client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
+    users = await cachedData.get("list_users")
+
     userList = []
     for user in users['UserSummaryList']:
         userList.append(user['Id'])
@@ -134,7 +112,7 @@ async def get_not_connected_users_data():
         print(i)
 
     return userList
-cachedData.add("get_not_connected_users_data", get_not_connected_users_data, 25)
+cachedData.add("get_not_connected_users_data", get_not_connected_users_data, 30)
 
 async def get_avg_call_time():
     routing_profile_list = await cachedData.get("list_routing_profile")
@@ -182,8 +160,8 @@ async def get_avg_call_time():
     )
 
     return card
-cachedData.add("get_avg_call_time", get_avg_call_time, 60)
-
+cachedData.add("get_avg_call_time", get_avg_call_time, 60 * 60 * 24) # 24 hours
+ 
 async def get_avg_contact_duration():
     client = boto3.client('connect')
 
@@ -258,8 +236,9 @@ async def get_avg_contact_duration():
     )
 
     return example_graph
-cachedData.add("get_avg_contact_duration", get_avg_contact_duration, 60)
+cachedData.add("get_avg_contact_duration", get_avg_contact_duration, 60 * 60 * 24) # 24 hours
 
+# THIS FUNCTION IS NOT BEING CALLED
 async def get_connected_agents():
     client = boto3.client('connect')
 
@@ -389,8 +368,6 @@ async def get_capacity():
 
 
     comp = datares1[0]-datares2[0]
-
-    # dat
 
     cardFooter = models.CardFooter(
         color = "text-red-500" if comp > 0 else "text-green-500",
@@ -564,7 +541,7 @@ async def get_queues():
     return example_graph
 cachedData.add("get_queues", get_queues, 60)
 
-# aqui va parte del agente hasta que funcione el dashboard agent
+# Agent Dashboard
 
 async def get_avg_holds(agent_id):
     client = boto3.client('connect')
