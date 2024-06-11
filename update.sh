@@ -14,6 +14,7 @@ cd "Front End/Connect Front"
 echo "Building front-end..."
 
 # build
+export NODE_ENV=production
 npm install
 npm run build
 
