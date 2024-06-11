@@ -164,9 +164,6 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
 #         if user['User']['Id'] in userList:
 #             userList.remove(user['User']['Id'])
 
-#     for i in userList:
-#         print(i)
-
 #     return userList
 
 @router.get("/average-call-time-duration")
@@ -390,13 +387,11 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
     for i in response['MetricResults']:
         for n in i['Collections']:
             datares1.append(n['Value'])
-            print(datares1)
     
     datares2 = []
     for i in response2['MetricResults']:
         for n in i['Collections']:
             datares2.append(n['Value'])
-            print(datares2)
 
 
     comp = datares1[0]-datares2[0]
@@ -423,7 +418,7 @@ async def get_capacity(token: Annotated[str, Depends(requireToken)]) -> models.G
 
 @router.get("/cards/abandonment-rate", tags=["cards"])
 async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
-
+    '''get the abandonment rate of the calls. used for dashboard cards'''
 
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
@@ -463,8 +458,6 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
     card_values = [i['Collections'][0]['Value'] for i in response['MetricResults']]
     card_value = sum(card_values) / len(card_values)
 
-    # print(card_value)
-
     if (card_value > 80):
         footerColor = "text-red-500"
         footerSpecialText = f'{(card_value - 80):.2f}%'
@@ -496,11 +489,14 @@ async def get_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> 
 
 @router.get("/graph/get-queues")
 async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
-    
     '''
     Returns the number of people in each queue
     
     ''' 
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
     client = boto3.client('connect')   
 
     queues_raw = await cachedData.get("list_queue")
@@ -812,13 +808,11 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
         for i in response['MetricResults']:
             for n in i['Collections']:
                 datares1.append(n['Value'])
-                print(datares1)
         
         datares2 = []
         for i in response2['MetricResults']:
             for n in i['Collections']:
                 datares2.append(n['Value'])
-                # print(datares2)
 
         comp = datares1[0]-datares2[0]
 
@@ -858,47 +852,47 @@ async def get_capacity_agent(token: Annotated[str, Depends(requireToken)], agent
 #----here schedule endpoints-----------------------------------
 #---------------------------------------------------------------
 
-@router.get("/card/agent/schedule", tags=["card"])
-async def get_schedule(agent_id:str):
+# @router.get("/card/agent/schedule", tags=["card"])
+# async def get_schedule(agent_id:str):
 
-    client = boto3.client('connect')
+#     client = boto3.client('connect')
 
                                    
-    EndTime =  datetime.today()
+#     EndTime =  datetime.today()
 
-    today_res = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = datetime.today()-timedelta(days=31),
-        EndTime = EndTime,
-        Interval = {
-            'TimeZone': 'UTC',
-            'IntervalPeriod': 'DAY',
-        },
-        Filters = [
-            {
-            'FilterKey': 'AGENT',
-            'FilterValues' : [agent_id],  
-            } 
-        ], 
-        Metrics = [
-            {
-                'Name': 'AGENT_ADHERENT_TIME',
-            }
-        ]
-    )
+#     today_res = client.get_metric_data_v2(
+#         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+#         StartTime = datetime.today()-timedelta(days=31),
+#         EndTime = EndTime,
+#         Interval = {
+#             'TimeZone': 'UTC',
+#             'IntervalPeriod': 'DAY',
+#         },
+#         Filters = [
+#             {
+#             'FilterKey': 'AGENT',
+#             'FilterValues' : [agent_id],  
+#             } 
+#         ], 
+#         Metrics = [
+#             {
+#                 'Name': 'AGENT_ADHERENT_TIME',
+#             }
+#         ]
+#     )
 
-    data=[]
+#     data=[]
 
-    for i in today_res['MetricResults']:
-        for n in i['Collections']:
-            data.append(n['Value'])
+#     for i in today_res['MetricResults']:
+#         for n in i['Collections']:
+#             data.append(n['Value'])
     
-    return today_res
+#     return today_res
     
 
 # ------------------------------ Get list of users
 @router.get("/list-users-data", response_model=List[dict])
-async def list_users_data():
+async def list_users_data(token: Annotated[str, Depends(requireToken)]):
     """
     Description:
         Return a list of agents of an instance.
@@ -911,55 +905,61 @@ async def list_users_data():
     @return 
         List containing the agents of an instance.
     """
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+
     response = await cachedData.get("list_users_data")
 
     return response
   
-@router.get("/agent-last-contact")
-async def agent_last_contact(agent_id: str):
-    client = boto3.client('connect')
+# @router.get("/agent-last-contact")
+# async def agent_last_contact(agent_id: str):
+#     client = boto3.client('connect')
     
-    searchRes = client.search_contacts(
-        InstanceId=Config.INSTANCE_ID,
-        TimeRange={
-            'Type': 'CONNECTED_TO_AGENT_TIMESTAMP',
-            'StartTime': datetime.now() - timedelta(days=30),
-            'EndTime': datetime.now()
-        },
-        SearchCriteria={
-            'AgentIds': [agent_id]
-        },
-        Sort={
-            'FieldName': 'CONNECTED_TO_AGENT_TIMESTAMP',
-            'Order': 'DESCENDING'
-        },
-        MaxResults=1
-    )
+#     searchRes = client.search_contacts(
+#         InstanceId=Config.INSTANCE_ID,
+#         TimeRange={
+#             'Type': 'CONNECTED_TO_AGENT_TIMESTAMP',
+#             'StartTime': datetime.now() - timedelta(days=30),
+#             'EndTime': datetime.now()
+#         },
+#         SearchCriteria={
+#             'AgentIds': [agent_id]
+#         },
+#         Sort={
+#             'FieldName': 'CONNECTED_TO_AGENT_TIMESTAMP',
+#             'Order': 'DESCENDING'
+#         },
+#         MaxResults=1
+#     )
 
-    if 'Contacts' in searchRes and len(searchRes['Contacts']) > 0:
-        contact_id = searchRes['Contacts'][0]['Id']
+#     if 'Contacts' in searchRes and len(searchRes['Contacts']) > 0:
+#         contact_id = searchRes['Contacts'][0]['Id']
 
-        describeRes = client.describe_contact(
-            InstanceId=Config.INSTANCE_ID,
-            ContactId=contact_id
-        )
+#         describeRes = client.describe_contact(
+#             InstanceId=Config.INSTANCE_ID,
+#             ContactId=contact_id
+#         )
     
-    return describeRes
+#     return describeRes
 
-@router.get("/usename", tags=["data"])
-async def get_usename(agent_id:str):
-    response = await cachedData.get("get_usename", agent_id=agent_id)
+# @router.get("/usename", tags=["data"])
+# async def get_usename(agent_id:str):
+#     response = await cachedData.get("get_usename", agent_id=agent_id)
 
-    return response
+#     return response
         
 # DONT DELETE THIS ROUTE
 @router.get("/agent-profile", tags=["profile"])
-async def get_agent_profile(id: str) -> models.AgentProfileData:
+async def get_agent_profile(id: str, token: Annotated[str, Depends(requireToken)]) -> models.AgentProfileData:
     '''
     Returns the profile of an agent.
 
     To get the full list, go to /lists/agents
     '''
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    
     try:
         client = boto3.client('connect')
         response = client.describe_user(
@@ -1132,7 +1132,7 @@ async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depend
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
-    agent= await list_users_data()
+    agent = await list_users_data(token)
 
     response = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,

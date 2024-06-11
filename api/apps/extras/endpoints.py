@@ -34,12 +34,16 @@ router = APIRouter(
 )
 
 @router.get("/agentID", tags=["agents"])
-async def get_agentID(username: str) -> str:
+async def get_agentID(username: str, token: Annotated[str, Depends(requireToken)]) -> str:
     '''
     Returns the agentID of the user.
 
     @param username: Username of the user.
     '''
+
+    if not (userType.isManager(token) or userType.isAgent(token)):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a logged in to access this resource.")
+    
     return await cachedData.get('get_agent_id', username=username)
 
 async def get_SecurityProfileID(securityProfileName: str) -> str:
