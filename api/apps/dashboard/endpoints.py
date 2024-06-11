@@ -49,7 +49,6 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
-        await graph_example(),
         await get_avg_contact_duration(token),
         await get_queues(token),  
     ]
@@ -64,9 +63,9 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
     Returns the cards that will be displayed on the agent dashboard.
     '''
     cards = [
-        await read_avg_holds(token, agent_id),
-        await read_People_to_answer(token),
-        await read_capacity_agent(token, agent_id),
+        # await read_avg_holds(token, agent_id),
+        # await read_People_to_answer(token),
+        # await read_capacity_agent(token, agent_id),
         await get_agent_rating(agent_id, token)
     ]
 
@@ -77,100 +76,100 @@ async def get_agent_cards(token: Annotated[str, Depends(requireToken)], agent_id
 
     return toReturn
 
-@router.get("/graph_example", tags=["data"])
-async def graph_example() -> models.GenericGraph:
-    '''
-    Returns an example of a generic graph.
-    '''
+# @router.get("/graph_example", tags=["data"])
+# async def graph_example() -> models.GenericGraph:
+#     '''
+#     Returns an example of a generic graph.
+#     '''
 
 
-    series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
+#     series_example = [models.SeriesData(name="Agent 1", data=[20,30,50,40,10]), models.SeriesData(name="Agent 2", data=[100, 120, 20, 50, 10])]
 
-    xaxis_example = models.XAxisData(
-        categories=["Jan", "Feb", "March", "Apr", "May"]
-    )
+#     xaxis_example = models.XAxisData(
+#         categories=["Jan", "Feb", "March", "Apr", "May"]
+#     )
 
-    example_options = models.GraphOptions(
-        colors=["#3b82f6", "#f87171"],
-        xaxis=xaxis_example
-    )
+#     example_options = models.GraphOptions(
+#         colors=["#3b82f6", "#f87171"],
+#         xaxis=xaxis_example
+#     )
 
-    example_chart = models.ChartData(
-        type="line",
-        series= series_example,
-        options=example_options
-    )
+#     example_chart = models.ChartData(
+#         type="line",
+#         series= series_example,
+#         options=example_options
+#     )
 
-    example_graph = models.GenericGraph(
-        title="Example Graph",
-        description="Graph showing number of calls per month",
-        footer="Updated 1st of June",
-        chart = example_chart
-    )
+#     example_graph = models.GenericGraph(
+#         title="Example Graph",
+#         description="Graph showing number of calls per month",
+#         footer="Updated 1st of June",
+#         chart = example_chart
+#     )
 
-    return example_graph
+#     return example_graph
 
 
 
-@router.get("/list-queues")
-async def list_queues():
+# @router.get("/list-queues")
+# async def list_queues():
 
-    response =await cachedData.get("list_queue")
+#     response =await cachedData.get("list_queue")
 
-    return response
+#     return response
 
-@router.get("/routing-profiles", response_model=List[dict])
-async def routing_profiles():
+# @router.get("/routing-profiles", response_model=List[dict])
+# async def routing_profiles():
     
-    response = await cachedData.get("list_routing_profile")
+#     response = await cachedData.get("list_routing_profile")
 
-    return response
+#     return response
 
-@router.get("/get-online-users-data")
-async def get_online_users_data():
+# @router.get("/get-online-users-data")
+# async def get_online_users_data():
 
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
+#     client = boto3.client('connect')
+#     users = client.list_users(
+#         InstanceId=Config.INSTANCE_ID,
+#     )
+#     userList = []
+#     for user in users['UserSummaryList']:
+#         userList.append(user['Id'])
 
-    response = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'Agents': userList
-        }
-    )
-    return response['UserDataList']
+#     response = client.get_current_user_data(
+#         InstanceId=Config.INSTANCE_ID,
+#         Filters={
+#             'Agents': userList
+#         }
+#     )
+#     return response['UserDataList']
 
-@router.get("/get-not-connected-users-data")
-async def get_not_connected_users_data():
+# @router.get("/get-not-connected-users-data")
+# async def get_not_connected_users_data():
 
-    client = boto3.client('connect')
-    users = client.list_users(
-        InstanceId=Config.INSTANCE_ID,
-    )
-    userList = []
-    for user in users['UserSummaryList']:
-        userList.append(user['Id'])
+#     client = boto3.client('connect')
+#     users = client.list_users(
+#         InstanceId=Config.INSTANCE_ID,
+#     )
+#     userList = []
+#     for user in users['UserSummaryList']:
+#         userList.append(user['Id'])
 
-    response = client.get_current_user_data(
-        InstanceId=Config.INSTANCE_ID,
-        Filters={
-            'Agents': userList
-        }
-    )
+#     response = client.get_current_user_data(
+#         InstanceId=Config.INSTANCE_ID,
+#         Filters={
+#             'Agents': userList
+#         }
+#     )
 
-    for user in response['UserDataList']:
-        if user['User']['Id'] in userList:
-            userList.remove(user['User']['Id'])
+#     for user in response['UserDataList']:
+#         if user['User']['Id'] in userList:
+#             userList.remove(user['User']['Id'])
 
-    for i in userList:
-        print(i)
+#     for i in userList:
+#         print(i)
 
-    return userList
+#     return userList
 
 
 @router.get("/average-call-time-duration")

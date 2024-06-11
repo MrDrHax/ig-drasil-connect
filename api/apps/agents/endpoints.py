@@ -47,8 +47,8 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     ]
 
     graphs = [
-        await queues_agent_answer_rate(token),
-        await queues_agent_occupancy(),
+        # await queues_agent_answer_rate(token),
+        # await queues_agent_occupancy(),
     ]
 
     toReturn = models.DashboardData(cards=cards, graphs=graphs)

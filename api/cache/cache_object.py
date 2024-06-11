@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
+from config import Config
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -112,10 +114,11 @@ async def trigger_auto_updates():
     logger.info("Auto updates triggered")
 
 async def startup(app: FastAPI, scheduler: AsyncIOScheduler):
-    await cachedData.forceAutoUpdates()
     # Start async job
     scheduler.add_job(invalidate_cache, trigger=IntervalTrigger(seconds=60*5)) # clean cache every 5 minutes
-    scheduler.add_job(trigger_auto_updates, trigger=IntervalTrigger(seconds=15)) # trigger auto updates every 15 seconds
+    if not Config.DEBUG:
+        await cachedData.forceAutoUpdates()
+        scheduler.add_job(trigger_auto_updates, trigger=IntervalTrigger(seconds=15)) # trigger auto updates every 15 seconds
 
 async def shutdown(app: FastAPI, scheduler: AsyncIOScheduler):
     global cachedData
