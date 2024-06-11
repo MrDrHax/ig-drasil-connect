@@ -3,7 +3,7 @@ from . import models
 import boto3
 from config import Config
 from cache.cache_object import cachedData
-from datetime import datetime , timedelta, date
+from datetime import datetime , timedelta, date, timezone
 from tools.lazySquirrel import LazySquirrel
 
 import logging
@@ -161,7 +161,7 @@ async def get_avg_call_time():
         id=1,
         title="Average Call Time",
         value="{p:.2f}".format(p=data/60),
-        icon="ClockIcon",
+        icon="Clock",
         footer=cardFooter,
         color="blue"
     )
@@ -387,7 +387,7 @@ async def get_capacity():
         id = 1,
         title = "Percentage of time \t  active agents",
         value = "{p:.2f}".format(p=datares1[0]),
-        icon = "UserIcon",
+        icon = "Person",
         footer = cardFooter
     )
 
@@ -458,7 +458,7 @@ async def get_abandonment_rate():
         id=1,
         title="Abandonment rate",
         value="{:.2f}%".format(card_value),
-        icon="PhoneXMarkIcon",
+        icon="Phone",
         footer=cardFooter,
     )
     
@@ -482,7 +482,7 @@ async def get_connected_users():
         id=1,
         title="Agents in call.",
         value=f'{agentsInCall} out of {totalAgents} connected agents',
-        icon="UserIcon",
+        icon="PhoneArrow",
         footer=footer_info,
         color="pink",
     )
@@ -628,7 +628,7 @@ async def get_avg_holds(agent_id):
             id=1,
             title="Average Holds",
             value="0",
-            icon="HandRaisedIcon",
+            icon="Clock",
             footer= models.CardFooter(
                 color="text-red-500",
                 value="0",
@@ -647,7 +647,7 @@ async def get_avg_holds(agent_id):
         id=1,
         title="Average customer hold time",
         value=str(today_data[0]),# Ensure this is a string
-        icon="HandRaisedIcon",
+        icon="Clock",
         footer=cardFooter,
     )
 
@@ -695,7 +695,7 @@ async def get_People_to_answer():
         id=1,
         title="People to answer",
         value=str(data), 
-        icon="BriefcaseIcon",
+        icon="Person",
         footer=cardFooter,
         color="green"
     )
@@ -806,7 +806,7 @@ async def get_capacity_agent(agent_id):
             id = 1,
             title = "porcentage of time active",
             value =  "{p:.2f}".format(p=datares1[0]),
-            icon = "UserIcon",
+            icon = "Chart",
             footer = cardFooter,
             color="blue"
         )
@@ -815,9 +815,9 @@ async def get_capacity_agent(agent_id):
     except:
         card = models.GenericCard(
             id = 0,
-            title = "Average Handle Time",
+            title = "porcentage of time active",
             value =  "No data",
-            icon = "UserIcon",
+            icon = "Chart",
             footer = models.CardFooter(
                 color = "text-red-500",
                 value = "",
@@ -867,6 +867,7 @@ async def get_alert_supervisor_NA():
             Text="You have "+str(agentNeedsAssistance) +  " agents who need your help. ",
             TextRecommendation="You should go a Queue and see who needs help and go to the agent who needs help.",
             color="red",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
         )
         return alert
     return None
@@ -901,6 +902,7 @@ async def get_alert_supervisor_available():
             Text="There are no agents available.",
             TextRecommendation=" You should check first to see if your agents are busy or offline to see if any of them might be available again.",
             color="red",
+            timestamp= datetime.now(tz=timezone.utc)
         )
         return alert
     else:
@@ -908,6 +910,7 @@ async def get_alert_supervisor_available():
             Text="There are "+ str(round(data)) + " agents available.",
             TextRecommendation="You should check first to see if your agents are busy or offline to see if any of them might be available again.",
             color="green",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
         )
         return alert
 cachedData.add("get_alert_supervisor_available", get_alert_supervisor_available, 60)
@@ -945,6 +948,7 @@ async def get_alert_supervisor_nonResponse():
                     Text="Agent "+ await get_usename(i["Dimensions"]["AGENT"]) + " has not responded during the call with the client.",
                     TextRecommendation="You could intervene in the call or send him a message as to why he is silent in front of the customer",
                     color="red",
+                    timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
                 ))
     return alert
 cachedData.add("get_alert_supervisor_nonResponse", get_alert_supervisor_nonResponse, 60)
@@ -978,6 +982,7 @@ async def get_alert_agent_nonResponse(agent_id):
             Text="You have not responded during the call with the client.",
             TextRecommendation="You could ask for help from a supervisor or ask the client if he has any questions.",
             color="orange",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
         )
         
     return alert

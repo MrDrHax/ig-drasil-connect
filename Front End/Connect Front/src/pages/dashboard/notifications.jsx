@@ -57,7 +57,7 @@ export function Notifications({is_supervisor, agent_id}) {
 */}
   return (
     <div className="mx-auto px-7 my-5 flex max-w-screen-lg flex-col gap-7 ">
-          {info.map(({Text,TextRecommendation,color })=> (
+          {info.map(({Text,TextRecommendation,color, timestamp })=> (
             <Alert
               key={color}
               open={showAlerts[color]}
@@ -66,6 +66,7 @@ export function Notifications({is_supervisor, agent_id}) {
             >
               <span className={ `${getTypography()}  ${getTextColor("white")}` }>{Text}
               <br /><span className={ `${getTypographybold()} ${getTextColor("white")}` }>Recommendation: </span>{TextRecommendation} </span>
+              <Typography className={ `${getTypography()}  ${getTextColor("white")} text-[0.7rem] text-right`}>{timestamp}</Typography>
             </Alert>
           ))}
 
@@ -107,7 +108,7 @@ export function NotificationsCard({is_supervisor, agent_id}) {
                 className={`flex items-center gap-1 text-base ${getTypography()}  text-blue-gray-600` }
               >
                 <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
-                <strong>{numberalerts} alerts </strong>in this 30 minutes
+                <strong>{numberalerts} alerts </strong>
               </Typography>
             </div>
           </CardHeader>

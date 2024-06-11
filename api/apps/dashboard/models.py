@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 import logging
 logger = logging.getLogger(__name__)
@@ -200,4 +201,5 @@ class GenericAlert(BaseModel):
     Text: str = Field("Alert text", examples=["Alert text"])
     TextRecommendation: str = Field("Alert recommendation", examples=["Alert recommendation"])
     color: str = Field("red", examples=["red", "green", "yellow"])
+    timestamp: datetime = Field(datetime.now(), examples=[datetime.now()])
 
