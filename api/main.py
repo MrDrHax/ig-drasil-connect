@@ -52,12 +52,15 @@ async def lifespan(app: FastAPI):
 logger.info("Starting the FastAPI app")
 
 try:
+    openapi_path = "/openapi.json" if Config.DEBUG else "/api/openapi.json"
+
     app = FastAPI(
         debug=Config.DEBUG, 
         title="Ig-drasil connect API", 
         description="API for Ig-drasil connect dashboard", 
         version="0.1.0", 
-        redoc_url="/docs", docs_url="/swagger",
+        redoc_url="/docs", docs_url="/swagger", 
+        openapi_url=openapi_path,
         lifespan=lifespan)
 
     # change docs cdn host

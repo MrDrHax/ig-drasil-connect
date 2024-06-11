@@ -102,19 +102,25 @@ export function DashboardNavbar() {
                 <>
                 <Link
                   to="/dashboard/home"
+
                   className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'home' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Home
                 </Link>
                 <Link
                   to="/dashboard/team"
+
                   className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'team' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Agents
                 </Link>
                 <Link
                   to="/dashboard/queues"
+
                   className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'queues' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Queues
                 </Link>
@@ -125,7 +131,9 @@ export function DashboardNavbar() {
               { roles.includes('agent') && (
                 <Link
                   to="/dashboard/agent"
+
                   className={`navitemAdmin rounded-xl flex-initial w-32 cursor-pointer ${getTypographybold()} ${page === 'agent' ? getBgColor(navColor) + ' '+ getTextColor("white2") : ''}`}
+
                 >
                   Dashboard
                 </Link>
@@ -195,14 +203,14 @@ export function DashboardNavbar() {
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="mb-1 font-normal"
+                    className={ `mb-1 ${getTypography()}`}
                   >
                     <strong>agent 1</strong> has connected a call
                   </Typography>
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="flex items-center gap-1 text-xs font-normal opacity-60"
+                    className={ `flex items-center gap-1 text-xs opacity-60 ${getTypography()}`}
                   >
                     <ClockIcon className="h-3.5 w-3.5" /> 13 minutes ago
                   </Typography>
@@ -219,14 +227,14 @@ export function DashboardNavbar() {
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="mb-1 font-normal"
+                    className={ `mb-1 ${getTypography()}`}
                   >
                     <strong>Issue with</strong> agent pedro
                   </Typography>
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="flex items-center gap-1 text-xs font-normal opacity-60"
+                    className={ `flex items-center gap-1 text-xs opacity-60 ${getTypography()}`}
                   >
                     <ClockIcon className="h-3.5 w-3.5" /> 1 day ago
                   </Typography>
@@ -240,14 +248,14 @@ export function DashboardNavbar() {
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="mb-1 font-normal"
+                    className={ `mb-1 ${getTypography()}`}
                   >
                     Payment successfully completed
                   </Typography>
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="flex items-center gap-1 text-xs font-normal opacity-60"
+                    className={ `flex items-center gap-1 text-xs opacity-60 ${getTypography()}`}
                   >
                     <ClockIcon className="h-3.5 w-3.5" /> 2 days ago
                   </Typography>
