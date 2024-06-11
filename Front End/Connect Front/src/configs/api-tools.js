@@ -2,10 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 export function getApiPath() {
 
-    if (process.env.NODE_ENV === 'development')
-        return "http://localhost:8080/";
-    else
+    if (import.meta.env.PROD)
         return "https://connect.igdrasilteam.com/api/";
+    else
+        return "http://localhost:8080/";
 }
 
 export function validateToken() {
