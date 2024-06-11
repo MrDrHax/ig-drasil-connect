@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source .dev.env
-uvicorn main:app --host $HOST --port $PORT --reload
+uvicorn main:app --host localhost --port 8080

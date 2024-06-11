@@ -12,11 +12,11 @@ else:
 
 # if you want to add a config variable, add it here!!!
 class Config:
-    PORT = os.getenv('PORT', 8080)
+    PORT = int(os.getenv('PORT', 8080))
     '''The port the server will run on.'''
     HOST = os.getenv('HOST', 'localhost')
     '''The host the server will run on.'''
-    DEBUG = os.getenv('DEBUG', False)
+    DEBUG = os.getenv('DEBUG', False) in ['True', 'true', '1', 'yes', 'Yes', 'Y', 'y']
     '''is the server running in debug mode?'''
     AUTH_DOMAIN = os.getenv('AUTH_DOMAIN', '>_<')
     '''The domain of keycloak, used for authentication. Includes a finalizing "/"'''
