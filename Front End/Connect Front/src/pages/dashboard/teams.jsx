@@ -14,7 +14,8 @@ import {
 // import { authorsTableData, projectsTableData } from "@/data";
 import { AgentList, JoinCall, ChangeStatus, StatusList, AgentCards } from "@/data/agents-data";
 import { StatisticsCard } from "@/widgets/cards";
-import { UsersIcon, CogIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
+import { StatisticsChart } from "@/widgets/charts";
+import { UsersIcon, CogIcon, ClockIcon, CheckCircleIcon, ExclamationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { parsePaginationString } from "@/configs/api-tools";
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
@@ -50,6 +51,7 @@ export function Teams() {
 
     const [dataToDisplay, setData] = useState([]);
     const [cards, setCards] = useState([]);
+    const [graphs, setGraphs] = useState([]);
     const [status_list, setStatusList] = useState([]);
 
     const [isLoaded, setIsLoaded] = useState(false);
@@ -150,6 +152,7 @@ export function Teams() {
         // get cards
         AgentCards().then((data) => {
             setCards(data.cards);
+            setGraphs(data.graphs);
         })
 
         // get agents
@@ -180,8 +183,7 @@ export function Teams() {
 
     return (
         <div>
-
-
+            {/*<!-- Cards -->*/}
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 {!isLoaded ? (
                 <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
@@ -211,6 +213,8 @@ export function Teams() {
                 ))
                 )}
             </div>
+
+            {/*<!-- Table -->*/}
             <div className="mt-12 mb-8 flex flex-col gap-12">
                 <Card className={`${getTypography()} ${getBgColor("background-cards")}`}>
                     <CardHeader variant="gradient" color="gray" className={`mb-8 p-6 flex ${getBgColor("search-bar")}`}>
@@ -448,6 +452,32 @@ export function Teams() {
                         </div>
                     </CardBody>
                 </Card>
+            </div>
+            {/*<!-- Graphs -->*/}
+            <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+                {!isLoaded ? (
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+                <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                    Graphs are now loading...
+                </Typography>
+                </div>
+                ) : (
+                graphs.map((props) => (
+                    <StatisticsChart
+                        key={props.title}
+                        {...props}
+                        footer={
+                        <Typography className={`flex items-center text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                            <ClockIcon strokeWidth={2} className={`h-4 w-4 text-blue-gray-400`} />
+                            &nbsp;{props.footer}
+                        </Typography>
+                        }
+                    />
+                    ))
+                )}
             </div>
         </div>
     );

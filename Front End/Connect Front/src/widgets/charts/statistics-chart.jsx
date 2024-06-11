@@ -44,7 +44,7 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
   return (
     <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")} ${getTypography()} `}>
       <CardHeader variant="gradient" color={color} floated={false} shadow={false}>
-        <Chart {...chart} className={`${getBgColor("background-cards")} ${getTextColor("dark")}`}/>
+        <Chart {...chart} width={"100%"} height={"100%"} className={`   ${getBgColor("background-cards")} ${getTextColor("dark")}`}/>
       </CardHeader>
       <CardBody className="px-6 pt-0">
         <Typography variant="h6" color="blue-gray" className={`${getTypography()} ${getTextColor("dark")}`}>

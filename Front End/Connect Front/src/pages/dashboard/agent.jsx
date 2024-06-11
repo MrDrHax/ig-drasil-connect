@@ -12,6 +12,7 @@ import {
 } from "@material-tailwind/react";
 import {
   EllipsisVerticalIcon,
+  CheckCircleIcon,
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { BookOpenIcon, UserGroupIcon,StarIcon,ClockIcon, ChartBarIcon, } from "@heroicons/react/24/solid";
@@ -26,20 +27,22 @@ import {
   AgentId
 } from "@/data";
 import { NotificationsCard } from "../dashboard/notifications.jsx";
-import { getBgColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold } from "@/context";
+import { getBgColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold, getBorderColor } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
 import { AgentHomeData } from "@/data/supervisor-home-data.js";
 
 
 export function Agent() {
 
-  const controller = useMaterialTailwindController();
-  const theme = controller;
+  const [controller, dispatch] = useMaterialTailwindController();
+  const {navColor, theme} = controller;
 
   const [open, setOpen] = useState(1);
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
+
+  const [isLoaded, setIsLoaded] = useState(false);
 
   function getIcon(icon) {
     switch (icon) {
@@ -70,7 +73,7 @@ export function Agent() {
 
     AgentHomeData(sessionStorage.getItem("userID")).then((data) => {
       setCards(data.cards);
-
+      setIsLoaded(true);
     });
   }
 
@@ -81,8 +84,20 @@ export function Agent() {
 
   return (
     <div className="mt-8">
+
+      {/*Statistics Cards*/}
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {cards.map(({ icon, title, footer, ...rest }) => (
+        {!isLoaded ? (
+          <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+          <span className="flex justify-center items-center">
+          <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+          </span>
+          <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+              Cards are now loading...
+          </Typography>
+          </div>
+          ) : (
+        cards.map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
             {...rest}
@@ -97,7 +112,8 @@ export function Agent() {
               </Typography>
             }
           />
-        ))}
+        ))
+        )}
       </div>
 
       {/*Client Data*/}

@@ -53,6 +53,12 @@ async def queues_answer_time():
     queue_series =[]
     categories = []
     for queue in queues_data['MetricResults']:
+        # Try to get the value and if it doesn't exist, set it to 0
+        try:
+            queue['Collections'][0]['Value']
+        except:
+            queue['Collections'][0]['Value'] = 0
+        
         queue_series.append(models.SeriesData(name = myQueuesDic[queue['Dimensions']['QUEUE']], 
                                               data=[queue['Collections'][0]['Value']]))
         categories.append(myQueuesDic[queue['Dimensions']['QUEUE']])
@@ -75,14 +81,13 @@ async def queues_answer_time():
 
     queue_graph = models.GenericGraph(
         title = "Queue Answer Time",
-        description = "This graph shows the average time it takes for a call to be answered by queue.",
+        description = "The average time it takes for a call to be answered by queue.",
         footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
         chart = queue_chart
     )
 
     return queue_graph
 cachedData.add("queues_answer_time", queues_answer_time, 30)
-
 
 async def queues_contact_duration():
     availableQueues = ["Tickets Management", "Customize Assistance", "Event News", "Default Queue","Supervisor", "Callback"]
@@ -145,14 +150,11 @@ async def queues_contact_duration():
     )
 
     queue_graph = models.GenericGraph(
-        title = "Queue averae contact duration",
-        description = "This graph shows the average time it takes for a call to be accomplished by queue.",
+        title = "Queue average contact duration",
+        description = "The average time it takes for a call to be accomplished by queue.",
         footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
         chart = queue_chart
     )
 
     return queue_graph
 cachedData.add("queues_contact_duration", queues_contact_duration, 30)
-
-
-

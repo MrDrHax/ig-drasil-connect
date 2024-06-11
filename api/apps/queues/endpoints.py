@@ -129,30 +129,28 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
 
 #     return queues_data
 
-
-
 @router.get("/queues/answer-time", tags=["cards"])
-async def queues_answer_time():
+async def queues_answer_time(token: Annotated[str, Depends(requireToken)]):
+    """
+    Returns the answer time of the queues that will be displayed on a graph.
+    """
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
     response = await cachedData.get("queues_answer_time")
 
     return response
 
-
 @router.get("/queues/contact-duration", tags=["cards"])
-async def queues_contact_duration():
+async def queues_contact_duration(token: Annotated[str, Depends(requireToken)]):
+    """
+    Returns the contact duration of the queues that will be displayed on a graph.
+    """
+
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     response = await cachedData.get("queues_contact_duration")
 
     return response
-
-    # AGENT_ANSWER_RATE
-    # AGENT_OCCUPANCY -> solo para: Routing Profile, Agent, Agent Hierarchy
-    # AVG_CONTACT_DURATION, AVG_INTERACTION_TIME, AVG_HANDLE_TIME
-    # AVG_QUEUE_ANSWER_TIME
-    # CONTACTS_ABANDONED
-    # CONTACTS_PUT_ON_HOLD
-    # CONTACTS_QUEUED
-
-    # MAX_QUEUED_TIME
-

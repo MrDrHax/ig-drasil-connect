@@ -53,7 +53,6 @@ async def online_agents():
     return card
 cachedData.add("online_agents", online_agents, 15)
 
-
 async def need_assistance_agents():
     client = boto3.client('connect')
     users = client.list_users(
@@ -101,7 +100,6 @@ async def need_assistance_agents():
 
     return card
 cachedData.add("need_assistance_agents", need_assistance_agents, 5)
-
 
 async def queues_agent_answer_rate():
     userNT = ["94c89e21-3aac-44b5-8ffa-c898061fddfd"]
