@@ -200,7 +200,6 @@ async def read_capacity(token: Annotated[str, Depends(requireToken)]) -> models.
 @router.get("/cards/abandonment-rate", tags=["cards"])
 async def read_abandonment_rate(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
 
-    # TODO fix this hot trash
 
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")

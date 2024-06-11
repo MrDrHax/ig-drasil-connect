@@ -7,6 +7,8 @@ import boto3
 from datetime import datetime, timedelta
 from cache.cache_object import cachedData
 import json
+import random
+import time
 
 from config import Config
 
@@ -225,12 +227,34 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
     transcript_json = json.loads(transcript)
     
     
-    sentiment = transcript_json['ConversationCharacteristics']['Sentiment']['OverallSentiment']['CUSTOMER']
+    sentiment = transcript_json['ConversationCharacteristics']['Sentiment']['OverallSentiment']['CUSTOMER'] if 'CUSTOMER' in transcript_json['ConversationCharacteristics']['Sentiment']['OverallSentiment'] else 0.0
+    
+    random.seed(time.time())
     
     
-    return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating" ,sentimentTitle="Customer sentiment rating", sentiment=sentiment, ratingTitle="Agent rating based of metrics", rating=calculateRating(transcript_json))
+    if transcript_json['ConversationCharacteristics']['TotalConversationDurationMillis'] > 100:
+        if sentiment > 2.5 and sentiment < 5.0:
+            recommendations = ["You are doing great! Keep up the good work!", 
+                              "You handled that call well! Keep it up!", 
+                              "That was a great call! Keep it up!"]
+            recommendation = random.choice(recommendations)
+        elif sentiment > 0.1 and sentiment <= 2.5:
+            recommendations = ["You should try to have a nicer tone.", 
+                              "You should try to be more empathetic.", 
+                              "You should try to be more understanding."]
+            recommendation = random.choice(recommendations)                                   
+        else:
+            recommendation = "No recommendation found at the moment."
+    
+    return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating",
+                                        sentimentTitle="Customer sentiment rating", 
+                                        sentiment=sentiment, 
+                                        ratingTitle="Agent rating based of metrics", 
+                                        rating=calculateRating(transcript_json),
+                                        recommendationTitle="Recommendation based of last call",
+                                        recommendation= recommendation)
 
-cachedData.add('getSentimentRating', getSentimentRating, 120)
+cachedData.add('getSentimentRating', getSentimentRating, 0.5)
 
 async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile]:
     contactData = await cachedData.get('getAllAgentContact', agent_id=agent_id)
