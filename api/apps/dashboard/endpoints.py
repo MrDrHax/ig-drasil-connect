@@ -6,7 +6,7 @@ from typing import Annotated
 from AAA.requireToken import requireToken
 import AAA.userType as userType
 from cache.cache_object import cachedData
-from datetime import datetime , timedelta, date
+from datetime import datetime , timedelta, date,timezone
 from tools.lazySquirrel import LazySquirrel
 
 import boto3
@@ -366,7 +366,7 @@ async def get_agent_rating(agent_id: str, token: Annotated[str, Depends(requireT
         id=1,
         title="Rating",
         value=str(res[0]),
-        icon="StarIcon",
+        icon="Star",
         footer=cardFooter,
         color="blue"
     )
@@ -409,6 +409,7 @@ async def post_alert_supervisor_message(agent_id:str, token: Annotated[str, Depe
         Text="You have a message from agent "+ agent ,
         TextRecommendation=". You should check your messages in the chat correspondant to the agent",
         color="blue",
+        timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
     )
 
     alert_message.append(alert)
@@ -421,7 +422,7 @@ async def get_alert_supervisor_available( token: Annotated[str, Depends(requireT
     '''
     returns the alert type log, if there is any available
     '''
-    if not userType.isManager(token):
+    if not userType.isAgent(token) or not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     res = await cachedData.get("get_alert_supervisor_available")
@@ -446,14 +447,14 @@ async def get_alert_supervisor(token: Annotated[str, Depends(requireToken)]):
     '''
     sends bock the alert of the supervisor
     '''
-    if not userType.isAgent(token):
+    if not userType.isAgent(token) or not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     alerts=[]
 
-    NA= await get_alert_supervisor_NA()
-    AV= await get_alert_supervisor_available()
-    NR= await get_alert_supervisor_nonResponse()
+    NA= await get_alert_supervisor_NA(token)
+    AV= await get_alert_supervisor_available(token)
+    NR= await get_alert_supervisor_nonResponse(token)
 
     if NA:
         alerts.append(NA)
@@ -477,13 +478,14 @@ async def post_alert_agent_message(token: Annotated[str, Depends(requireToken)])
     '''
     Sends an alert if agent has a message
     '''
-    if not userType.isAgent(token):
+    if not userType.isAgent(token) or not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     alert= models.GenericAlert(
         Text="You have a message from supervisor",
         TextRecommendation=". You should check your messages in the chat correspondant to the supervisor",
         color="blue-gray",
+        timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
     )
 
     alert_message_agent.append(alert)
@@ -497,7 +499,7 @@ async def post_alert_agent_message(agent_id:int, token: Annotated[str, Depends(r
     '''
     Sends an alert if agent has a message
     '''
-    if not userType.isAgent(token):
+    if not userType.isAgent(token) or not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     if str(agent_id) not in dict_agent:
@@ -513,7 +515,7 @@ async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depend
     '''
     sends back the alert of the agent that has not responded during the call with the client
     '''
-    if not userType.isAgent(token):
+    if not userType.isAgent(token) or not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     client = boto3.client('connect')
@@ -546,17 +548,20 @@ async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depend
                     Text="You have a non response a call with the client",
                     TextRecommendation=". You asked to respond to the client during the call or asker for help to the supervisor",
                     color="red",
+                    timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
                 )
             else:
                 return models.GenericAlert(
                     Text="You have a non response a call with the client",
                     TextRecommendation=". you good job, you have responded to the client during the call",
                     color="green",
+                    timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
                 )
     return models.GenericAlert(
         Text="You have a non response a call with the client",
         TextRecommendation=". you good job, you have responded to the client during the call",
         color="green",
+        timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
     )
 
     
@@ -566,12 +571,12 @@ async def get_alert_agent(agent_id:str, token: Annotated[str, Depends(requireTok
     '''
     sends back the alert of the agent
     '''
-    if not userType.isAgent(token):
+    if not userType.isAgent(token) or not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     alerts=[]
 
-    NR= await get_alert_agent_NonResponse(agent_id)
+    NR= await get_alert_agent_NonResponse(agent_id, token)
 
     if NR:
         alerts.append(NR)
@@ -580,6 +585,7 @@ async def get_alert_agent(agent_id:str, token: Annotated[str, Depends(requireTok
             Text="You have "+ str(dict_agent[str(agent_id)]) + " messages from supervisor",
             TextRecommendation=". You should check your messages in the chat",
             color="blue-gray",
+            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
             )
         )
         dict_agent[str(agent_id)] = 0

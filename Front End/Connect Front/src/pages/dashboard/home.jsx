@@ -12,7 +12,7 @@ import {
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import { RecomendationCard } from "@/widgets/cards";
-import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon, FaceSmileIcon, } from "@heroicons/react/24/solid";
+import { CheckCircleIcon, ClockIcon, ArrowUpIcon, BookOpenIcon, UserGroupIcon, FaceSmileIcon, ScissorsIcon, PhoneArrowDownLeftIcon, PhoneXMarkIcon} from "@heroicons/react/24/solid";
 import {NotificationsCard} from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController, getTypography,getTypographybold } from "@/context";
 
@@ -29,6 +29,14 @@ export function getIcon(icon) {
       return ClockIcon;
     case "Person":
       return UserGroupIcon;
+    case "Face":
+      return FaceSmileIcon;
+    case "Scissors":
+      return ScissorsIcon;
+    case "Phone":
+      return PhoneXMarkIcon;
+    case "PhoneArrow":
+      return PhoneArrowDownLeftIcon;
     default:
       return CheckCircleIcon;
   }
