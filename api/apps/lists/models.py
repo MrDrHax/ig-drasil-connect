@@ -36,6 +36,7 @@ class QueueDataListItem(BaseModel):
     waiting: int = Field(0, description="The amount of clients waiting in the queue.", example=5)
     averageWaitTime: float = Field(0, description="The average wait time for the clients in the queue.", example=5)
     routingProfiles: list[str] = Field([], description="The list of routing profiles associated with the queue.", example=["a", "b", "c"])
+    status: str = Field("No status", description="The current status of the queue.", examples=["Free", "Stressed","Exceeded"])
 
     def __getitem__(self, item):
         return getattr(self, item)

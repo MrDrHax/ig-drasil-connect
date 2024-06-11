@@ -56,7 +56,14 @@ async def get_cards(token: Annotated[str, Depends(requireToken)]) -> models.Dash
     return toReturn
 
 @router.get("/get/connected/agents", tags=["cards"])
-async def online_agents():
+
+async def online_agents(token: Annotated[str, Depends(requireToken)]) -> models.GenericCard:
+    '''
+    Returns the number of people that are currently online.
+    
+    ''' 
+    if not userType.isManager(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     response = await cachedData.get("online_agents")
     
@@ -64,44 +71,3 @@ async def online_agents():
 
 @router.get("/get/need-assistance/agents", tags=["cards"])
 async def need_assistance_agents():
-
-    response = await cachedData.get("need_assistance_agents")
-
-    return response
-
-@router.get("/queues/agent-answer-rate", tags=["cards"])
-async def queues_agent_answer_rate():
-    
-    response = await cachedData.get("queues_agent_answer_rate")
-
-    return response
-
-
-@router.get("/queues/agent-occupancy", tags=["cards"])
-async def queues_agent_occupancy():
-    
-    response = await cachedData.get("queues_agent_occupancy")
-
-    return response
-
-
-# @router.get("/list/list-agent")
-# async def list_agent():
-    
-#     client = boto3.client('connect')
-#     resp = client.list_users(
-#         InstanceId=Config.INSTANCE_ID
-
-#     )
-
-#     return resp
-
-# AGENT_ANSWER_RATE
-# AGENT_OCCUPANCY -> solo para: Routing Profile, Agent, Agent Hierarchy
-# AVG_CONTACT_DURATION, AVG_INTERACTION_TIME, AVG_HANDLE_TIME
-# AVG_QUEUE_ANSWER_TIME
-# CONTACTS_ABANDONED
-# CONTACTS_PUT_ON_HOLD
-# CONTACTS_QUEUED
-
-# MAX_QUEUED_TIME

@@ -239,4 +239,25 @@ async def queues_agent_occupancy():
     )
 
     return agent_occupancy_graph
+
 cachedData.add("queues_agent_occupancy", queues_agent_occupancy, 30)
+
+async def get_current_user_data() -> dict:
+    client = boto3.client('connect')
+    users = client.list_users(
+        InstanceId=Config.INSTANCE_ID,
+    )
+    userList = []
+    for user in users['UserSummaryList']:
+        userList.append(user['Id'])
+
+    users_data = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters = {
+            'Agents': userList
+        }
+    )
+
+    return users_data
+
+cachedData.add('get_current_user_data', get_current_user_data, 30) # 30 seconds

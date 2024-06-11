@@ -14,6 +14,7 @@ import {
   EllipsisVerticalIcon,
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
+import { BookOpenIcon, UserGroupIcon,StarIcon,ClockIcon, ChartBarIcon, } from "@heroicons/react/24/solid";
 import { StatisticsCard, CustomerCard, Lexcard } from "@/widgets/cards";
 import { RecomendationCard } from "@/widgets/cards";
 // import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
@@ -24,7 +25,6 @@ import {
   messageData,
   AgentId
 } from "@/data";
-import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import { NotificationsCard } from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
@@ -51,6 +51,10 @@ export function Agent() {
         return ClockIcon;
       case "Person":
         return UserGroupIcon;
+      case "Star":
+        return StarIcon;
+      case "Chart":
+        return ChartBarIcon;
       default:
         return CheckCircleIcon;
     }
