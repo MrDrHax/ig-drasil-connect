@@ -17,8 +17,11 @@ export function Sidenav({ brandImg, brandName, routes }) {
   useEffect(() => {
     let ccp_link = "https://igdrasilcallcenter.my.connect.aws/ccp-v2?visual-refresh=true"
     let container_div = document.getElementById("container-div");
+    let login_Url = "https://igdrasilconnect.awsapps.com/start/#/saml/default/Amazon%20Connect%20Admin/ins-1858d832c3362350"
 
-    connect.core.initCCP(container_div, {ccpUrl: ccp_link, softphone : {allowFramedSoftphone: true, allowFramedVideoCall: true, } });
+    connect.core.initCCP(container_div, {ccpUrl: ccp_link,
+      loginUrl: login_Url,
+      softphone : {allowFramedSoftphone: true, allowFramedVideoCall: true }});
   }, []);
 
   return (
