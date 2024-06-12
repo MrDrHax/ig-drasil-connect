@@ -33,6 +33,7 @@ import {
   getTheme,
   getTypography,
   getTypographybold,
+  getBorderColor,
 } from "@/context";
 import { getApiLoginPage, getNameFromToken, getRolesFromToken } from "@/configs";
 
@@ -161,7 +162,7 @@ export function DashboardNavbar() {
           </IconButton>
 
           {/* Profile dropdown */}
-          <Tooltip placement="bottom" className={`border border-blue-gray-50 bg-white px-4 py-3 shadow-xl shadow-black/10 ${getBgColor('background')}`}
+          <Tooltip placement="bottom" className={`border ${getBorderColor('dark')} bg-white px-4 py-3 shadow-xl shadow-black/10 ${getBgColor('background')}`}
           content={ <div className="w-80">
                       <Typography color="blue-gray" className={`font-medium ${getTypography()} ${getTextColor("contrast")}`}>
                         {getNameFromToken()}
@@ -188,7 +189,7 @@ export function DashboardNavbar() {
           </Tooltip>
 
           {/* Notifications */}
-          <Menu>
+          <Menu placement="bottom">
           <MenuHandler>
             <IconButton variant="text" color="blue-gray" className="hidden xl:flex">
               <BellIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
@@ -197,10 +198,7 @@ export function DashboardNavbar() {
               }
             </IconButton>
           </MenuHandler>
-          <MenuList className={`${getBgColor("background")} border-0`}>
-            <Typography variant="h6" color="blue-gray" className={ `mb-1 ${getTypographybold()} ${getTextColor("contrast")}`}>
-              Alerts:
-            </Typography>
+          <MenuList className={`${getBgColor("background")} ${getBorderColor("dark")}`}>
               {
                 info.map(({Text,TextRecommendation, color, timestamp }) => (
                   <MenuItem key={timestamp} className="flex items-center gap-3">

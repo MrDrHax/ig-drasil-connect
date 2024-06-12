@@ -475,73 +475,6 @@ async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.Gen
         )
     )
 
-# async def get_queues(token: Annotated[str, Depends(requireToken)]) -> models.GenericGraph:
-#     '''
-#     Returns the number of people in each queue
-    
-#     ''' 
-
-#     if not userType.isManager(token):
-#         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
-    
-#     client = boto3.client('connect')   
-
-#     queues_raw = await cachedData.get("list_queue")
-
-#     queues_list = []
-    
-#     for i in queues_raw['QueueSummaryList']:
-#         if i['QueueType'] == 'STANDARD':
-#             queues_list.append([i['Id'], i['Name']])
-
-#     response = client.get_current_metric_data(
-#         InstanceId=Config.INSTANCE_ID,
-#         Filters = {
-#             'Queues' : [i[0] for i in queues_list],
-#         },
-#         Groupings=['QUEUE',],
-#         CurrentMetrics = [
-#             {
-#                 'Name': 'CONTACTS_IN_QUEUE', 
-#                 'Unit': 'COUNT'
-#             }
-#         ],
-#     )
-
-#     data = []
-
-#     for j in response['MetricResults']:
-#         data.append(j['Collections'][0]['Value']) 
-    
-#     series_example = [models.SeriesData(name=response['MetricResults'][0]['Collections'][0]['Metric']['Name'], data=data)]
-
-#     # Create the x axis labels
-#     xaxis_example = models.XAxisData(
-#         categories=[i[1] for i in queues_list]
-#     )
-
-#     # Create the graph options
-#     example_options = models.GraphOptions(
-#         xaxis=xaxis_example
-#     )
-
-#     # Create the graph type
-#     example_chart = models.ChartData(
-#         type="bar",
-#         series= series_example,
-#         options=example_options
-#     )
-
-#     # Create the graph
-#     example_graph = models.GenericGraph(
-#         title="Queues",
-#         description="Graph shows the number of people in all queues",
-#         footer="Updated " + datetime.today().strftime('%Y-%m-%d') ,
-#         chart = example_chart
-#     )
-
-#     return example_graph   
-
 # Agent Dashboard
 
 @router.get("/agent/avg-holds", tags=["agent"])
@@ -563,7 +496,7 @@ async def get_People_to_answer(token: Annotated[str, Depends(requireToken)])-> m
     Returns the number of people all queues
     
     ''' 
-    if not userType.isManager(token):
+    if not userType.isAgent(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
     ret = await cachedData.get("get_People_to_answer")
@@ -629,7 +562,7 @@ async def list_users_data(token: Annotated[str, Depends(requireToken)]):
     @return 
         List containing the agents of an instance.
     """
-    if not userType.isManager(token):
+    if not userType.isManager(token) and not userType.isAgent(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     response = await cachedData.get("list_users_data")
@@ -682,7 +615,7 @@ async def get_agent_profile(id: str, token: Annotated[str, Depends(requireToken)
 @router.get("/alerts/supervisor/NA", tags=["alerts"])
 async def get_alert_supervisor_NA(token: Annotated[str, Depends(requireToken)]):
     '''
-    Sends back the message of how many agent need help.
+    Sends back the message of how many agents need help.
     '''
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
@@ -698,7 +631,7 @@ async def post_alert_supervisor_message(agent_id:str, token: Annotated[str, Depe
     '''
     Sends an alert if supervisor has a message
     '''
-    if not userType.isManager(token):
+    if not userType.isManager(token) and not userType.isAgent(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     data = await list_users_data()
@@ -725,7 +658,7 @@ async def get_alert_supervisor_available( token: Annotated[str, Depends(requireT
     '''
     returns the alert type log, if there is any available
     '''
-    if not userType.isAgent(token) and not userType.isManager(token):
+    if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     res = await cachedData.get("get_alert_supervisor_available")
@@ -737,7 +670,7 @@ async def get_alert_supervisor_nonResponse(token: Annotated[str, Depends(require
     '''
     sends back the alert of the agent that has not responded during the call with the client
     '''
-    if not userType.isAgent(token):
+    if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     res = await cachedData.get("get_alert_supervisor_nonResponse")
 
@@ -748,7 +681,7 @@ async def get_alert_supervisor(token: Annotated[str, Depends(requireToken)]):
     '''
     sends bock the alert of the supervisor
     '''
-    if not userType.isAgent(token) and not userType.isManager(token):
+    if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
 
     alerts=[]
@@ -815,8 +748,8 @@ async def get_alert_agent_NonResponse(agent_id:str, token: Annotated[str, Depend
     '''
     sends back the alert of the agent that has not responded during the call with the client
     '''
-    if not userType.isAgent(token) and not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be an agent to access this resource.")
 
     client = boto3.client('connect')
     agent = await list_users_data(token)
@@ -869,8 +802,8 @@ async def get_alert_agent(agent_id:str, token: Annotated[str, Depends(requireTok
     '''
     sends back the alert of the agent
     '''
-    if not userType.isAgent(token) and not userType.isManager(token):
-        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
+    if not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be an agent to access this resource.")
 
     alerts=[]
 

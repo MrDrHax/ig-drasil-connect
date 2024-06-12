@@ -84,7 +84,7 @@ export function Agent() {
 
       {/*Statistics Cards*/}
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {!isLoaded ? (
+        {!isLoaded || userID == null ? (
           <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
           <span className="flex justify-center items-center">
           <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
@@ -151,56 +151,33 @@ export function Agent() {
 
 
 
-      {/*Agent Alerts */}
+      {/*Agent Alerts */}      
       <div id="notifications" className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
-        <NotificationsCard is_supervisor={false} agent_id={sessionStorage.getItem("userID")} />
-
-
-        {/* Recomendations Card
-        <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
-          <CardHeader
-            floated={false}
-            shadow={false}
-            color="transparent"
-            className="m-0 p-6"
-          >
-            <Typography variant="h6" color="blue-gray" className={`text-lg ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
-              Recommendations
-            </Typography>
-            <Typography
-              // variant="small"
-              className={`flex items-center gap-1 font-normal text-sm ${getTypography()} ${getTextColor("white3")}`}
-            >
-              Next, a list of recommendations for you:
-            </Typography>
-          </CardHeader>
-          <CardBody className="pt-0">
-            <RecomendationCard
-              title={<h2>Check Metrics</h2>}
-              content={<p>Check the client information and metrics.</p>}
-              id={1}
-              openID={open}
-              openhandler={() => handleOpen(1)} />
-            <RecomendationCard
-              title={<h2>De-escalate the call</h2>}
-              content={<p>Try to calm the client and understand his situation.</p>}
-              id={2}
-              openID={open}
-              openhandler={() => handleOpen(2)} />
-            <RecomendationCard
-              title={<h2>Average time response</h2>}
-              content={<p>Try to pay attention to incoming calls, time is valuable for our clients.</p>}
-              id={3}
-              openID={open}
-              openhandler={() => handleOpen(3)} />
-          </CardBody>
-        </Card>
-        */}
+        {
+        userID == null ?
+          <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+          <span className="flex justify-center items-center">
+          <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+          </span>
+          <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+              Notifications are now loading...
+          </Typography>
+          </div> : 
+        <NotificationsCard is_supervisor={false} agent_id={userID} />
+        }
       </div>
 
-
       {/*Agent Chat*/}
-      { userID == null ? null :
+      { userID == null ? 
+        <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+        <span className="flex justify-center items-center">
+        <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+        </span>
+        <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+            Chat is now loading...
+        </Typography>
+        </div>
+      :
         <ChatBox agent_id={userID} is_supervisor={false} />
       }
 

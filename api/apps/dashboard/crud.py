@@ -745,7 +745,7 @@ async def get_capacity_agent(agent_id):
         ]
     )
 
-    response2 = await cachedData.get('past_month_capacity_agent', agent_id)
+    response2 = await cachedData.get('past_month_capacity_agent', agent_id=agent_id)
 
     try:
         
