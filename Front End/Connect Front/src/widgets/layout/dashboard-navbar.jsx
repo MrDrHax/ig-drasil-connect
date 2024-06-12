@@ -275,16 +275,15 @@ export function DashboardNavbar() {
             <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
           </IconButton>
 
-
-          <HomeIcon
-          variant="text"
-          color="black"
-          className={`h-7 w-7 p-1 mx-2 cursor-pointer ${getTextColor("contrast")}`}
-          onClick={() => window.location.href ='https://igdrasilconnect.awsapps.com/start/#/?tab=applications'}
-        />
-
-
-
+          {/* Link to aws portal */}
+          <Link to = {'https://igdrasilconnect.awsapps.com/start/#/?tab=applications'}>
+            <HomeIcon
+            variant="text"
+            color="black"
+            className={`h-7 w-7 p-1 mx-2 ${getTextColor("contrast")}`}
+            //onClick={() => window.location.href ='https://igdrasilconnect.awsapps.com/start/#/?tab=applications'}
+            />
+          </Link>
             
         </div>
       </div>

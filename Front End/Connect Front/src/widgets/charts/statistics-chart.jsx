@@ -4,7 +4,6 @@ import {
   CardBody,
   CardFooter,
   Typography,
-  tooltip,
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
@@ -16,22 +15,22 @@ import {
 } from "@/context";
 
 import { chartsConfig } from "@/configs";
-import { propTypesLabelProps } from "@material-tailwind/react/types/components/input";
 
 export function StatisticsChart({ color, chart, title, description, footer }) {
 
   const controller = useMaterialTailwindController();
   const theme = controller;
 
-  // Fix the bar chart
-  if (chart.type === 'bar' && chart.series.length > 1) {
+  // Fix the normal bar chart graphs 
+  if (chart.type === 'bar' &&  title !== 'Clients by Queue' && chart.series.length > 1) {
     // Fix the series data to be a single dictionary named data
     let data = chart.series.map((item) => item.data[0])
     chart.series = []
     chart.series[0] = {
       data : data,
       name : title,
-    } 
+    }
+
   }
 
   chart = {

@@ -106,7 +106,7 @@ export function Home() {
         )}
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-2">
         {!isLoaded ? (
           <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
             <span className="flex justify-center items-center">
