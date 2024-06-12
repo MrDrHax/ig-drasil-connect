@@ -78,7 +78,7 @@ export function TwitterChatboxTextarea({agent_id, is_supervisor}) {
  * @param {boolean} props.is_supervisor - Whether the current viewer is a supervisor.
  * @return {JSX.Element} The chat message component.
  */
-export function ChatMessage ({ message, rol, hour, is_supervisor, transcript}) {
+export function ChatMessage ({ message, rol, hour, is_supervisor}) {
   {/* Defines the color of the card based on the role of the message sender. */}
   const isAgent = rol === is_supervisor;
 
@@ -94,7 +94,6 @@ export function ChatMessage ({ message, rol, hour, is_supervisor, transcript}) {
               {message} 
             </Typography>
             <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")} `} >
-                
                 {hour.split("T")[0]} {hour.split("T")[1].split(".")[0].split(":")[0]}:{hour.split("T")[1].split(".")[0].split(":")[1]}
               </Typography>
           </CardBody>
@@ -103,33 +102,5 @@ export function ChatMessage ({ message, rol, hour, is_supervisor, transcript}) {
       </div>
     );
   }
-
-  export function Transcript ({rol, hour, is_supervisor, transcript}) {
-    {/* Defines the color of the card based on the role of the message sender. */}
-    const isAgent = rol === is_supervisor;
-  
-    const controller = useMaterialTailwindController();
-    const { theme } = controller;
-  
-    return (
-       <div className={`flex ${isAgent ? 'justify-end' : 'justify-start'} m-5`}>
-          {/* Change the color of the card based on the role of the message sender. */}
-          <Card className={`m-2 rounded-[100px] border  ${getBorderColor('search-bar')} ${isAgent ? getBgColor('green') : getBgColor('gray')}`}  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', maxWidth: '300px' }}>
-            <CardBody>
-            <Typography color="black" className={`text-base ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")}`}>
-                {transcript} 
-              </Typography>
-              <Typography  color="blue-gray" className={`text-right text-[0.7rem] g ${getTypography()} ${isAgent ? getTextColor("white2") : getTextColor("black")} `} >
-                  
-                  {hour.split("T")[0]} {hour.split("T")[1].split(".")[0].split(":")[0]}:{hour.split("T")[1].split(".")[0].split(":")[1]}
-                </Typography>
-            </CardBody>
-  
-          </Card>
-        </div>
-      );
-    }
-
-
 
 export default TwitterChatboxTextarea; ChatMessage;

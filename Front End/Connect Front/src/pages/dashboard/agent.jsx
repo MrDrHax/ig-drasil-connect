@@ -39,16 +39,14 @@ export function Agent() {
   const {navColor, theme} = controller;
 
   const [open, setOpen] = useState(1);
-  const [userID, setUserID] = useState(null);
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
   const [sentiment, setSentiment] = useState([]);
+  const [sentimentIsLoaded, setSentimentIsLoaded] = useState(false);
   const [userID, setUserID] = useState("");
 
   const [isLoaded, setIsLoaded] = useState(false);
-
-  let agent_id = localStorage.getItem("userID");
 
   function getIcon(icon) {
     switch (icon) {
@@ -84,12 +82,11 @@ export function Agent() {
       
       AgentSentimentRatingData(userID).then((data) => {
       setSentiment(data);
-      setIsLoaded(true);
+      setSentimentIsLoaded(true);
       //console.log(data);
     }).catch((error) => {
-      setIsLoaded(true);
+      setSentimentIsLoaded(true);
     });
-  } 
     }
   }, [userID]);
 
@@ -130,8 +127,17 @@ export function Agent() {
       {/*Client Data*/}
       <div className="p-4 mb-10">
         <div className="grid grid-cols-2 gap-4">
-          
-          {sentiment.map(({ sentiment, rating, recommendation, ...rest }) => (
+          {!sentimentIsLoaded ? (
+            <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+            <span className="flex justify-center items-center">
+            <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+            </span>
+            <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                Customer sentiment data is now loading...
+            </Typography>
+            </div>
+            ) : 
+          sentiment.map(({ sentiment, rating, recommendation, ...rest }) => (
             <CustomerSentimentCard
               key={1}
               {...rest}

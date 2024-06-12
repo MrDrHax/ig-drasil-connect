@@ -22,7 +22,6 @@ import {
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
-import  {ChatMessage, Transcript}  from "@/widgets/chat/chat.jsx";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
 import { AgentDetails, getAgentTranscriptSummaryData } from "@/data/agents-data";
@@ -82,9 +81,9 @@ export function Profile() {
 
     getAgentTranscriptSummaryData(searchParams.get("profile")).then((data) => {
       setTranscripts(data);
+      setIsLoaded(true);
     })
 
-    setIsLoaded(true);
   }
 
   //Call the function just once
@@ -153,6 +152,12 @@ export function Profile() {
           { view === 'app' && (
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
+            { !isLoaded ?
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+              </div> :
             <ProfileInfoCard
               title="Agent AI.n Recommendations"
               description= {"Al.n is under maintenance, please check back later."}
@@ -161,8 +166,9 @@ export function Profile() {
                 "Mobile Phone": dataToDisplay.mobile,
                 "Email": dataToDisplay.email,
               }}
-              transcript={transcript}
+              transcript={transcripts}
             />
+            }
 
               {/* Add Last Customer Calls */}
               <div>

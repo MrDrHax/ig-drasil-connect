@@ -214,7 +214,7 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
     matches = [obj['Key'] for obj in response['Contents'] if file in obj['Key']]
 
     if len(matches) == 0:
-        raise HTTPException(status_code=404, detail="Transcript not found")
+        return [models.AgentSentimentRating(sentiment=0.0, rating=0.0, recommendation="No calls made yet. You should try to answer some calls.")]
 
     file = matches[0]
 
@@ -245,7 +245,7 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
                               "You should try to be more understanding."]
             recommendation = random.choice(recommendations)                                   
         else:
-            recommendation = "No recommendation found at the moment."
+            recommendation = "The sentiment of the call was neutral. You should try to be more empathetic."
     
     return [models.AgentSentimentRating( sentiment=sentiment, 
                                         rating=calculateRating(transcript_json),
@@ -321,7 +321,8 @@ async def getAgentTranscriptSummary(agent_id: str):
     logger.warning(response)
 
     if len(response['UserDataList'][0]['Contacts']) == 0:
-        raise HTTPException(status_code=404, detail="No contact found for the agent.")
+        return []
+        #raise HTTPException(status_code=404, detail="No contact found for the agent.")
     
     call_id = response['UserDataList'][0]['Contacts'][0]['ContactId']
     

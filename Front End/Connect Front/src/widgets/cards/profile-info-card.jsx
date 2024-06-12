@@ -26,7 +26,7 @@ export function ProfileInfoCard({ title, description, details, action, transcrip
         </Typography>
         {action}
       </CardHeader>
-      <CardBody className="p-0">
+      <CardBody className="pt-0">
         {description && (
           <Typography
             //variant="small"
@@ -35,37 +35,17 @@ export function ProfileInfoCard({ title, description, details, action, transcrip
             {description}
           </Typography>
         )}
-        {description && details ? (
-          <hr className="my-8 border-blue-gray-50" />
-        ) : null}
-        {details && (
-          <ul className="flex flex-col gap-4 p-0">
-            {Object.keys(details).map((el, key) => (
-              <li key={key} className="flex items-center gap-4">
-                <Typography
-                  //variant="small"
-                  color="blue-gray"
-                  className={`text-sm ${getTypographybold()} ${getTextColor("white3")} text-[0.8rem] `}
-                >
-                  {el}:
-                </Typography>
-                {typeof details[el] === "string" ? (
-                  <Typography
-                    //variant="small"
-                    className={`text-sm ${getTypography()} ${getTextColor("white3")} text-[0.6rem] `}
-                  >
-                    {details[el]}
-                  </Typography>
-                ) : (
-                  details[el]
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        {transcript.map(data => (
-          <ChatMessage message={data[1]} rol={data[0] === "AGENT" ? true:false  } hour={data[2]} is_supervisor={true} />
         
+        </CardBody>
+
+        <CardBody className={`overflow-y-auto px-0 pt-0 max-h-[17rem] ` }>
+        <Typography variant="h6" className={` ${getTypography()} ${getTextColor("white3")} `}>
+            {transcript.length == 0 ? "No transcript available" : "Transcript"}
+        </Typography>
+        { transcript.length == 0 ?
+          null :
+          transcript.map((data) => (
+          <ChatMessage message={data[1]} rol={data[0] === "AGENT" ? true: false } hour={data[2]} is_supervisor={true} />
         ))}
       </CardBody>
     </Card>
