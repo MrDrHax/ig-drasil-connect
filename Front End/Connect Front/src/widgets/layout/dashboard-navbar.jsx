@@ -22,6 +22,7 @@ import {
   ClockIcon,
   CreditCardIcon,
   Bars3Icon,
+  HomeIcon
 } from "@heroicons/react/24/solid";
 import {
   useMaterialTailwindController,
@@ -183,6 +184,8 @@ export function DashboardNavbar() {
                 <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
                 {getNameFromToken()}
               </Button>
+
+      
               
           </Tooltip>
           {/* <Menu>
@@ -266,10 +269,23 @@ export function DashboardNavbar() {
           <IconButton
             variant="text"
             color="blue-gray"
+            className='p-2 mr-1'
             onClick={() => setOpenConfigurator(dispatch, true)}
           >
             <Cog6ToothIcon className={`h-5 w-5  ${getTextColor("contrast")}`} />
           </IconButton>
+
+
+          <HomeIcon
+          variant="text"
+          color="black"
+          className={`h-7 w-7 p-1 mx-2 cursor-pointer ${getTextColor("contrast")}`}
+          onClick={() => window.location.href ='https://igdrasilconnect.awsapps.com/start/#/?tab=applications'}
+        />
+
+
+
+            
         </div>
       </div>
     </Navbar>
