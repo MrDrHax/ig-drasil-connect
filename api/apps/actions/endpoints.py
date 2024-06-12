@@ -38,7 +38,7 @@ async def join_call(token: Annotated[str, Depends(requireToken)], agent_id: str)
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    user_id = await get_agentID(userType.getUserName(token))
+    user_id = await get_agentID(username=userType.getUserName(token), token=token)
 
     client = boto3.client('connect')
 

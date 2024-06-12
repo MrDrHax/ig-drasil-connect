@@ -92,8 +92,6 @@ export function Profile() {
       setConversations(data);
     })
 
-    setIsLoaded(true);
-
     getAiRecommendations();
 
     getAgentTranscriptSummaryData(searchParams.get("profile")).then((data) => {
