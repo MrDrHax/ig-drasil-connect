@@ -38,9 +38,9 @@ function getColorOfStatus(status) {
             return "red";
         case "Offline":
             return "gray";
-        // Statuses while in a call are shown as yellow
+        // Statuses while in a call are shown as pink
         default:
-            return "yellow";
+            return "pink";
     }
 }
 
@@ -353,7 +353,7 @@ export function Teams() {
                                                             </td>
                                                             {/* Needs help indicator*/}
                                                             <td className={className}>
-                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'yellow' ? <ExclamationCircleIcon className="h-6 w-6 text-yellow-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
+                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'pink' ? <ExclamationCircleIcon className="h-6 w-6 text-pink-300" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
@@ -362,7 +362,7 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { requireHelp || getColorOfStatus(status) == 'yellow' ?
+                                                            { requireHelp || getColorOfStatus(status) == 'pink' ?
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
