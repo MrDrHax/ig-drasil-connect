@@ -18,6 +18,7 @@ import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController
 
 import React, { useState, useEffect } from 'react';
 import { SupervisorHomeData } from "@/data/supervisor-home-data";
+import { AgentId } from "@/data";
 
 export function getIcon(icon) {
   switch (icon) {
@@ -54,7 +55,8 @@ export function Home() {
   const [graphs, setGraphs] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  let agent_id = localStorage.getItem("userID");
+  const [agent_id, setAgent_id] = useState("");
+
 
   function updateData() {
 
@@ -62,17 +64,21 @@ export function Home() {
       setCards(data.cards);
       setGraphs(data.graphs);
       setIsLoaded(true);
-      //console.log(data);
     }).catch((error) => {
-      console.log(error);
       setIsLoaded(true);
     });
   }
 
-  //Call the function to recieve data just once
+  useEffect(() => {
+    AgentId().then((data) => {
+      setAgent_id(data);
+    });
+  }, []);
+
+  //Call the function to recieve data once the agent_id is set
   useEffect(() => {
     updateData();
-  }, []);
+  }, [agent_id]);
 
   return (
     <div className="mt-4">
@@ -134,49 +140,9 @@ export function Home() {
 
 
       {/* Notifications */}
-       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
+       <div id="notifications" className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
         <NotificationsCard is_supervisor={true} agent_id={agent_id}/>
 
-        {/* Recomendations
-        <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
-          <CardHeader
-            floated={false}
-            shadow={false}
-            color="transparent"
-            className="m-0 p-6"
-          >
-             <Typography variant="h6" color="blue-gray" className={`text-xl ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
-              Recommendations
-            </Typography>
-            <Typography
-              //variant="small"
-              className={`flex items-center gap-1 font-normal text-base ${getTypography()} ${getTextColor("white3")}`}
-            >
-              Next, a list of recommendations for you:
-            </Typography>
-          </CardHeader>
-          <CardBody className="pt-0">
-            <RecomendationCard 
-              title={<h2>Check Metrics</h2>} 
-              content={<p>Check the client information and metrics.</p>}
-              id={1}
-              openID={open}
-              openhandler={() => handleOpen(1)}/>
-      <RecomendationCard 
-              title={<h2>De-escalate the call</h2>} 
-              content={<p>Try to calm the client and understand his situation.</p>}
-              id={2}
-              openID={open}
-              openhandler={() => handleOpen(2)}/>
-      <RecomendationCard 
-              title={<h2>Average time response</h2>} 
-              content={<p>Try to pay attention to incoming calls, time is valuable for our clients.</p>}
-              id={3}
-              openID={open}
-              openhandler={() => handleOpen(3)}/>
-          </CardBody>
-        </Card>
-        */}
       </div> 
     </div>
   );

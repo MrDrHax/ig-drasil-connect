@@ -36,6 +36,12 @@ import {
 } from "@/context";
 import { getApiLoginPage, getNameFromToken, getRolesFromToken } from "@/configs";
 
+import { AgentId } from '@/data';
+
+import { Notifications } from '@/pages/dashboard';
+
+import { Alerts } from '@/data/supervisor-home-data';
+
 function handleTabClick(tab) {
   history.push(`/${tab}`);
 }
@@ -46,14 +52,39 @@ export function DashboardNavbar() {
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
 
-  const [loginUrl, setLoginUrl] = useState('');
+  const [agent_id, setAgent_id] = useState('');
 
-  let roles = getRolesFromToken();
+  const [gotNotification, setGotNotification] = useState(false);
+
+  const [info, setInfo] = useState([]);
+
+  const roles = getRolesFromToken();
+
+  function getNotifications(isAgent, isSupervisor) {
+
+    if (isAgent) {
+      Alerts(false, agent_id).then((data) => {
+        setInfo(data);
+      });
+    }
+
+    if (isSupervisor) {
+      Alerts(true, agent_id).then((data) => {
+        setInfo(info.concat(data));
+      });
+    }
+
+    setGotNotification(true);
+
+  }
 
   useEffect(() => {
-    getApiLoginPage()
-      .then(data => setLoginUrl(data))
-      .catch(error => console.error('Error:', error));
+    AgentId().then((data) => {
+      setAgent_id(data);
+    });
+
+    if (!gotNotification)
+      getNotifications(roles.includes('agent'), roles.includes('manager'));
   }, []);
 
   return (
@@ -68,31 +99,6 @@ export function DashboardNavbar() {
     >
       <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
         <div className="capitalize">
-          {/* <Breadcrumbs
-            className={`bg-transparent p-0 transition-all ${
-              fixedNavbar ? "mt-1" : ""
-            }`}
-          >
-            <Link to={`/${layout}`}>
-              <Typography
-                variant="small"
-                color="blue-gray"
-                className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
-              >
-                le test
-              </Typography>
-            </Link>
-            <Typography
-              variant="small"
-              color="blue-gray"
-              className="font-normal"
-            >
-              {page}
-            </Typography>
-          </Breadcrumbs> */}
-          {/* <Typography variant="h6" color="blue-gray">
-            {page}
-          </Typography> */}
 
           <Typography variant="h6" className={'${getTypography()}'} color={getTheme() === "light"? 'black' : 'white'}>
           {/* Main navbar with tabs for different pages */}
@@ -145,11 +151,6 @@ export function DashboardNavbar() {
 
         </div>
         <div className="flex items-center">
-          {/*
-         <div className="mr-auto md:mr-4 md:w-56">
-            <Input label="Search" />
-          </div>
-         */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -160,19 +161,19 @@ export function DashboardNavbar() {
           </IconButton>
 
           {/* Profile dropdown */}
-          <Tooltip placement="bottom" className="border border-blue-gray-50 bg-white px-4 py-3 shadow-xl shadow-black/10"
+          <Tooltip placement="bottom" className={`border border-blue-gray-50 bg-white px-4 py-3 shadow-xl shadow-black/10 ${getBgColor('background')}`}
           content={ <div className="w-80">
-                      <Typography color="blue-gray" className="font-medium">
+                      <Typography color="blue-gray" className={`font-medium ${getTypography()} ${getTextColor("contrast")}`}>
                         {getNameFromToken()}
                       </Typography>
-                      {getRolesFromToken().map((role, index) => (
+                      {roles.map((role, index) => (
                         <Typography
                           key={index}
                           variant="small"
                           color="blue-gray"
-                          className="font-normal opacity-80"
+                          className={`font-normal opacity-80 ${getTypography()} ${getTextColor("contrast")}`}
                         >
-                          {role == "manager" ||  role == "agent" ? role : null}
+                          {role == "manager" ? "Supervisor" : role == "agent" ? "Agent" : null}
                         </Typography>
                       ))}
                     </div>}>
@@ -183,89 +184,39 @@ export function DashboardNavbar() {
               >
                 <UserCircleIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
                 {getNameFromToken()}
-              </Button>
-
-      
-              
+              </Button>              
           </Tooltip>
-          {/* <Menu>
-            <MenuHandler>
-              <IconButton variant="text" color="blue-gray">
-                <BellIcon className={`h-10 w-5 ${getTextColor("contrast")}`} />
-              </IconButton>
-            </MenuHandler>
-            <MenuList className="w-max border-0">
-              <MenuItem className="flex items-center gap-3">
-                <Avatar
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/team-2.jpg"
-                  alt="item-1"
-                  size="sm"
-                  variant="circular"
-                />
-                <div>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className={ `mb-1 ${getTypography()}`}
-                  >
-                    <strong>agent 1</strong> has connected a call
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className={ `flex items-center gap-1 text-xs opacity-60 ${getTypography()}`}
-                  >
-                    <ClockIcon className="h-3.5 w-3.5" /> 13 minutes ago
-                  </Typography>
-                </div>
-              </MenuItem>
-              <MenuItem className="flex items-center gap-4">
-                <Avatar
-                  src="https://imgs.search.brave.com/YHSiLIxYYxfQCMAe51EOOPS0oevNKqtWXeUyDvJF7mU/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pMC53/cC5jb20vbmV3c3Bh/Y2stZWxzb2wuczMu/YW1hem9uYXdzLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/NC8wNC9NYXBhY2hl/LVBlZHJvLmpwZz9m/aXQ9ODMwLDYyMyZz/c2w9MQ"
-                  alt="item-1"
-                  size="sm"
-                  variant="circular"
-                />
-                <div>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className={ `mb-1 ${getTypography()}`}
-                  >
-                    <strong>Issue with</strong> agent pedro
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className={ `flex items-center gap-1 text-xs opacity-60 ${getTypography()}`}
-                  >
-                    <ClockIcon className="h-3.5 w-3.5" /> 1 day ago
-                  </Typography>
-                </div>
-              </MenuItem>
-              <MenuItem className="flex items-center gap-4">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-tr from-blue-gray-800 to-blue-gray-900">
-                  <CreditCardIcon className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className={ `mb-1 ${getTypography()}`}
-                  >
-                    Payment successfully completed
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className={ `flex items-center gap-1 text-xs opacity-60 ${getTypography()}`}
-                  >
-                    <ClockIcon className="h-3.5 w-3.5" /> 2 days ago
-                  </Typography>
-                </div>
-              </MenuItem>
-            </MenuList>
-          </Menu> */}
+
+          {/* Notifications */}
+          <Menu>
+          <MenuHandler>
+            <IconButton variant="text" color="blue-gray" className="hidden xl:flex">
+              <BellIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
+              { info.length == 0 ? null :
+              <div key="Num_Notifications" className={`absolute bottom-0 right-0 rounded-full bg-red-600 w-2.5 h-2.5 ${getTextColor("contrast")}`}/>
+              }
+            </IconButton>
+          </MenuHandler>
+          <MenuList className={`${getBgColor("background")} border-0`}>
+            <Typography variant="h6" color="blue-gray" className={ `mb-1 ${getTypographybold()} ${getTextColor("contrast")}`}>
+              Alerts:
+            </Typography>
+              {
+                info.map(({Text,TextRecommendation, color, timestamp }) => (
+                  <MenuItem key={timestamp} className="flex items-center gap-3">
+                      <Typography
+                        variant="small"
+                        className={ `mb-1 ${getTypography()} ${getTextColor("contrast")}` }
+                      >
+                        <strong className={ `${getTypographybold()} ${getTextColor(color)}` }>{Text}</strong> <br /><span className={ `${getTypographybold()} ${getTextColor("contrast")}` }>Recommendation: </span>{TextRecommendation}
+                      </Typography>
+                    </MenuItem>
+                ))
+              }
+          </MenuList>
+          </Menu>
+
+          {/* Configurator button */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -277,12 +228,13 @@ export function DashboardNavbar() {
 
           {/* Link to aws portal */}
           <Link to = {'https://igdrasilconnect.awsapps.com/start/#/?tab=applications'}>
-            <HomeIcon
+            <IconButton
             variant="text"
             color="black"
-            className={`h-7 w-7 p-1 mx-2 ${getTextColor("contrast")}`}
-            //onClick={() => window.location.href ='https://igdrasilconnect.awsapps.com/start/#/?tab=applications'}
-            />
+            className={`p-2 mr-1`}
+            >
+              <HomeIcon className={`h-5 w-5 ${getTextColor("contrast")}`} />
+            </IconButton>
           </Link>
             
         </div>

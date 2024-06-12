@@ -64,9 +64,9 @@ export function Notifications({is_supervisor, agent_id}) {
               color={color}
               onClose={() => setShowAlerts((current) => ({ ...current, [color]: false }))}
             >
-              <span className={ `${getTypography()}  ${getTextColor("white")}` }>{Text}
-              <br /><span className={ `${getTypographybold()} ${getTextColor("white")}` }>Recommendation: </span>{TextRecommendation} </span>
-              <Typography className={ `${getTypography()}  ${getTextColor("white")} text-[0.7rem] text-right`}>{timestamp}</Typography>
+              <span className={ `${getTypography()}  ${getTextColor("white3")}` }>{Text}
+              <br /><span className={ `${getTypographybold()} ${getTextColor("white3")}` }>Recommendation: </span>{TextRecommendation} </span>
+              <Typography className={ `${getTypography()}  ${getTextColor("white3")} text-[0.7rem] text-right`}>{timestamp}</Typography>
             </Alert>
           ))}
 

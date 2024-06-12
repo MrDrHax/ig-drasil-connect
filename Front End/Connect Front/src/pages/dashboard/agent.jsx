@@ -152,7 +152,7 @@ export function Agent() {
 
 
       {/*Agent Alerts */}
-      <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
+      <div id="notifications" className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
         <NotificationsCard is_supervisor={false} agent_id={sessionStorage.getItem("userID")} />
 
 
