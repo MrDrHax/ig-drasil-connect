@@ -4,10 +4,13 @@ import boto3
 from config import Config
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date, timezone
+import pytz
 from tools.lazySquirrel import LazySquirrel
 
 import logging
 logger = logging.getLogger(__name__)
+
+tz = pytz.timezone('America/Mexico_City')
 
 async def agent_profile_data(id) -> tuple:
     client = boto3.client('connect')
@@ -859,7 +862,7 @@ async def get_alert_supervisor_NA():
             Text="You have "+str(agentNeedsAssistance) +  " agents who need your help. ",
             TextRecommendation="You should go a Queue and see who needs help and go to the agent who needs help.",
             color="red",
-            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
+            timestamp= datetime.now(tz).strftime('%Y-%m-%d %H:%M')
         )
         return alert
     return None
@@ -894,7 +897,7 @@ async def get_alert_supervisor_available():
             Text="There are no agents available.",
             TextRecommendation=" You should check first to see if your agents are busy or offline to see if any of them might be available again.",
             color="red",
-            timestamp= datetime.now(tz=timezone.utc)
+            timestamp= datetime.now(tz)
         )
         return alert
     else:
@@ -902,7 +905,7 @@ async def get_alert_supervisor_available():
             Text="There are "+ str(round(data)) + " agents available.",
             TextRecommendation="You should check first to see if your agents are busy or offline to see if any of them might be available again.",
             color="green",
-            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
+            timestamp= datetime.now(tz).strftime('%Y-%m-%d %H:%M')
         )
         return alert
 cachedData.add("get_alert_supervisor_available", get_alert_supervisor_available, 60)
@@ -940,7 +943,7 @@ async def get_alert_supervisor_nonResponse():
                     Text="Agent "+ await get_usename(i["Dimensions"]["AGENT"]) + " has not responded during the call with the client.",
                     TextRecommendation="You could intervene in the call or send him a message as to why he is silent in front of the customer",
                     color="red",
-                    timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
+                    timestamp= datetime.now(tz).strftime('%Y-%m-%d %H:%M')
                 ))
     return alert
 cachedData.add("get_alert_supervisor_nonResponse", get_alert_supervisor_nonResponse, 60)
@@ -974,7 +977,7 @@ async def get_alert_agent_nonResponse(agent_id):
             Text="You have not responded during the call with the client.",
             TextRecommendation="You could ask for help from a supervisor or ask the client if he has any questions.",
             color="orange",
-            timestamp= datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M')
+            timestamp= datetime.now(tz).strftime('%Y-%m-%d %H:%M')
         )
         
     return alert
