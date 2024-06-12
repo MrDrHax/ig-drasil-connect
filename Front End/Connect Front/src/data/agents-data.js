@@ -14,7 +14,7 @@ import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-to
 export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
     let url = new URL(getApiPath() + 'lists/agents');
 
-    console.log("seatch: " + search);
+    // console.log("search: " + search);
 
     let params = {
         skip: skip,
@@ -131,7 +131,7 @@ export async function AgentId() {
  */
 export async function JoinCall(agent_id) {
 
-    let url = getApiPath() + `actions/join_call?agent_id=${agent_id}}`;
+    let url = getApiPath() + `actions/join-call?agent_id=${agent_id}`;
     let request = new Request(url, {method: 'POST'});
     addTokenToHeader(request);
     let response = await fetch(request);
@@ -181,6 +181,17 @@ export async function ChangeStatus(agent_id, status) {
     let request = new Request(url, {method: 'POST'});
     addTokenToHeader(request);
     let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+export async function AgentSummary(agent_id) {
+    let url = getApiPath() + `summaries/AI/AgentPerformance?agent_id=${agent_id}`;
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request, {method: 'GET'});
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
     }

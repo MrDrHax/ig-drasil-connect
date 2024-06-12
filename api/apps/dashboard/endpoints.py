@@ -519,9 +519,9 @@ async def get_agent_rating(agent_id: str, token: Annotated[str, Depends(requireT
     res[0] = res[0] / res[1]
 
     cardFooter = models.CardFooter(
-        color="text-green-500",
-        value="",
-        label="The average rating of the agent",
+        color="text-green-500" if 5-res[0] < 1 else "text-red-500",
+        value="{:.2f}".format(5-res[0]),
+        label="less than perfect. This rates your performance. " + ("You should aim for a 5 star rating." if 5-res[0] > 1 else "You are doing a great job."),
     )
 
     card = models.GenericCard(

@@ -77,6 +77,10 @@ try:
     # Include routers
     # app.include_router(dashboard_router)
 
+    @app.get("/")
+    def read_root():
+        return {"Hello": "World"}
+
     @app.post("/recommendations/{agent_id}")
     def get_agent_recommendations(agent_id: str, json_data: dict, credential: HTTPAuthorizationCredentials = Depends(security)) -> str:
         '''
@@ -86,7 +90,10 @@ try:
         if credential.credentials != Config.SECRET:
             return HTTPException(status_code=401, detail="Invalid credentials")
 
-        parsed_data = parseMetrics(json_data)
+        try:
+            parsed_data = parseMetrics(json_data)
+        except KeyError:
+            return "The last call was not available. Waiting for new call..."
 
         try:
             response = model.prompt(f'recommendations-{agent_id}', parsed_data)

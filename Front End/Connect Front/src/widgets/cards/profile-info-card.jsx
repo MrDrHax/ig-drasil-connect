@@ -26,7 +26,7 @@ export function ProfileInfoCard({ title, description, details, action, transcrip
         </Typography>
         {action}
       </CardHeader>
-      <CardBody className="pt-0">
+      <CardBody className="overflow-y-auto pt-0 max-h-[10rem]">
         {description && (
           <Typography
             //variant="small"
@@ -38,7 +38,7 @@ export function ProfileInfoCard({ title, description, details, action, transcrip
         
         </CardBody>
 
-        <CardBody className={`overflow-y-auto px-0 pt-0 max-h-[17rem] ` }>
+        <CardBody className={`overflow-y-auto px-0 pt-0 max-h-[10rem] ` }>
         <Typography variant="h6" className={` ${getTypography()} ${getTextColor("white3")} `}>
             {transcript.length == 0 ? "No transcript available" : "Transcript"}
         </Typography>
