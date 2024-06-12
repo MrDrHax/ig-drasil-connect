@@ -8,11 +8,26 @@ def parseMetrics(json_data: dict) -> str:
 
     transcript += f"END OF CHAT\n\n"
 
-    transcript += f"Chat Duration: {json_data['ConversationCharacteristics']['TotalConversationDurationMillis']}\n"
-    transcript += f"Interruptions: {json_data['ConversationCharacteristics']['Interruptions']['TotalCount']}\n"
-    transcript += f"No talk time: {json_data['ConversationCharacteristics']['NonTalkTime']['TotalTimeMillis']}\n"
-    transcript += f"Agent sentiment: {json_data['ConversationCharacteristics']['Sentiment']['OverallSentiment']['AGENT']}\n"
-    transcript += f"Customer sentiment: {json_data['ConversationCharacteristics']['Sentiment']['OverallSentiment']['CUSTOMER']}\n"
+    try:
+        transcript += f"Chat Duration: {json_data['ConversationCharacteristics']['TotalConversationDurationMillis']}\n"
+    except KeyError:
+        transcript += "Chat Duration: 0\n"
+    try:
+        transcript += f"Interruptions: {json_data['ConversationCharacteristics']['Interruptions']['TotalCount']}\n"
+    except KeyError:
+        transcript += "Interruptions: none\n"
+    try:
+        transcript += f"No talk time: {json_data['ConversationCharacteristics']['NonTalkTime']['TotalTimeMillis']}\n"
+    except KeyError:
+        transcript += "No talk time: 0\n"
+    try:
+        transcript += f"Agent sentiment: {json_data['ConversationCharacteristics']['Sentiment']['OverallSentiment']['AGENT']}\n"
+    except KeyError:
+        transcript += "Agent sentiment: positive\n"
+    try:
+        transcript += f"Customer sentiment: {json_data['ConversationCharacteristics']['Sentiment']['OverallSentiment']['CUSTOMER']}\n"
+    except KeyError:
+        transcript += "Customer sentiment: positive\n"
 
     return transcript
 
