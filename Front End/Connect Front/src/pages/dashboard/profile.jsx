@@ -22,9 +22,10 @@ import {
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
+import  {ChatMessage, Transcript}  from "@/widgets/chat/chat.jsx";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
-import { AgentDetails } from "@/data/agents-data";
+import { AgentDetails, getAgentTranscriptSummaryData } from "@/data/agents-data";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
@@ -52,6 +53,7 @@ export function Profile() {
   const [avgRatingFloat, setAvgRatingFloat] = useState(0.0);
 
   const [conversations, setConversations] = useState([]);
+  const [transcripts, setTranscripts] = useState([{}]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   searchParams.get("profile")
@@ -76,6 +78,10 @@ export function Profile() {
 
     AgentConversations(searchParams.get("profile")).then((data) => {
       setConversations(data);
+    })
+
+    getAgentTranscriptSummaryData(searchParams.get("profile")).then((data) => {
+      setTranscripts(data);
     })
 
     setIsLoaded(true);
@@ -155,6 +161,7 @@ export function Profile() {
                 "Mobile Phone": dataToDisplay.mobile,
                 "Email": dataToDisplay.email,
               }}
+              transcript={transcript}
             />
 
               {/* Add Last Customer Calls */}

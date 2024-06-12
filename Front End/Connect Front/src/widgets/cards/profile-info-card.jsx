@@ -6,9 +6,11 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { getBgColor, getTextColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
+import {ChatMessage} from "@/widgets/chat/chat.jsx";
+import { data } from "autoprefixer";
 
 
-export function ProfileInfoCard({ title, description, details, action }) {
+export function ProfileInfoCard({ title, description, details, action, transcript }) {
   const controller = useMaterialTailwindController();
 
   return (
@@ -61,6 +63,10 @@ export function ProfileInfoCard({ title, description, details, action }) {
             ))}
           </ul>
         )}
+        {transcript.map(data => (
+          <ChatMessage message={data[1]} rol={data[0] === "AGENT" ? true:false  } hour={data[2]} is_supervisor={true} />
+        
+        ))}
       </CardBody>
     </Card>
   );

@@ -154,7 +154,19 @@ export async function AgentSentimentRatingData(agent_id) {
   
     return await response.json();
   }
+
+  export async function getAgentTranscriptSummaryData(agent_id) {
+    let url = getApiPath() + `summaries/AgentTranscriptSummary?agent_id=` + agent_id;
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+      // raise error
+      throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
   
+    return await response.json();
+  }
 
 /**
  * Changes the status of an agent.

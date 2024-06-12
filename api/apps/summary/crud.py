@@ -330,8 +330,11 @@ async def getAgentTranscriptSummary(agent_id: str):
     InstanceId=Config.INSTANCE_ID,
     ContactId=call_id
 )
+    Transcript = []
     
-    
-    return responseV2
+    for segment in responseV2['Segments']:
+            Transcript.append([segment['Transcript']['ParticipantRole'], segment['Transcript']['Content'], datetime.now()])
+            
+    return Transcript
 
 cachedData.add('getAgentTranscriptSummary', getAgentTranscriptSummary, 120)

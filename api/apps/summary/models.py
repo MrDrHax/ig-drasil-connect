@@ -49,4 +49,10 @@ class AgentContactProfile(BaseModel):
     agentSentiment: float = Field(0, example=5, description="The sentiment of the agent. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
     customerSentiment: float = Field(0, example=5, description="The sentiment of the customer. Higher is better. Uses KPIs to try to approach how well it's going", min=0, max=5)
     timestamp: str = Field("%m-%d %H:%M", example="%m-%d %H:%M", description="The timestamp of when the contact was given")
+    
+class AgentTranscript(BaseModel):
+    content: str = Field("Agent transcript", example="Agent transcript", description="Agent transcript. In JSON format.")
+
+    class Config:
+        from_attributes = True
 
