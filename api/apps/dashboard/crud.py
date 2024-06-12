@@ -111,9 +111,6 @@ async def get_not_connected_users_data():
         if user['User']['Id'] in userList:
             userList.remove(user['User']['Id'])
 
-    for i in userList:
-        print(i)
-
     return userList
 cachedData.add("get_not_connected_users_data", get_not_connected_users_data, 30)
 
@@ -361,13 +358,11 @@ async def get_capacity():
     for i in response['MetricResults']:
         for n in i['Collections']:
             datares1.append(n['Value'])
-            print(datares1)
     
     datares2 = []
     for i in response2['MetricResults']:
         for n in i['Collections']:
             datares2.append(n['Value'])
-            print(datares2)
 
 
     comp = datares1[0]-datares2[0]
@@ -427,8 +422,6 @@ async def get_abandonment_rate():
 
     card_values = [i['Collections'][0]['Value'] for i in response['MetricResults']]
     card_value = sum(card_values) / len(card_values)
-
-    # print(card_value)
 
     if (card_value > 80):
         footerColor = "text-red-500"
@@ -546,9 +539,7 @@ cachedData.add("get_queues", get_queues, 60)
 
 # Agent Dashboard
 
-async def get_avg_holds(agent_id):
-    client = boto3.client('connect')
-
+async def last_month_avg_holds(agent_id):
     StartTime =  datetime((date.today() - timedelta(days=31)).year,
                           (date.today() - timedelta(days=31)).month, 1)
                                    
@@ -556,6 +547,40 @@ async def get_avg_holds(agent_id):
                                 (date.today() - timedelta(days=31)).month, 
                                 (datetime(date.today().year, date.today().month, 1) - timedelta(days=1)).day,
                                 23, 59, 59)
+    
+    client = boto3.client('connect')
+
+    past_month_res = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = StartTime,
+        EndTime = EndTime,
+        Interval = {
+            'TimeZone': 'UTC',
+            'IntervalPeriod': 'DAY',
+        },
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AVG_HOLDS',
+            }
+        ]
+    )
+
+    past_month_data = []
+    for i in past_month_res['MetricResults']:
+        for n in i['Collections']:
+            past_month_data.append(n['Value'])
+
+    return past_month_data
+cachedData.add("last_month_avg_holds", last_month_avg_holds, 60 * 60 * 24) # 24 hours
+
+async def get_avg_holds(agent_id):
+    client = boto3.client('connect')
     
     queues_list = await cachedData.get("list_queue")
 
@@ -585,37 +610,12 @@ async def get_avg_holds(agent_id):
         ]
     )
 
-    past_month_res = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = StartTime,
-        EndTime = EndTime,
-        Interval = {
-            'TimeZone': 'UTC',
-            'IntervalPeriod': 'DAY',
-        },
-        Filters = [
-            {
-            'FilterKey': 'AGENT',
-            'FilterValues' : [agent_id],  
-            } 
-        ], 
-        Metrics = [
-            {
-                'Name': 'AVG_HOLDS',
-            }
-        ]
-    )
-
     today_data = []
     for i in today_res['MetricResults']:
         for n in i['Collections']:
             today_data.append(n['Value'])
 
-    past_month_data = []
-    for i in past_month_res['MetricResults']:
-        for n in i['Collections']:
-            past_month_data.append(n['Value'])
-
+    past_month_data = await cachedData.get("last_month_avg_holds", agent_id=agent_id)
 
     if len(today_data) == 0 or len(past_month_data) == 0:
         #Return an empty card in case of no data
@@ -626,16 +626,15 @@ async def get_avg_holds(agent_id):
             icon="Clock",
             footer= models.CardFooter(
                 color="text-red-500",
-                value="0",
-                label="The average number of times a voice contact was put on hold ",
+                value="",
+                label="There was no data for the past month",
             )
         )
 
     cardFooter = models.CardFooter(
-        
-        color="text-red-500" if today_data[0] <= past_month_data[0] else "text-green-500",
+        color="text-red-500" if today_data[0] > past_month_data[0] else "text-green-500",
         value=(str(today_data[0] - past_month_data[0]) if  today_data[0] <= past_month_data[0] else ("+" + str(today_data[0] - past_month_data[0]))),
-        label="The average number of times a voice contact was put on hold ",
+        label=" times more today per contact than last month" if today_data[0] <= past_month_data[0] else " times less today per contact than last month",
     )
 
     card = models.GenericCard(
@@ -647,7 +646,7 @@ async def get_avg_holds(agent_id):
     )
 
     return card
-cachedData.add("get_avg_holds", get_avg_holds, 60)
+cachedData.add("get_avg_holds", get_avg_holds, 60) # 60 seconds
 
 async def get_People_to_answer():
     client = boto3.client('connect')
@@ -689,70 +688,18 @@ async def get_People_to_answer():
     card = models.GenericCard(
         id=1,
         title="People to answer",
-        value=str(data), 
+        # Get just the integer value from data
+        value= str(data.__round__()), 
         icon="Person",
         footer=cardFooter,
         color="green"
     )
 
     return card
-cachedData.add("get_People_to_answer", get_People_to_answer, 60)
+cachedData.add("get_People_to_answer", get_People_to_answer, 60) # 60 seconds
 
-async def get_schedule(agent_id):
+async def past_month_capacity_agent(agent_id):
     client = boto3.client('connect')
-
-                                   
-    EndTime =  datetime.today()
-
-    today_res = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = datetime.today()-timedelta(days=31),
-        EndTime = EndTime,
-        Interval = {
-            'TimeZone': 'UTC',
-            'IntervalPeriod': 'DAY',
-        },
-        Filters = [
-            {
-            'FilterKey': 'AGENT',
-            'FilterValues' : [agent_id],  
-            } 
-        ], 
-        Metrics = [
-            {
-                'Name': 'AGENT_ADHERENT_TIME',
-            }
-        ]
-    )
-
-    data=[]
-
-    for i in today_res['MetricResults']:
-        for n in i['Collections']:
-            data.append(n['Value'])
-    
-    return today_res
-cachedData.add("get_schedule", get_schedule, 60)
-
-async def get_capacity_agent(agent_id):
-    client = boto3.client('connect')
-    
-    response = client.get_metric_data_v2(
-        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
-        StartTime = datetime.today()-timedelta(days=1),
-        EndTime = datetime.today(),
-        Filters = [
-            {
-            'FilterKey': 'AGENT',
-            'FilterValues' : [agent_id],  
-            } 
-        ], 
-        Metrics = [
-            {
-                'Name': 'AGENT_OCCUPANCY',
-            }
-        ]
-    )
 
     response2 = client.get_metric_data_v2(
         ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
@@ -775,32 +722,55 @@ async def get_capacity_agent(agent_id):
         ]
     )
 
+    return response2
+cachedData.add("past_month_capacity_agent", past_month_capacity_agent, 60 * 60 * 24) # 24 hours
+
+async def get_capacity_agent(agent_id):
+    client = boto3.client('connect')
+    
+    response = client.get_metric_data_v2(
+        ResourceArn = 'arn:aws:connect:us-east-1:654654498666:instance/433f1d30-6d7d-4e6a-a8b0-120544c8724e' ,
+        StartTime = datetime.today()-timedelta(days=1),
+        EndTime = datetime.today(),
+        Filters = [
+            {
+            'FilterKey': 'AGENT',
+            'FilterValues' : [agent_id],  
+            } 
+        ], 
+        Metrics = [
+            {
+                'Name': 'AGENT_OCCUPANCY',
+            }
+        ]
+    )
+
+    response2 = await cachedData.get('past_month_capacity_agent', agent_id=agent_id)
+
     try:
         
         datares1 = []
         for i in response['MetricResults']:
             for n in i['Collections']:
                 datares1.append(n['Value'])
-                print(datares1)
         
         datares2 = []
         for i in response2['MetricResults']:
             for n in i['Collections']:
                 datares2.append(n['Value'])
-                print(datares2)
 
         comp = datares1[0]-datares2[0]
 
         cardFooter = models.CardFooter(
             color = "text-red-500" if comp > 0 else "text-green-500",
-            value = "{p:.2f}".format(p=comp),
+            value = "{p:.2f}%".format(p=comp),
             label ="more than last month" if comp > 0 else "less than last month"
         )
         
         card = models.GenericCard(
             id = 1,
-            title = "porcentage of time active",
-            value =  "{p:.2f}".format(p=datares1[0]),
+            title = "Percentage of time active",
+            value =  "{p:.2f}%".format(p=datares1[0]),
             icon = "Chart",
             footer = cardFooter,
             color="blue"
@@ -810,7 +780,7 @@ async def get_capacity_agent(agent_id):
     except:
         card = models.GenericCard(
             id = 0,
-            title = "porcentage of time active",
+            title = "Percentage of time active",
             value =  "No data",
             icon = "Chart",
             footer = models.CardFooter(
@@ -823,6 +793,8 @@ async def get_capacity_agent(agent_id):
     
     return card
 cachedData.add("get_capacity_agent", get_capacity_agent, 60)
+
+# Other endpoints
 
 async def list_users_data():
     client = boto3.client('connect')

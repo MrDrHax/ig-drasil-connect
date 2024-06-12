@@ -172,12 +172,13 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
     for contact in contactData:
         contactID = contact['Id']
 
-        file =f'{contactID}_analysis_' 
+        file =f'{contactID}_analysis_'
 
         matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
 
         if len(matches) == 0:
-            raise HTTPException(status_code=404, detail="Transcript not found")
+            continue
+            #raise HTTPException(status_code=404, detail="Transcript not found")
 
         file = matches[0]
 
@@ -275,7 +276,8 @@ async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile
         matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
 
         if len(matches) == 0:
-            raise HTTPException(status_code=404, detail="Transcript not found")
+            continue
+            #raise HTTPException(status_code=404, detail="Transcript not found")
 
         file = matches[0]
 
