@@ -625,9 +625,9 @@ async def get_avg_holds(agent_id):
             value="0",
             icon="Clock",
             footer= models.CardFooter(
-                color="text-red-500",
-                value="",
-                label="There was no data for the past month",
+                color="text-green-500",
+                value="You have no holds.",
+                label="Great job!",
             )
         )
 
@@ -680,14 +680,14 @@ async def get_People_to_answer():
             data += n['Value']
     
     cardFooter = models.CardFooter(
-        color="text-red-500",
-        value="",
-        label="There are currently this many people in all queues, waiting to be answered",
+        color="text-red-500" if data.__round__() > 5 else "text-green-500",
+        value=str(data.__round__()),
+        label="are waiting to be answered. " + ("Hurry up, make sure to finish this call as fast as possible." if data.__round__() > 5 else "You are doing a great job, keep it up!"),
     )
 
     card = models.GenericCard(
         id=1,
-        title="People to answer",
+        title="People waiting to be answered",
         # Get just the integer value from data
         value= str(data.__round__()), 
         icon="Person",
@@ -764,12 +764,12 @@ async def get_capacity_agent(agent_id):
         cardFooter = models.CardFooter(
             color = "text-red-500" if comp > 0 else "text-green-500",
             value = "{p:.2f}%".format(p=comp),
-            label ="more than last month" if comp > 0 else "less than last month"
+            label ="more than last month" if comp > 0 else "less than last month. To get it up, take as much calls as possible!"
         )
         
         card = models.GenericCard(
             id = 1,
-            title = "Percentage of time active",
+            title = "Percentage of active time",
             value =  "{p:.2f}%".format(p=datares1[0]),
             icon = "Chart",
             footer = cardFooter,
@@ -780,7 +780,7 @@ async def get_capacity_agent(agent_id):
     except:
         card = models.GenericCard(
             id = 0,
-            title = "Percentage of time active",
+            title = "Percentage of active time",
             value =  "No data",
             icon = "Chart",
             footer = models.CardFooter(

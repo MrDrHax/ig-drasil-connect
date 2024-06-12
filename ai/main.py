@@ -77,6 +77,10 @@ try:
     # Include routers
     # app.include_router(dashboard_router)
 
+    @app.get("/")
+    def read_root():
+        return {"Hello": "World"}
+
     @app.post("/recommendations/{agent_id}")
     def get_agent_recommendations(agent_id: str, json_data: dict, credential: HTTPAuthorizationCredentials = Depends(security)) -> str:
         '''

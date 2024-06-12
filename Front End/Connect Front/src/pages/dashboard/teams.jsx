@@ -141,8 +141,8 @@ export function Teams() {
     }
     let skip = (page - 1) * 10;
 
-    //if (!background)
-    setIsLoaded(false);
+    if (!background)
+      setIsLoaded(false);
 
     // get statuses
     StatusList().then((data) => {
@@ -187,7 +187,7 @@ export function Teams() {
       setIsTimeoutScheduled(true);
       setTimeout(() => {
         updateData(page, true);
-      }, 15000);
+      }, 5000);
     }
   }
 
@@ -300,7 +300,7 @@ export function Teams() {
             <table className="w-full min-w-[640px] table-auto">
               <thead>
                 <tr>
-                  {["name", "Routing Profile", "status", "needs help", ""].map((el, i) => (
+                  {["name", "Routing Profile", "", "needs help", ""].map((el, i) => (
                     <th
                       key={i}
                       className="border-b border-blue-gray-50 py-3 px-5 text-left"

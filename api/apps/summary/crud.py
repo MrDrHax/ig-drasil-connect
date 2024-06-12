@@ -1,3 +1,4 @@
+import aiohttp
 from fastapi import HTTPException
 import markdown
 import requests
@@ -74,13 +75,17 @@ cachedData.add('getLatestAgentTranscript', getLatestAgentTranscript, 120)
 async def fetchRecommendations(agent_id: str) -> str:
     res = await cachedData.get('getLatestAgentTranscript', agent_id=agent_id)
 
-    # call the gpt endpoint at localhost:8081/recommendations/{agent_id}
-    request = requests.post(f'{Config.GPT_URI}recommendations/{agent_id}', data=res, headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {Config.GPT_Key}'})
-
-    if request.status_code != 200:
-        return "Sorry, I am not available at the moment. Please try again later."
-    
-    return request.text.strip('"').replace("\\n", "\n\n")
+    # Create a session
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(f'{Config.GPT_URI}recommendations/{agent_id}', data=res, headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {Config.GPT_Key}'}) as response:
+                if response.status != 200:
+                    return "Sorry, I am not available at the moment. Please try again later."
+                
+                text = await response.text()
+                return text.strip('"').replace("\\n", "\n\n")
+        except Exception as e:
+            return f"Sorry, I am not available at the moment. Please try again later."
 
 cachedData.add('fetchRecommendations', fetchRecommendations, 120)
 

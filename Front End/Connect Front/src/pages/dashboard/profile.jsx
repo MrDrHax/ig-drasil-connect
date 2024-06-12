@@ -24,11 +24,11 @@ import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
-import { AgentDetails } from "@/data/agents-data";
+import { AgentDetails, AgentSummary } from "@/data/agents-data";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
-import {lexRecommendationData} from "@/data";
+import { lexRecommendationData } from "@/data";
 
 import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/data/supervisor-home-data";
 
@@ -57,6 +57,17 @@ export function Profile() {
   searchParams.get("profile")
 
 
+  const [aiRecommendations, setAiRecommendations] = useState("<p>Fetching data...</p>");
+
+  function getAiRecommendations() {
+    AgentSummary(searchParams.get("profile")).then((data) => {
+      console.log(data);
+      setAiRecommendations(data["content"]);
+    }).catch(() => {
+      setAiRecommendations("<p>Al.n is not available at the moment. Try again later</p>");
+    });
+  }
+
   function updateData() {
 
     AgentDetails(searchParams.get("profile")).then((data) => {
@@ -79,6 +90,8 @@ export function Profile() {
     })
 
     setIsLoaded(true);
+
+    getAiRecommendations();
   }
 
   //Call the function just once
@@ -148,8 +161,8 @@ export function Profile() {
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
             <ProfileInfoCard
-              title="Agent AI.n Recommendations"
-              description= {"Al.n is under maintenance, please check back later."}
+              title="Agent Al.n Recommendations"
+                description={<div dangerouslySetInnerHTML={{ __html: aiRecommendations }} />}
               details={{
                 "Name": dataToDisplay.name,
                 "Mobile Phone": dataToDisplay.mobile,

@@ -160,3 +160,14 @@ export async function ChangeStatus(agent_id, status) {
     }
     return await response.json();
 }
+
+export async function AgentSummary(agent_id) {
+    let url = getApiPath() + `summaries/AI/AgentPerformance?agent_id=${agent_id}`;
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request, {method: 'GET'});
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+}
