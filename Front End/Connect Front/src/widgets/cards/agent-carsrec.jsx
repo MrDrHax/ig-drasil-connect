@@ -109,7 +109,7 @@ export function Lexcard({ recomendation, footer }) {
           Al.n, your virtual assistant:
         </Typography>
         <Typography variant="paragraph" className={`text-[1rem] p-1 text-justify ${getTypography()} ${getTextColor("dark")}`}>
-          <span className={`${getTypographybold()}`}>Recommends: </span> {recomendation} 😊
+          {recomendation}
         </Typography>
       </CardBody>
       {footer && (

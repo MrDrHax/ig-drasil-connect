@@ -83,7 +83,8 @@ async def fetchRecommendations(agent_id: str) -> str:
                     return "Sorry, I am not available at the moment. Please try again later."
                 
                 text = await response.text()
-                return text.strip('"').replace("\\n", "\n\n")
+                
+                return text.strip('"').replace("\\n", "\n\n").replace('\\"', '"')
         except Exception as e:
             return f"Sorry, I am not available at the moment. Please try again later."
 

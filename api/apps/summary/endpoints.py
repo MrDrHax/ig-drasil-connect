@@ -34,6 +34,8 @@ async def read_agent_performance_summary(agent_id: str, token: Annotated[str, De
     if not userType.testToken(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
     res = await cachedData.get('fetchRecommendations', agent_id=agent_id)
+
+    res = re.sub(r'^([\w\s]+: )', r'- \1', res, flags=re.MULTILINE)
     
     html_content = markdown.markdown(res).replace("\n", "")
 
