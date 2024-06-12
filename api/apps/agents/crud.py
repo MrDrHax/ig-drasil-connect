@@ -4,10 +4,13 @@ import boto3
 from config import Config
 from cache.cache_object import cachedData
 from datetime import datetime , timedelta, date
+import pytz
 from tools.lazySquirrel import LazySquirrel
 
 import logging
 logger = logging.getLogger(__name__)
+
+tz = pytz.timezone('America/Mexico_City')
 
 
 async def online_agents():
@@ -162,7 +165,7 @@ async def queues_agent_answer_rate():
     user_graph = models.GenericGraph(
         title = "Agent Answer Rate",
         description = "This graph shows the answer rate of each agent in the last 30 days.",
-        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        footer = ("Updated at: " + datetime.now(tz).strftime("%H:%M")),
         chart = user_chart
     )
 
@@ -231,7 +234,7 @@ async def queues_agent_occupancy():
     agent_occupancy_graph = models.GenericGraph(
         title = "Agent Occupancy of today",
         description = "The occupancy of each agent on the current day.",
-        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        footer = ("Updated at: " + datetime.now(tz).strftime("%H:%M")),
         chart = agent_chart
     )
 
