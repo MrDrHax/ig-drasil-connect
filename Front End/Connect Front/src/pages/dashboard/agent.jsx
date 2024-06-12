@@ -38,7 +38,7 @@ export function Agent() {
   const {navColor, theme} = controller;
 
   const [open, setOpen] = useState(1);
-  const [userID, setUserID] = useState("");
+  const [userID, setUserID] = useState(null);
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
@@ -64,21 +64,20 @@ export function Agent() {
     }
   }
 
-  function updateData() {
-    AgentId().then((data) => {
-      setUserID(data.userID);
-    });
-
-    AgentHomeData(userID).then((data) => {
-      setCards(data.cards);
-      setIsLoaded(true);
-    });
-  } 
-
-  //Call the function just once
   useEffect(() => {
-    updateData();
+    AgentId().then((data) => {
+      setUserID(data);
+    });
   }, []);
+
+  useEffect(() => {
+    if (userID) {
+      AgentHomeData(userID).then((data) => {
+        setCards(data.cards);
+        setIsLoaded(true);
+      });
+    }
+  }, [userID]);
 
   return (
     <div className="mt-8">
@@ -200,7 +199,9 @@ export function Agent() {
 
 
       {/*Agent Chat*/}
-      <ChatBox agent_id={userID} is_supervisor={false} />
+      { userID == null ? null :
+        <ChatBox agent_id={userID} is_supervisor={false} />
+      }
 
     </div>
   );

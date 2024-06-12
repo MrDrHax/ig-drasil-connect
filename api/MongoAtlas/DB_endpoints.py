@@ -65,7 +65,7 @@ async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id:
     
 #    return db['chats'].find_one({"agent_id": agent_id})
 
-    if agent_id == 'null':
+    if agent_id == None:
         agent_id = await get_agentID(token)
 
     try:
