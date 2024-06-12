@@ -97,10 +97,12 @@ export function Teams() {
     ChangeStatus(agentId, status).then(result => {
       setChanged(!changed);
       if (result && result.message == "Status changed")
-        showAlertWithMessage("green", "Status changed", 5000);
+        showAlertWithMessage("green", "Status changed. It might take a few seconds to reflect changes.", 5000);
       else
         showAlertWithMessage("red", "Failed to change status", 5000);
     });
+
+    updateData();
   }
 
   /**
@@ -139,8 +141,8 @@ export function Teams() {
     }
     let skip = (page - 1) * 10;
 
-    if (!background)
-      setIsLoaded(false);
+    //if (!background)
+    setIsLoaded(false);
 
     // get statuses
     StatusList().then((data) => {
@@ -185,7 +187,7 @@ export function Teams() {
       setIsTimeoutScheduled(true);
       setTimeout(() => {
         updateData(page, true);
-      }, 5000);
+      }, 15000);
     }
   }
 
@@ -378,13 +380,28 @@ export function Teams() {
                                     className={`py-0.5 px-2 text-[0.8rem] font-medium w-fit ${getTypographybold()}`}
                                 />
                                 */}
-                                <Select value={status}
-                                  className={` text-[0.8rem] py-0.5 px-2 ${getTypographybold()} ${status === "Offline" ? getTextColor('dark') : getTextColor('white2')} ${getBgColor(getColorOfStatus(status))}`}
+                                {/* <Select value={status}
+                                  className={`text-[0.8rem] ${getTypographybold()} ${status === "Offline" ? getTextColor('dark') : getTextColor('white2')} ${getBgColor(getColorOfStatus(status))}`}
                                   color={getColorOfStatus(status)}
                                   onChange={(val) => handleChangeStatus(agentID, val, status)}>
                                   <Option key={status} value={status}>{status}</Option>
                                   {status_list.map((status_option) => status_option == status ? <></> : <Option key={status_option} value={status_option}>{status_option}</Option>)}
-                                </Select>
+                                </Select> */}
+
+                                <form class="max-w-sm mx-auto w-fit">
+                                  <label for="status_select" class="sr-only">Status</label>
+                                  <select
+                                    id="status_select"
+                                    onChange={(val) => handleChangeStatus(agentID, val.target.value, status)}
+                                    class={`block rounded-full py-2.5 px-5 w-full text-center text-sm border-0 border-b-2 border-gray-200 appearance-none ${getTypographybold()} ${status === " Offline" ? getTextColor('dark') : getTextColor('white2')} ${getBgColor(getColorOfStatus(status))} focus:outline-none focus:ring-0 focus:border-gray-200 peer`}
+                                  >
+                                    <option key={status} value={status} selected>{status.toUpperCase()}</option>
+                                    <optgroup label="Change to">
+                                      {status_list.map((status_option) => status_option == status ? <></> : <option key={status_option} value={status_option}>{status_option.toUpperCase()}</option>)}
+                                    </optgroup>
+                                  </select>
+                                </form>
+
                               </td>
                               {/* Needs help indicator*/}
                               <td className={className}>
