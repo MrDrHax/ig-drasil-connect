@@ -142,7 +142,7 @@ async def routing_profiles_data() -> tuple:
                                 for userData in list]
     return parsed
 
-cachedData.add("routing_profiles_data", routing_profiles_data, 10) # 10 seconds
+cachedData.add("routing_profiles_data", routing_profiles_data, 10, autoUpdate=True) # 20 seconds
 
 async def get_queue_description(queueID: str):
     client = boto3.client('connect')
@@ -229,4 +229,24 @@ async def get_queues_data():
 
     return builtData
 
-cachedData.add("get_queues_data", get_queues_data, 10) # 10 seconds
+cachedData.add("get_queues_data", get_queues_data, 10, autoUpdate=True) # 20 seconds
+
+async def list_statuses():
+    client = boto3.client('connect')
+    statuses = client.list_agent_statuses(
+        InstanceId=Config.INSTANCE_ID
+    )
+    
+    ret = []
+
+    for status in statuses['AgentStatusSummaryList']:
+        described = client.describe_agent_status(
+            InstanceId=Config.INSTANCE_ID,
+            AgentStatusId=status['Id']
+        )
+
+        ret.append(described['AgentStatus'])
+
+    return ret
+
+cachedData.add("list_statuses", list_statuses, 20) # 24 hours

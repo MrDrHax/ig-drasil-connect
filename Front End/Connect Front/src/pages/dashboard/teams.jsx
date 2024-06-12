@@ -38,9 +38,9 @@ function getColorOfStatus(status) {
             return "red";
         case "Offline":
             return "gray";
-        // Statuses while in a call are shown as yellow
+        // Statuses while in a call are shown as pink
         default:
-            return "yellow";
+            return "pink";
     }
 }
 
@@ -55,6 +55,8 @@ export function Teams() {
     const [status_list, setStatusList] = useState([]);
 
     const [isLoaded, setIsLoaded] = useState(false);
+    const [cardsLoaded, setCardsLoaded] = useState(false);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [searchQuery_status, setSearchQuery_status] = useState('');
     const [helpFilter, setHelpFilter] = useState(false);
@@ -118,6 +120,27 @@ export function Teams() {
         //console.log("Barging in to call with agent " + agentId);
     }
 
+    function updateCards() {
+        // get cards
+        AgentCards().then((data) => {
+            setCards(data.cards);
+            setGraphs(data.graphs);
+        })
+
+        // get statuses
+        StatusList().then((data) => {
+            let list = data.map((item) => item.Name);
+            list.sort();
+            setStatusList(list);
+        })
+
+        setCardsLoaded(true);
+    }
+
+    useEffect(() => {
+        updateCards();
+    }, []);
+
     /**
      * Updates the data on the page based on the provided page number.
      *
@@ -138,22 +161,6 @@ export function Teams() {
         let skip = (page - 1) * 10;
 
         setIsLoaded(false);
-
-        // get statuses
-        StatusList().then((data) => {
-            let statuses = [];
-            for (let i = 0; i < data.length; i++) {
-                statuses.push(data[i].Name);
-            }
-            statuses.sort();
-            setStatusList(statuses);
-        })
-
-        // get cards
-        AgentCards().then((data) => {
-            setCards(data.cards);
-            setGraphs(data.graphs);
-        })
 
         // get agents
         AgentList(skip, 10, search, "name", "asc").then((data) => {
@@ -185,7 +192,7 @@ export function Teams() {
         <div>
             {/*<!-- Cards -->*/}
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-                {!isLoaded ? (
+                {!cardsLoaded ? (
                 <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
                 <span className="flex justify-center items-center">
                 <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
@@ -353,7 +360,7 @@ export function Teams() {
                                                             </td>
                                                             {/* Needs help indicator*/}
                                                             <td className={className}>
-                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'yellow' ? <ExclamationCircleIcon className="h-6 w-6 text-yellow-500" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
+                                                                {requireHelp ? <ExclamationCircleIcon className="h-6 w-6 text-red-500" /> : getColorOfStatus(status) == 'pink' ? <ExclamationCircleIcon className="h-6 w-6 text-pink-300" /> : <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                                                             </td>
                                                             {/* View Agent Profile */}
                                                             <td className={className}>
@@ -362,7 +369,7 @@ export function Teams() {
                                                                 </Link>
                                                             </td>
                                                             {/* Barge-In If needed*/}
-                                                            { requireHelp || getColorOfStatus(status) == 'yellow' ?
+                                                            { requireHelp || getColorOfStatus(status) == 'pink' ?
                                                             <td className={className}>
                                                                 <Button onClick={() => bargeIn(agentID)}
                                                                 variant="gradient" color="red" className="py-0.5 px-2 text-[11px] font-medium w-fit">
@@ -455,7 +462,7 @@ export function Teams() {
             </div>
             {/*<!-- Graphs -->*/}
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2">
-                {!isLoaded ? (
+                {!cardsLoaded ? (
                 <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
                 <span className="flex justify-center items-center">
                 <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>

@@ -64,9 +64,9 @@ export function Notifications({is_supervisor, agent_id}) {
               color={color}
               onClose={() => setShowAlerts((current) => ({ ...current, [color]: false }))}
             >
-              <span className={ `${getTypography()}  ${getTextColor("white")}` }>{Text}
-              <br /><span className={ `${getTypographybold()} ${getTextColor("white")}` }>Recommendation: </span>{TextRecommendation} </span>
-              <Typography className={ `${getTypography()}  ${getTextColor("white")} text-[0.7rem] text-right`}>{timestamp}</Typography>
+              <span className={ `${getTypography()}  ${getTextColor("white3")}` }>{Text}
+              <br /><span className={ `${getTypographybold()} ${getTextColor("white3")}` }>Recommendation: </span>{TextRecommendation} </span>
+              <Typography className={ `${getTypography()}  ${getTextColor("white3")} text-[0.7rem] text-right`}>{timestamp}</Typography>
             </Alert>
           ))}
 
@@ -100,8 +100,8 @@ export function NotificationsCard({is_supervisor, agent_id}) {
             className="m-0 flex items-center justify-between p-6"
           >
             <div>
-              <Typography variant="h6" color="blue-gray" className={`mb-1 text-xl ${getTypography()} ${getTextColor('dark')}`}>
-                Alerts
+              <Typography variant="h6" color="blue-gray" className={`text-xl ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
+                Alerts & Recommendations
               </Typography>
               <Typography
                 //variant="small"

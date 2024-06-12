@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from . import models
 import boto3
 from datetime import datetime, timedelta
+import pytz
 from cache.cache_object import cachedData
 import json
 
@@ -12,6 +13,8 @@ from config import Config
 
 import logging
 logger = logging.getLogger(__name__)
+
+tz = pytz.timezone('America/Mexico_City')
 
 async def queues_answer_time():
     availableQueues = ["Tickets Management", "Customize Assistance", "Event News", "Default Queue","Supervisor", "Callback"]
@@ -82,7 +85,7 @@ async def queues_answer_time():
     queue_graph = models.GenericGraph(
         title = "Queue Answer Time",
         description = "The average time it takes for a call to be answered by queue.",
-        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        footer = ("Updated at: " + datetime.now(tz).strftime("%H:%M")),
         chart = queue_chart
     )
 
@@ -152,7 +155,7 @@ async def queues_contact_duration():
     queue_graph = models.GenericGraph(
         title = "Queue average contact duration",
         description = "The average time it takes for a call to be finished by queue.",
-        footer = ("Updated at: " + str(datetime.now().hour) + ":" + str(datetime.now().minute)),
+        footer = ("Updated at: " + datetime.now(tz).strftime("%H:%M")),
         chart = queue_chart
     )
 

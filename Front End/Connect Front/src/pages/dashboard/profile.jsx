@@ -40,7 +40,7 @@ import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/dat
  */
 export function Profile() {
 
-  const controller = useMaterialTailwindController();
+  const [controller, dispatch] = useMaterialTailwindController();
   const { theme, navColor } = controller;
 
   const [view, setView] = useState('app');
@@ -171,13 +171,16 @@ export function Profile() {
                 </Typography>
                 <ul className={`flex flex-col gap-6 max-h-[20rem] overflow-auto`}>
                   { conversations.length == 0 ?
-                  <tr key="loading">
-                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
-                        <span className="flex justify-center items-center">
-                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
-                        </span>
-                    </td>
-                  </tr> :
+                  (
+                    <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                    <span className="flex justify-center items-center">
+                    <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                    </span>
+                    <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                        Conversations are now loading...
+                    </Typography>
+                    </div>
+                    ) :
                   conversations.map((props) => (
                     <MessageCard
                       key={props.timestamp}
@@ -195,13 +198,16 @@ export function Profile() {
                 </Typography>
                 { ratingData.length == 0 ?
                 /* Renders a loading indicator while the data is being fetched */
-                  <tr key="loading">
-                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
-                        <span className="flex justify-center items-center">
-                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
-                        </span>
-                    </td>
-                  </tr> : 
+                (
+                  <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                  <span className="flex justify-center items-center">
+                  <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                  </span>
+                  <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                      Graph is now loading...
+                  </Typography>
+                  </div>
+                  ) : 
                 /* Renders the rating chart from the API call */
                 ratingData.map((props) => (
                   //statisticsChartsData.map((props) => (
