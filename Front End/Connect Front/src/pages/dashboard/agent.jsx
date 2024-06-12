@@ -152,11 +152,11 @@ export function Agent() {
 
 
       {/*Agent Alerts */}
-      <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
         <NotificationsCard is_supervisor={false} agent_id={sessionStorage.getItem("userID")} />
 
 
-        {/* Recomendations Card*/}
+        {/* Recomendations Card
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
@@ -164,7 +164,7 @@ export function Agent() {
             color="transparent"
             className="m-0 p-6"
           >
-            <Typography /*variant="h6"*/ color="blue-gray" className={`text-lg ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
+            <Typography variant="h6" color="blue-gray" className={`text-lg ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
               Recommendations
             </Typography>
             <Typography
@@ -195,6 +195,7 @@ export function Agent() {
               openhandler={() => handleOpen(3)} />
           </CardBody>
         </Card>
+        */}
       </div>
 
 

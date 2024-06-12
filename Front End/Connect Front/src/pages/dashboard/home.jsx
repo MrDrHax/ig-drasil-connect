@@ -134,10 +134,10 @@ export function Home() {
 
 
       {/* Notifications */}
-       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
+       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-1">
         <NotificationsCard is_supervisor={true} agent_id={agent_id}/>
 
-        {/* Recomendations */}
+        {/* Recomendations
         <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
           <CardHeader
             floated={false}
@@ -176,6 +176,7 @@ export function Home() {
               openhandler={() => handleOpen(3)}/>
           </CardBody>
         </Card>
+        */}
       </div> 
     </div>
   );

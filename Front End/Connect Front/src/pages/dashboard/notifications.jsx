@@ -100,8 +100,8 @@ export function NotificationsCard({is_supervisor, agent_id}) {
             className="m-0 flex items-center justify-between p-6"
           >
             <div>
-              <Typography variant="h6" color="blue-gray" className={`mb-1 text-xl ${getTypography()} ${getTextColor('dark')}`}>
-                Alerts
+              <Typography variant="h6" color="blue-gray" className={`text-xl ${getTypographybold()} ${getTextColor("white3")} text-[1.5rem] pb-1`}>
+                Alerts & Recommendations
               </Typography>
               <Typography
                 //variant="small"
