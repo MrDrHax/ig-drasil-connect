@@ -141,12 +141,9 @@ export function Teams() {
 
         // get statuses
         StatusList().then((data) => {
-            let statuses = [];
-            for (let i = 0; i < data.length; i++) {
-                statuses.push(data[i].Name);
-            }
-            statuses.sort();
-            setStatusList(statuses);
+            let list = data.map((item) => item.Name);
+            list.sort();
+            setStatusList(list);
         })
 
         // get cards

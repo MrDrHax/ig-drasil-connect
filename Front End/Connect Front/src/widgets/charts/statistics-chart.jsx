@@ -27,7 +27,6 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
   if (chart.type === 'bar' && chart.series.length > 1) {
     // Fix the series data to be a single dictionary named data
     let data = chart.series.map((item) => item.data[0])
-    console.error(data)
     chart.series = []
     chart.series[0] = {
       data : data,

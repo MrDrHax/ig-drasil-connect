@@ -76,13 +76,13 @@ async def change_status(token: Annotated[str, Depends(requireToken)], agent_id: 
     if not userType.isManager(token):
         raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager to access this resource.")
     
-    response = await cachedData.get('getListAgentStatuses')
+    response = await cachedData.get('list_statuses')
     
     statusID = None
 
     for statuses in response:
         if statuses['Name'] == status:
-            statusID = statuses['Id']
+            statusID = statuses['AgentStatusId']
 
     if statusID == None:
         raise HTTPException(status_code=400, detail="Invalid status.")

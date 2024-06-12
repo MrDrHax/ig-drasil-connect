@@ -49,7 +49,7 @@ export async function AgentList(skip = 0, limit = 10, search = null, sortbydat =
  * @throws {Error} If the API request fails.
  */
 export async function StatusList() {
-    let url = getApiPath() + 'agents/list/list-agent-statuses';
+    let url = getApiPath() + 'lists/statuses';
     let request = new Request(url);
     addTokenToHeader(request);
     let response = await fetch(request);
