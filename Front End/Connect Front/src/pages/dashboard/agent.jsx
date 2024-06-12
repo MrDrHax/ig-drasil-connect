@@ -16,7 +16,7 @@ import {
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { BookOpenIcon, UserGroupIcon,StarIcon,ClockIcon, ChartBarIcon, } from "@heroicons/react/24/solid";
-import { StatisticsCard, CustomerCard, Lexcard } from "@/widgets/cards";
+import { StatisticsCard, CustomerCard, Lexcard, CustomerSentimentCard } from "@/widgets/cards";
 import { RecomendationCard } from "@/widgets/cards";
 // import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
 import {
@@ -24,7 +24,8 @@ import {
   customerDataAgent,
   lexRecommendationData,
   messageData,
-  AgentId
+  AgentId, 
+  AgentSentimentRatingData
 } from "@/data";
 import { NotificationsCard } from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold, getBorderColor } from "@/context";
@@ -42,8 +43,12 @@ export function Agent() {
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
+  const [sentiment, setSentiment] = useState([]);
+  const [userID, setUserID] = useState("");
 
   const [isLoaded, setIsLoaded] = useState(false);
+
+  let agent_id = localStorage.getItem("userID");
 
   function getIcon(icon) {
     switch (icon) {
@@ -76,6 +81,15 @@ export function Agent() {
         setCards(data.cards);
         setIsLoaded(true);
       });
+      
+      AgentSentimentRatingData(userID).then((data) => {
+      setSentiment(data);
+      setIsLoaded(true);
+      //console.log(data);
+    }).catch((error) => {
+      setIsLoaded(true);
+    });
+  } 
     }
   }, [userID]);
 
@@ -116,18 +130,14 @@ export function Agent() {
       {/*Client Data*/}
       <div className="p-4 mb-10">
         <div className="grid grid-cols-2 gap-4">
-          {customerDataAgent().map(({ name, descripcion, footer, ...rest }) => (
-            <CustomerCard
-              key={name}
+          
+          {sentiment.map(({ sentiment, rating, recommendation, ...rest }) => (
+            <CustomerSentimentCard
+              key={1}
               {...rest}
-              name={name}
-              descripcion={descripcion}
-              footer={
-                <Typography className={`text-base ${getTypography()} ${getTextColor('dark')}`}>
-                  <strong className={footer.color}>{footer.value}</strong>
-                  &nbsp;{footer.label}
-                </Typography>
-              }
+              sentiment={sentiment}
+              rating={rating}
+              recommendation={recommendation}
               className="p-4 rounded-lg bg-white shadow-md"
             />
           ))}

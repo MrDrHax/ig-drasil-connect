@@ -247,13 +247,9 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
         else:
             recommendation = "No recommendation found at the moment."
     
-    return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating",
-                                        sentimentTitle="Customer sentiment rating", 
-                                        sentiment=sentiment, 
-                                        ratingTitle="Agent rating based of metrics", 
+    return [models.AgentSentimentRating( sentiment=sentiment, 
                                         rating=calculateRating(transcript_json),
-                                        recommendationTitle="Recommendation based of last call",
-                                        recommendation= recommendation)
+                                        recommendation= recommendation)]
 
 cachedData.add('getSentimentRating', getSentimentRating, 60)
 
@@ -309,3 +305,38 @@ async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile
     return parsed_contacts
 
 cachedData.add('getListContactParsed', getListContactParsed, 120)
+
+async def getAgentTranscriptSummary(agent_id: str):
+
+    client = boto3.client('connect')
+
+    # Get the id for the call
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'Agents': [ agent_id ]      
+        }
+    )
+    
+    logger.warning(response)
+
+    if len(response['UserDataList'][0]['Contacts']) == 0:
+        raise HTTPException(status_code=404, detail="No contact found for the agent.")
+    
+    call_id = response['UserDataList'][0]['Contacts'][0]['ContactId']
+    
+    
+    clientV2 = boto3.client('connect-contact-lens')
+    
+    responseV2 = clientV2.list_realtime_contact_analysis_segments(
+    InstanceId=Config.INSTANCE_ID,
+    ContactId=call_id
+)
+    Transcript = []
+    
+    for segment in responseV2['Segments']:
+            Transcript.append([segment['Transcript']['ParticipantRole'], segment['Transcript']['Content'], datetime.now()])
+            
+    return Transcript
+
+cachedData.add('getAgentTranscriptSummary', getAgentTranscriptSummary, 120)
