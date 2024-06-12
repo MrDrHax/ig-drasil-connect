@@ -122,10 +122,10 @@ export function customerDataAgent(){
   ];
 }
 
-export function lexRecommendationData(){
+export function lexRecommendationData(data){
   return[
     {
-      recomendation: " be more friendly with customers!",
+      recomendation: data,
       footer:{
         color:"text-green-500",
         value:"3",

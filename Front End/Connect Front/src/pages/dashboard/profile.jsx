@@ -24,11 +24,13 @@ import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
-import { AgentDetails, getAgentTranscriptSummaryData } from "@/data/agents-data";
+
+import { AgentDetails, getAgentTranscriptSummaryData, AgentSummary } from "@/data/agents-data";
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
-import {lexRecommendationData} from "@/data";
+import { lexRecommendationData } from "@/data";
 
 import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/data/supervisor-home-data";
 
@@ -58,6 +60,17 @@ export function Profile() {
   searchParams.get("profile")
 
 
+  const [aiRecommendations, setAiRecommendations] = useState("<p>Fetching data...</p>");
+
+  function getAiRecommendations() {
+    AgentSummary(searchParams.get("profile")).then((data) => {
+      console.log(data);
+      setAiRecommendations(data["content"]);
+    }).catch(() => {
+      setAiRecommendations("<p>Al.n is not available at the moment. Try again later</p>");
+    });
+  }
+
   function updateData() {
 
     AgentDetails(searchParams.get("profile")).then((data) => {
@@ -78,6 +91,10 @@ export function Profile() {
     AgentConversations(searchParams.get("profile")).then((data) => {
       setConversations(data);
     })
+
+    setIsLoaded(true);
+
+    getAiRecommendations();
 
     getAgentTranscriptSummaryData(searchParams.get("profile")).then((data) => {
       setTranscripts(data);
@@ -159,8 +176,8 @@ export function Profile() {
                 </span>
               </div> :
             <ProfileInfoCard
-              title="Agent AI.n Recommendations"
-              description= {"Al.n is under maintenance, please check back later."}
+              title="Agent Al.n Recommendations"
+                description={<div dangerouslySetInnerHTML={{ __html: aiRecommendations }} />}
               details={{
                 "Name": dataToDisplay.name,
                 "Mobile Phone": dataToDisplay.mobile,
