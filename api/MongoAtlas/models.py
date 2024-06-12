@@ -12,4 +12,10 @@ class ChatMessageBody(BaseModel):
 class ChatMessage(BaseModel):
     agent_id: str = Field("text-green-500", examples=["text-green-500", "text-gray-500", "text-red-500"])
     messages: list[ChatMessageBody]
+
+class Ratings(BaseModel):
+    contactId: str
+    surveyId: str
+    survey_result_1: str
+    survey_result_2: str
     

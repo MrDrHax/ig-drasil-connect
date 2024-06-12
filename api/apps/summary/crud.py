@@ -195,6 +195,14 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
         if transcript['ConversationCharacteristics']['TotalConversationDurationMillis'] > 100:
             agent_ratings.append(models.AgentRating(rating=calculateRating(transcript), timestamp=contact['InitiationTimestamp']))
 
+        # Add the ratings that were given by clients for that contact
+        client_ratings = await cachedData.get('get_specific_rating', contact_id=contactID)
+
+        if len(client_ratings) > 0:
+            for client_rating in client_ratings:
+                agent_ratings.append(models.AgentRating(rating=client_rating['survey_result_1'], timestamp=contact['InitiationTimestamp'] - timedelta(years=10)))
+                agent_ratings.append(models.AgentRating(rating=client_rating['survey_result_2'], timestamp=contact['InitiationTimestamp'] - timedelta(years=20)))
+
     return agent_ratings
 
 cachedData.add('getListAgentRatings', getListAgentRatings, 120)
