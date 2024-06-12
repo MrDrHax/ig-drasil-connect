@@ -14,7 +14,7 @@ import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-to
 export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
     let url = new URL(getApiPath() + 'lists/agents');
 
-    console.log("seatch: " + search);
+    // console.log("search: " + search);
 
     let params = {
         skip: skip,
