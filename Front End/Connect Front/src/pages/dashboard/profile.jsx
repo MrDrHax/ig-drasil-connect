@@ -24,7 +24,9 @@ import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
-import { AgentDetails, AgentSummary } from "@/data/agents-data";
+
+import { AgentDetails, getAgentTranscriptSummaryData, AgentSummary } from "@/data/agents-data";
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
@@ -52,6 +54,7 @@ export function Profile() {
   const [avgRatingFloat, setAvgRatingFloat] = useState(0.0);
 
   const [conversations, setConversations] = useState([]);
+  const [transcripts, setTranscripts] = useState([{}]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   searchParams.get("profile")
@@ -92,6 +95,12 @@ export function Profile() {
     setIsLoaded(true);
 
     getAiRecommendations();
+
+    getAgentTranscriptSummaryData(searchParams.get("profile")).then((data) => {
+      setTranscripts(data);
+      setIsLoaded(true);
+    })
+
   }
 
   //Call the function just once
@@ -160,6 +169,12 @@ export function Profile() {
           { view === 'app' && (
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
+            { !isLoaded ?
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+              </div> :
             <ProfileInfoCard
               title="Agent Al.n Recommendations"
                 description={<div dangerouslySetInnerHTML={{ __html: aiRecommendations }} />}
@@ -168,7 +183,9 @@ export function Profile() {
                 "Mobile Phone": dataToDisplay.mobile,
                 "Email": dataToDisplay.email,
               }}
+              transcript={transcripts}
             />
+            }
 
               {/* Add Last Customer Calls */}
               <div>

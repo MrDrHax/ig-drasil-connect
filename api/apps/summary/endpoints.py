@@ -118,7 +118,7 @@ async def read_agent_rating(agent_id: str, token: Annotated[str, Depends(require
     return res
 
 @router.get("/AgentSentimentRating", tags=["contacts"])
-async def read_agent_contact_summary(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> models.AgentSentimentRating:
+async def read_agent_contact_summary(agent_id: str, token: Annotated[str, Depends(requireToken)]) -> list[models.AgentSentimentRating]:
     """
     Returns a list of contacts for the agent.
     """
@@ -126,6 +126,15 @@ async def read_agent_contact_summary(agent_id: str, token: Annotated[str, Depend
         raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
 
     res = await cachedData.get('getSentimentRating', agent_id=agent_id)
+    return res
+
+@router.get("/AgentTranscriptSummary", tags=["profile"])
+async def read_agent_transcript_summary(agent_id: str, token: Annotated[str, Depends(requireToken)]):
+    if not userType.testToken(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be logged in to access this.")
+
+    res = await cachedData.get('getAgentTranscriptSummary', agent_id=agent_id)
+
     return res
     
 @router.get("/AgentContactsProfile", tags=["profile"])

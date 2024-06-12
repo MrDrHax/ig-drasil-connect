@@ -16,7 +16,7 @@ import {
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { BookOpenIcon, UserGroupIcon, StarIcon, ClockIcon, ChartBarIcon, } from "@heroicons/react/24/solid";
-import { StatisticsCard, CustomerCard, Lexcard } from "@/widgets/cards";
+import { StatisticsCard, CustomerCard, Lexcard, CustomerSentimentCard } from "@/widgets/cards";
 import { RecomendationCard } from "@/widgets/cards";
 // import { RecomendationsCards } from "@/widgets/cards/recomendations-card.jsx";
 import {
@@ -24,7 +24,8 @@ import {
   customerDataAgent,
   lexRecommendationData,
   messageData,
-  AgentId
+  AgentId,
+  AgentSentimentRatingData
 } from "@/data";
 import { AgentSummary } from "@/data/agents-data";
 import { NotificationsCard } from "../dashboard/notifications.jsx";
@@ -39,10 +40,12 @@ export function Agent() {
   const { navColor, theme } = controller;
 
   const [open, setOpen] = useState(1);
-  const [userID, setUserID] = useState(null);
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
+  const [sentiment, setSentiment] = useState([]);
+  const [sentimentIsLoaded, setSentimentIsLoaded] = useState(false);
+  const [userID, setUserID] = useState("");
 
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -88,7 +91,16 @@ export function Agent() {
         setCards(data.cards);
         setIsLoaded(true);
       });
+      
       getAiRecommendations(userID);
+
+      AgentSentimentRatingData(userID).then((data) => {
+        setSentiment(data);
+        setSentimentIsLoaded(true);
+        //console.log(data);
+      }).catch((error) => {
+        setSentimentIsLoaded(true);
+      });
     }
   }, [userID]);
 
@@ -129,21 +141,26 @@ export function Agent() {
       {/*Client Data*/}
       <div className="p-4 mb-10">
         <div className="grid grid-cols-2 gap-4">
-          {customerDataAgent().map(({ name, descripcion, footer, ...rest }) => (
-            <CustomerCard
-              key={name}
-              {...rest}
-              name={name}
-              descripcion={descripcion}
-              footer={
-                <Typography className={`text-base ${getTypography()} ${getTextColor('dark')}`}>
-                  <strong className={footer.color}>{footer.value}</strong>
-                  &nbsp;{footer.label}
-                </Typography>
-              }
-              className="p-4 rounded-lg bg-white shadow-md"
-            />
-          ))}
+          {!sentimentIsLoaded ? (
+            <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+              <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+              </span>
+              <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                Customer sentiment data is now loading...
+              </Typography>
+            </div>
+          ) :
+            sentiment.map(({ sentiment, rating, recommendation, ...rest }) => (
+              <CustomerSentimentCard
+                key={1}
+                {...rest}
+                sentiment={sentiment}
+                rating={rating}
+                recommendation={recommendation}
+                className="p-4 rounded-lg bg-white shadow-md"
+              />
+            ))}
 
           <Lexcard
             key="Lex"
