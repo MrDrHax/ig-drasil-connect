@@ -24,11 +24,13 @@ import ChatBox from "@/widgets/chat/chatbox.jsx";
 import { StatisticsChart } from "@/widgets/charts";
 
 import { getBgColor, getTextColor, getBorderColor, useMaterialTailwindController,getTypography,getTypographybold } from "@/context";
-import { AgentDetails } from "@/data/agents-data";
+
+import { AgentDetails, getAgentTranscriptSummaryData, AgentSummary } from "@/data/agents-data";
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 
-import {lexRecommendationData} from "@/data";
+import { lexRecommendationData } from "@/data";
 
 import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/data/supervisor-home-data";
 
@@ -39,7 +41,7 @@ import { AgentRatingGraphData, AgentRatingData, AgentConversations } from "@/dat
  */
 export function Profile() {
 
-  const controller = useMaterialTailwindController();
+  const [controller, dispatch] = useMaterialTailwindController();
   const { theme, navColor } = controller;
 
   const [view, setView] = useState('app');
@@ -52,10 +54,22 @@ export function Profile() {
   const [avgRatingFloat, setAvgRatingFloat] = useState(0.0);
 
   const [conversations, setConversations] = useState([]);
+  const [transcripts, setTranscripts] = useState([{}]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   searchParams.get("profile")
 
+
+  const [aiRecommendations, setAiRecommendations] = useState("<p>Fetching data...</p>");
+
+  function getAiRecommendations() {
+    AgentSummary(searchParams.get("profile")).then((data) => {
+      console.log(data);
+      setAiRecommendations(data["content"]);
+    }).catch(() => {
+      setAiRecommendations("<p>Al.n is not available at the moment. Try again later</p>");
+    });
+  }
 
   function updateData() {
 
@@ -78,7 +92,13 @@ export function Profile() {
       setConversations(data);
     })
 
-    setIsLoaded(true);
+    getAiRecommendations();
+
+    getAgentTranscriptSummaryData(searchParams.get("profile")).then((data) => {
+      setTranscripts(data);
+      setIsLoaded(true);
+    })
+
   }
 
   //Call the function just once
@@ -147,15 +167,23 @@ export function Profile() {
           { view === 'app' && (
             
             <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3" style={{ visibility: view === 'app' ? 'visible' : 'hidden' }}>
+            { !isLoaded ?
+                <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                <span className="flex justify-center items-center">
+                <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                </span>
+              </div> :
             <ProfileInfoCard
-              title="Agent AI.n Recommendations"
-              description= {"Al.n is under maintenance, please check back later."}
+              title="Agent Al.n Recommendations"
+                description={<div dangerouslySetInnerHTML={{ __html: aiRecommendations }} />}
               details={{
                 "Name": dataToDisplay.name,
                 "Mobile Phone": dataToDisplay.mobile,
                 "Email": dataToDisplay.email,
               }}
+              transcript={transcripts}
             />
+            }
 
               {/* Add Last Customer Calls */}
               <div>
@@ -164,13 +192,16 @@ export function Profile() {
                 </Typography>
                 <ul className={`flex flex-col gap-6 max-h-[20rem] overflow-auto`}>
                   { conversations.length == 0 ?
-                  <tr key="loading">
-                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
-                        <span className="flex justify-center items-center">
-                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
-                        </span>
-                    </td>
-                  </tr> :
+                  (
+                    <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                    <span className="flex justify-center items-center">
+                    <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                    </span>
+                    <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                        Conversations are now loading...
+                    </Typography>
+                    </div>
+                    ) :
                   conversations.map((props) => (
                     <MessageCard
                       key={props.timestamp}
@@ -188,13 +219,16 @@ export function Profile() {
                 </Typography>
                 { ratingData.length == 0 ?
                 /* Renders a loading indicator while the data is being fetched */
-                  <tr key="loading">
-                    <td className="py-3 px-5 border-b border-blue-gray-50 text-center" colSpan="5">
-                        <span className="flex justify-center items-center">
-                            <span className={"animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" + getBorderColor(navColor)}></span>
-                        </span>
-                    </td>
-                  </tr> : 
+                (
+                  <div className="py-3 px-5 border-b border-blue-gray-50 text-center col-span-full">
+                  <span className="flex justify-center items-center">
+                  <span className={`animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 ${getBorderColor(navColor)}`}></span>
+                  </span>
+                  <Typography className={`text-base ${getTypography()}  ${getTextColor('dark')}`}>
+                      Graph is now loading...
+                  </Typography>
+                  </div>
+                  ) : 
                 /* Renders the rating chart from the API call */
                 ratingData.map((props) => (
                   //statisticsChartsData.map((props) => (

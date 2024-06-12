@@ -14,6 +14,8 @@ import AAA.userType as userType
 from datetime import datetime, timezone
 from base64 import b64encode, b64decode
 
+
+from cache.cache_object import cachedData
 import logging
 logger = logging.getLogger(__name__)
 
@@ -65,7 +67,7 @@ async def get_chat_by_id(token: Annotated[str, Depends(requireToken)], agent_id:
     
 #    return db['chats'].find_one({"agent_id": agent_id})
 
-    if agent_id == 'null':
+    if agent_id == None:
         agent_id = await get_agentID(token)
 
     try:
@@ -108,3 +110,23 @@ async def post_chat(token: Annotated[str, Depends(requireToken)], message: str, 
     db['chats'].update_one({"agent_id": agent_id}, {"$push": {"messages": {"content": encoded_message, "supervisor_sender": supervisor, "timestamp": datetime.now(tz=timezone.utc)}}}, upsert=True)
 
     return "success"
+
+async def getAllRatings():
+    return db['SurveyResults'].find()
+cachedData.add('getAllRatings', getAllRatings, 120) # 2 minutes
+
+async def get_specific_rating(contact_id: str):
+    all_contacts = await cachedData.get('getAllRatings')
+
+    return list(filter(lambda contact: contact['contactId'] == contact_id, all_contacts))
+cachedData.add('get_specific_rating', get_specific_rating, 60 * 60 * 24) # 24 hours
+
+@router.get('/get_ratings', tags=["DB"])
+async def get_ratings(token: Annotated[str, Depends(requireToken)], contact_id: str) -> List[models.Ratings]:
+    """
+    Returns the rating from a specific contact ID.
+    """
+    if not userType.isManager(token) and not userType.isAgent(token):
+        raise HTTPException(status_code=401, detail="Unauthorized. You must be a manager or an agent to access this resource.")
+    
+    return await cachedData.get('get_specific_rating', contact_id)

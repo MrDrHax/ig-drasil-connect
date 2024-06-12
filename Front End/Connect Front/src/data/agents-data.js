@@ -14,7 +14,7 @@ import { getApiPath, addTokenToHeader, getNameFromToken } from "@/configs/api-to
 export async function AgentList(skip = 0, limit = 10, search = null, sortbydat = null, sortby = null) {
     let url = new URL(getApiPath() + 'lists/agents');
 
-    console.log("seatch: " + search);
+    // console.log("search: " + search);
 
     let params = {
         skip: skip,
@@ -49,7 +49,7 @@ export async function AgentList(skip = 0, limit = 10, search = null, sortbydat =
  * @throws {Error} If the API request fails.
  */
 export async function StatusList() {
-    let url = getApiPath() + 'agents/list/list-agent-statuses';
+    let url = getApiPath() + 'lists/statuses';
     let request = new Request(url);
     addTokenToHeader(request);
     let response = await fetch(request);
@@ -131,7 +131,7 @@ export async function AgentId() {
  */
 export async function JoinCall(agent_id) {
 
-    let url = getApiPath() + `actions/join_call?agent_id=${agent_id}}`;
+    let url = getApiPath() + `actions/join-call?agent_id=${agent_id}`;
     let request = new Request(url, {method: 'POST'});
     addTokenToHeader(request);
     let response = await fetch(request);
@@ -141,6 +141,32 @@ export async function JoinCall(agent_id) {
     return await response.json();
 
 }
+
+export async function AgentSentimentRatingData(agent_id) {
+    let url = getApiPath() + `summaries/AgentSentimentRating?agent_id=` + agent_id;
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+      // raise error
+      throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+  
+    return await response.json();
+  }
+
+  export async function getAgentTranscriptSummaryData(agent_id) {
+    let url = getApiPath() + `summaries/AgentTranscriptSummary?agent_id=` + agent_id;
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request);
+    if (!response.ok) {
+      // raise error
+      throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+  
+    return await response.json();
+  }
 
 /**
  * Changes the status of an agent.
@@ -155,6 +181,17 @@ export async function ChangeStatus(agent_id, status) {
     let request = new Request(url, {method: 'POST'});
     addTokenToHeader(request);
     let response = await fetch(request);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+export async function AgentSummary(agent_id) {
+    let url = getApiPath() + `summaries/AI/AgentPerformance?agent_id=${agent_id}`;
+    let request = new Request(url);
+    addTokenToHeader(request);
+    let response = await fetch(request, {method: 'GET'});
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}, details ${response.statusText}`);
     }

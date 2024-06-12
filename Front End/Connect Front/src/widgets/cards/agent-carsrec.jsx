@@ -40,6 +40,31 @@ export function CustomerCard({ name, description, footer }) {
   );
 }
 
+export function CustomerSentimentCard({ sentiment, rating, recommendation }) {
+
+  const controller = useMaterialTailwindController();
+  const theme = controller;
+  {/* En los className llaman a la función que esta manejando el background o el color de texto */ }
+  return (
+    <Card className={`border border-blue-gray-100 shadow-sm ${getBgColor("background-cards")}`}>
+      <CardBody className="p-4 text-right">
+        <Typography /*variant="h4"*/ className={`text-justify text-[1.5rem] ${getTypographybold()} ${getTextColor("dark")}`}>
+          Customer data
+        </Typography>
+        <Typography variant="paragraph" className={`text-[1rem] text-justify ${getTypography()} ${getTextColor("gray")}`}>
+          <span className={` ${getTypographybold()} ${getTextColor("dark")}`}>Costumer Sentiment Rating: </span>{sentiment}
+        </Typography>
+        <Typography variant="paragraph" className={`text-[1rem] text-justify ${getTypography()} ${getTextColor("gray")}`}>
+          <span className={`text-justify ${getTypographybold()} ${getTextColor("dark")}`}>Agent Rating based of metrics: </span> {rating}
+        </Typography>
+      </CardBody>
+        <CardFooter className={`border-t border-blue-gray-50 p-4 ${getTypography()} ${getTextColor("dark")}`}>
+          {recommendation}
+        </CardFooter>
+    </Card>
+  );
+}
+
 CustomerCard.defaultProps = {
   color: "blue",
   footer: null,
@@ -84,7 +109,7 @@ export function Lexcard({ recomendation, footer }) {
           Al.n, your virtual assistant:
         </Typography>
         <Typography variant="paragraph" className={`text-[1rem] p-1 text-justify ${getTypography()} ${getTextColor("dark")}`}>
-          <span className={`${getTypographybold()}`}>Recommends: </span> {recomendation} 😊
+          {recomendation}
         </Typography>
       </CardBody>
       {footer && (

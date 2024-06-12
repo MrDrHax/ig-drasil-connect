@@ -34,7 +34,7 @@ export function MessageCard({ img, summary, status, duration, agentSentiment, cu
           <Typography
             className={`text-sm ${getTypography()} ${getTextColor("white3")} text-[0.6rem]`}
           >
-            {(duration / 60000).toFixed(0)} minutes {(duration / 1000).toFixed(1)} seconds
+            {(duration / 60000).toFixed(0)} minutes {Math.ceil((duration / 1000).toFixed(1) % 60)} seconds
           </Typography>
 
           <Typography

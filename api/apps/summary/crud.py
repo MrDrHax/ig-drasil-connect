@@ -1,3 +1,4 @@
+import aiohttp
 from fastapi import HTTPException
 import markdown
 import requests
@@ -74,13 +75,18 @@ cachedData.add('getLatestAgentTranscript', getLatestAgentTranscript, 120)
 async def fetchRecommendations(agent_id: str) -> str:
     res = await cachedData.get('getLatestAgentTranscript', agent_id=agent_id)
 
-    # call the gpt endpoint at localhost:8081/recommendations/{agent_id}
-    request = requests.post(f'{Config.GPT_URI}recommendations/{agent_id}', data=res, headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {Config.GPT_Key}'})
-
-    if request.status_code != 200:
-        return "Sorry, I am not available at the moment. Please try again later."
-    
-    return request.text.strip('"').replace("\\n", "\n\n")
+    # Create a session
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(f'{Config.GPT_URI}recommendations/{agent_id}', data=res, headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {Config.GPT_Key}'}) as response:
+                if response.status != 200:
+                    return "Sorry, I am not available at the moment. Please try again later."
+                
+                text = await response.text()
+                
+                return text.strip('"').replace("\\n", "\n\n").replace('\\"', '"')
+        except Exception as e:
+            return f"Sorry, I am not available at the moment. Please try again later."
 
 cachedData.add('fetchRecommendations', fetchRecommendations, 120)
 
@@ -172,12 +178,13 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
     for contact in contactData:
         contactID = contact['Id']
 
-        file =f'{contactID}_analysis_' 
+        file =f'{contactID}_analysis_'
 
         matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
 
         if len(matches) == 0:
-            raise HTTPException(status_code=404, detail="Transcript not found")
+            continue
+            #raise HTTPException(status_code=404, detail="Transcript not found")
 
         file = matches[0]
 
@@ -193,6 +200,14 @@ async def getListAgentRatings(agent_id: str) -> list[models.AgentRating]:
         # Filter out short conversations (less than 10 seconds)
         if transcript['ConversationCharacteristics']['TotalConversationDurationMillis'] > 100:
             agent_ratings.append(models.AgentRating(rating=calculateRating(transcript), timestamp=contact['InitiationTimestamp']))
+
+        # Add the ratings that were given by clients for that contact
+        client_ratings = await cachedData.get('get_specific_rating', contact_id=contactID)
+
+        if len(client_ratings) > 0:
+            for client_rating in client_ratings:
+                agent_ratings.append(models.AgentRating(rating=client_rating['survey_result_1'], timestamp=contact['InitiationTimestamp'] - timedelta(years=10)))
+                agent_ratings.append(models.AgentRating(rating=client_rating['survey_result_2'], timestamp=contact['InitiationTimestamp'] - timedelta(years=20)))
 
     return agent_ratings
 
@@ -213,7 +228,7 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
     matches = [obj['Key'] for obj in response['Contents'] if file in obj['Key']]
 
     if len(matches) == 0:
-        raise HTTPException(status_code=404, detail="Transcript not found")
+        return [models.AgentSentimentRating(sentiment=0.0, rating=0.0, recommendation="No calls made yet. You should try to answer some calls.")]
 
     file = matches[0]
 
@@ -244,15 +259,11 @@ async def getSentimentRating(agent_id: str) -> models.AgentSentimentRating:
                               "You should try to be more understanding."]
             recommendation = random.choice(recommendations)                                   
         else:
-            recommendation = "No recommendation found at the moment."
+            recommendation = "The sentiment of the call was neutral. You should try to be more empathetic."
     
-    return models.AgentSentimentRating( title="Last Contact Sentiment rating and Agent rating",
-                                        sentimentTitle="Customer sentiment rating", 
-                                        sentiment=sentiment, 
-                                        ratingTitle="Agent rating based of metrics", 
+    return [models.AgentSentimentRating( sentiment=sentiment, 
                                         rating=calculateRating(transcript_json),
-                                        recommendationTitle="Recommendation based of last call",
-                                        recommendation= recommendation)
+                                        recommendation= recommendation)]
 
 cachedData.add('getSentimentRating', getSentimentRating, 60)
 
@@ -275,7 +286,8 @@ async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile
         matches = [obj['Key'] for obj in objects['Contents'] if file in obj['Key']]
 
         if len(matches) == 0:
-            raise HTTPException(status_code=404, detail="Transcript not found")
+            continue
+            #raise HTTPException(status_code=404, detail="Transcript not found")
 
         file = matches[0]
 
@@ -307,3 +319,39 @@ async def getListContactParsed(agent_id: str) -> list[models.AgentContactProfile
     return parsed_contacts
 
 cachedData.add('getListContactParsed', getListContactParsed, 120)
+
+async def getAgentTranscriptSummary(agent_id: str):
+
+    client = boto3.client('connect')
+
+    # Get the id for the call
+    response = client.get_current_user_data(
+        InstanceId=Config.INSTANCE_ID,
+        Filters={
+            'Agents': [ agent_id ]      
+        }
+    )
+    
+    logger.warning(response)
+
+    if len(response['UserDataList'][0]['Contacts']) == 0:
+        return []
+        #raise HTTPException(status_code=404, detail="No contact found for the agent.")
+    
+    call_id = response['UserDataList'][0]['Contacts'][0]['ContactId']
+    
+    
+    clientV2 = boto3.client('connect-contact-lens')
+    
+    responseV2 = clientV2.list_realtime_contact_analysis_segments(
+    InstanceId=Config.INSTANCE_ID,
+    ContactId=call_id
+)
+    Transcript = []
+    
+    for segment in responseV2['Segments']:
+            Transcript.append([segment['Transcript']['ParticipantRole'], segment['Transcript']['Content'], datetime.now()])
+            
+    return Transcript
+
+cachedData.add('getAgentTranscriptSummary', getAgentTranscriptSummary, 120)
