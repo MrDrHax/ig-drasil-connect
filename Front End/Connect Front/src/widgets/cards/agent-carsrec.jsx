@@ -40,7 +40,7 @@ export function CustomerCard({ name, description, footer }) {
   );
 }
 
-export function CustomerSentimentCard({ sentiment, rating, recomendation, agent_id }) {
+export function CustomerSentimentCard({ sentiment, rating, recommendation }) {
 
   const controller = useMaterialTailwindController();
   const theme = controller;
@@ -58,11 +58,9 @@ export function CustomerSentimentCard({ sentiment, rating, recomendation, agent_
           <span className={`text-justify ${getTypographybold()} ${getTextColor("dark")}`}>Agent Rating based of metrics: </span> {rating}
         </Typography>
       </CardBody>
-      {recomendation && (
         <CardFooter className={`border-t border-blue-gray-50 p-4 ${getTypography()} ${getTextColor("dark")}`}>
-          {recomendation}
+          {recommendation}
         </CardFooter>
-      )}
     </Card>
   );
 }

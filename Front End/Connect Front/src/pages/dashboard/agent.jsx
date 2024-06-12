@@ -24,13 +24,13 @@ import {
   customerDataAgent,
   lexRecommendationData,
   messageData,
-  AgentId
+  AgentId, 
+  AgentSentimentRatingData
 } from "@/data";
 import { NotificationsCard } from "../dashboard/notifications.jsx";
 import { getBgColor, getTextColor, useMaterialTailwindController, getTypography, getTypographybold, getBorderColor } from "@/context";
 import ChatBox from '@/widgets/chat/chatbox.jsx';
 import { AgentHomeData } from "@/data/supervisor-home-data.js";
-import {AgentSentimentRatingData} from "@/data/agents-data.js";
 
 
 export function Agent() {
@@ -43,21 +43,11 @@ export function Agent() {
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [cards, setCards] = useState([]);
   const [sentiment, setSentiment] = useState([]);
+  const [userID, setUserID] = useState("");
 
   const [isLoaded, setIsLoaded] = useState(false);
 
   let agent_id = localStorage.getItem("userID");
-
-   function updateData() {
-    AgentSentimentRatingData().then((data) => {
-      setSentiment(data.sentiment);
-      setIsLoaded(true);
-      //console.log(data);
-    }).catch((error) => {
-      console.log(error);
-      setIsLoaded(true);
-    });
-  }
 
   function getIcon(icon) {
     switch (icon) {
@@ -86,8 +76,20 @@ export function Agent() {
       });
     }
 
+
+
     AgentHomeData(sessionStorage.getItem("userID")).then((data) => {
       setCards(data.cards);
+      setIsLoaded(true);
+    });
+
+    AgentSentimentRatingData(sessionStorage.getItem("userID")).then((data) => {
+      setSentiment(data);
+      console.error(data)
+      setIsLoaded(true);
+      //console.log(data);
+    }).catch((error) => {
+      console.error(error);
       setIsLoaded(true);
     });
   } 
@@ -135,15 +137,13 @@ export function Agent() {
       <div className="p-4 mb-10">
         <div className="grid grid-cols-2 gap-4">
           
-          {sentiment.map(({ sentiment, rating, recomendation, ...rest }) => (
+          {sentiment.map(({ sentiment, rating, recommendation, ...rest }) => (
             <CustomerSentimentCard
-              key={sentiment}
+              key={1}
               {...rest}
               sentiment={sentiment}
               rating={rating}
-              footer={
-                recomendation
-              }
+              recommendation={recommendation}
               className="p-4 rounded-lg bg-white shadow-md"
             />
           ))}
